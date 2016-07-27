@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "139425671337",
+    "firebase_url": "https://triibe-user-app.firebaseio.com",
+    "project_id": "triibe-user-app",
+    "storage_bucket": "triibe-user-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:139425671337:android:39283e62faaec7e2",
+        "android_client_info": {
+          "package_name": "com.example.triibe.triibeuserapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "139425671337-92ivv2bnqi6s0mabvvt03g4nkrra86sk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.triibe.triibeuserapp",
+            "certificate_hash": "E31D3CA6E3EC041F9E77AEB66D7848E21E0BFC71"
+          }
+        },
+        {
+          "client_id": "139425671337-5j4b0c3fajfj5s6d5an161rui3gemdsr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkbjvNX8w6oOIBB7OZsW3DJgDbq3foEeY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "139425671337-5j4b0c3fajfj5s6d5an161rui3gemdsr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

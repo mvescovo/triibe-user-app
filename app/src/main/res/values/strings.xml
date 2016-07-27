@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">TRIIBE user app</string>
+
+    <!--AuthUiActivity-->
+    <string name="unknown_response">Unexpected onActivityResult response code</string>
+    <string name="sign_in_cancelled">Sign in cancelled</string>
+    <string name="unknown_sign_in_response">Unknown response from AuthUI sign-in</string>
 </resources>
