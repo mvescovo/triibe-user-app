@@ -5,4 +5,8 @@
     <string name="unknown_response">Unexpected onActivityResult response code</string>
     <string name="sign_in_cancelled">Sign in cancelled</string>
     <string name="unknown_sign_in_response">Unknown response from AuthUI sign-in</string>
+    <string name="sign_out_failed">Sign out failed</string>
+
+    <!--TrackDataActivity Menu-->
+    <string name="sign_out">Sign out</string>
 </resources>
