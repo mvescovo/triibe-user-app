@@ -15,7 +15,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".trackData.TrackDataActivity"></activity>
+        <activity android:name=".trackData.TrackDataActivity" />
+        <activity
+            android:name=".takeSurvey.TakeSurveyActivity"
+            android:label="@string/title_activity_take_survey"
+            android:parentActivityName=".trackData.TrackDataActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.triibe.triibeuserapp.trackData.TrackDataActivity" />
+        </activity>
     </application>
 
 </manifest>

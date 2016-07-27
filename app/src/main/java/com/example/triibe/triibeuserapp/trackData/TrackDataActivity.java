@@ -16,6 +16,7 @@ import android.view.View;
 
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.auth.AuthUiActivity;
+import com.example.triibe.triibeuserapp.takeSurvey.TakeSurveyActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -29,6 +30,12 @@ public class TrackDataActivity extends AppCompatActivity {
     private static final String TAG = "TrackDataActivity";
     @BindView(android.R.id.content)
     View mRootView;
+
+    @BindView(R.id.start_tracking_button)
+    View mStartTrackingButton;
+
+    @BindView(R.id.stop_tracking_button)
+    View mStopTrackingButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,5 +114,21 @@ public class TrackDataActivity extends AppCompatActivity {
     private void showSnackbar(@StringRes int errorMessageRes) {
         Snackbar.make(mRootView, errorMessageRes, Snackbar.LENGTH_LONG)
                 .show();
+    }
+
+    public void takeSurvey(View view) {
+        startActivity(new Intent(this, TakeSurveyActivity.class));
+    }
+
+    public void startDataTracking(View view) {
+        Snackbar.make(mRootView, getString(R.string.started_data_tracking), Snackbar.LENGTH_LONG).show();
+        mStartTrackingButton.setVisibility(View.GONE);
+        mStopTrackingButton.setVisibility(View.VISIBLE);
+    }
+
+    public void stopDataTracking(View view) {
+        Snackbar.make(mRootView, getString(R.string.stopped_data_tracking), Snackbar.LENGTH_LONG).show();
+        mStopTrackingButton.setVisibility(View.GONE);
+        mStartTrackingButton.setVisibility(View.VISIBLE);
     }
 }
