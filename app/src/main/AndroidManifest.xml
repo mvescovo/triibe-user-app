@@ -8,23 +8,29 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".auth.AuthUiActivity">
+
+        <activity
+            android:name=".auth.AuthUiActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".trackData.TrackDataActivity" />
+
+        <activity
+            android:name=".trackData.TrackDataActivity"
+            android:label="@string/title_activity_track_data" />
+
         <activity
             android:name=".takeSurvey.TakeSurveyActivity"
             android:label="@string/title_activity_take_survey"
-            android:parentActivityName=".trackData.TrackDataActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName=".trackData.TrackDataActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.triibe.triibeuserapp.trackData.TrackDataActivity" />
         </activity>
+
     </application>
 
 </manifest>

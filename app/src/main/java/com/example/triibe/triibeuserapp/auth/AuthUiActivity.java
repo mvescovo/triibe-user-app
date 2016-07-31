@@ -28,6 +28,7 @@ import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.trackData.TrackDataActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,6 +54,8 @@ public class AuthUiActivity extends AppCompatActivity {
                     AuthUI.getInstance()
                             .createSignInIntentBuilder()
                             .setProviders(AuthUI.GOOGLE_PROVIDER)
+                            .setLogo(R.drawable.the_westfield_group_logo)
+                            .setTheme(R.style.AppTheme)
                             .build(),
                     RC_SIGN_IN);
         }

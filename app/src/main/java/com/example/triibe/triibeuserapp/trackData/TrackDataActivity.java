@@ -17,6 +17,7 @@ import android.view.View;
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.auth.AuthUiActivity;
 import com.example.triibe.triibeuserapp.takeSurvey.TakeSurveyActivity;
+import com.example.triibe.triibeuserapp.util.Globals;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -27,7 +28,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class TrackDataActivity extends AppCompatActivity {
+
     private static final String TAG = "TrackDataActivity";
+
     @BindView(android.R.id.content)
     View mRootView;
 
@@ -42,6 +45,10 @@ public class TrackDataActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track_data);
         ButterKnife.bind(this);
+
+        if (!Globals.getInstance().isFirebasePersistenceSet()) {
+            Globals.getInstance().setFirebasePersistenceEnabled();
+        }
 
         displayProfileInfo();
     }
