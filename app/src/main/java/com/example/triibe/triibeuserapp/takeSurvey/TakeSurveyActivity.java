@@ -1,5 +1,6 @@
 package com.example.triibe.triibeuserapp.takeSurvey;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -37,6 +39,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -147,7 +151,8 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         ValueEventListener answerListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<List<Answer>> t = new GenericTypeIndicator<List<Answer>>() {};
+                GenericTypeIndicator<List<Answer>> t = new GenericTypeIndicator<List<Answer>>() {
+                };
                 mAnswers = (ArrayList<Answer>) dataSnapshot.getValue(t);
                 mLoadSurveyProgressBar.setVisibility(View.GONE);
 
@@ -198,6 +203,21 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         if (!question.getIntro().contentEquals("")) {
             mIntro.setVisibility(View.VISIBLE);
             mIntro.setText(question.getIntro());
+
+            if (question.getIntroLinkKey() != null && question.getIntroLinkUrl() != null) {
+                Linkify.TransformFilter mentionFilter = new Linkify.TransformFilter() {
+                    public final String transformUrl(final Matcher match, String url) {
+                        return question.getIntroLinkUrl();
+                    }
+                };
+
+                Pattern pattern = Pattern.compile(question.getIntroLinkKey());
+                String scheme = "";
+                Linkify.addLinks(mIntro, pattern, scheme, null, mentionFilter);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    mIntro.setLinkTextColor(getResources().getColor(R.color.linkColor, getTheme()));
+                }
+            }
         } else {
             mIntro.setVisibility(View.GONE);
         }

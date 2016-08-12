@@ -88,7 +88,6 @@
                 android:visibility="gone" />
 
             <TextView
-                android:autoLink="web"
                 android:id="@+id/query"
                 style="@style/Base.TextAppearance.AppCompat.Body1"
                 android:layout_width="wrap_content"
@@ -140,7 +139,7 @@
                 android:layout_height="wrap_content"
                 android:onClick="addNewQuestion"
                 android:text="@string/add_question"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
         </LinearLayout>
 
