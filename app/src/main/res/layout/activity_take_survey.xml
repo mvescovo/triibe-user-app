@@ -5,6 +5,13 @@
     android:layout_height="match_parent"
     tools:context=".takeSurvey.TakeSurveyActivity">
 
+    <ProgressBar
+        android:id="@+id/load_survey_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
     <RelativeLayout
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
@@ -30,6 +37,7 @@
             android:progressTint="@color/colorPrimary" />
 
         <Button
+            android:id="@+id/next_button"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,9 +48,9 @@
     </RelativeLayout>
 
     <ScrollView
-        android:layout_above="@id/bottom_nav"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_nav">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -63,6 +71,7 @@
 
             <TextView
                 android:id="@+id/title"
+                style="@style/Base.TextAppearance.AppCompat.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
@@ -71,6 +80,7 @@
 
             <TextView
                 android:id="@+id/intro"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -78,16 +88,26 @@
                 android:visibility="gone" />
 
             <TextView
-                android:id="@+id/question"
+                android:autoLink="web"
+                android:id="@+id/query"
+                style="@style/Base.TextAppearance.AppCompat.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/question"
+                android:text="@string/query"
                 android:visibility="gone" />
 
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/radio_group"
                 android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/checkbox_group"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:orientation="vertical"
@@ -107,15 +127,6 @@
 
             </android.support.design.widget.TextInputLayout>
 
-
-            <LinearLayout
-                android:id="@+id/checkbox_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="vertical"
-                android:visibility="gone" />
-
             <LinearLayout
                 android:id="@+id/edit_text_group"
                 android:layout_width="match_parent"
@@ -129,7 +140,7 @@
                 android:layout_height="wrap_content"
                 android:onClick="addNewQuestion"
                 android:text="@string/add_question"
-                android:visibility="gone" />
+                android:visibility="visible" />
 
         </LinearLayout>
 

@@ -30,10 +30,13 @@
     <string name="question_logo">Question logo</string>
     <string name="title">Title</string>
     <string name="intro">Intro</string>
-    <string name="question">Question</string>
-    <string name="answer">Answer</string>
+    <string name="query">Query</string>
+    <string name="response">Answer</string>
     <string name="image_url">Image url</string>
     <string name="next_question">NEXT &gt;</string>
     <string name="previous_question">&lt; BACK</string>
-    <string name="add_question">Add question</string>
+    <string name="add_question">Add query</string>
+    <string name="at_first_question">You are at the first question</string>
+    <string name="question_incomplete">Question incomplete</string>
+    <string name="finish_survey">Finish</string>
 </resources>

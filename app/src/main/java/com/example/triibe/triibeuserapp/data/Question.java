@@ -10,22 +10,29 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Question {
 
+    private String id;
     private String imageUrl;
     private String title;
     private String intro;
-    private String question;
-    private Answer answer;
+    private Query query;
 
-    public Question() {
+    // Empty constructor required for firebase
+    public Question() {}
 
-    }
-
-    public Question(String imageUrl, String title, String intro, String question, Answer answer) {
+    public Question(String id, String imageUrl, String title, String intro, Query query) {
+        this.id = id;
         this.imageUrl = imageUrl;
         this.title = title;
         this.intro = intro;
-        this.question = question;
-        this.answer = answer;
+        this.query = query;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getImageUrl() {
@@ -52,19 +59,11 @@ public class Question {
         this.intro = intro;
     }
 
-    public String getQuestion() {
-        return question;
+    public Query getQuery() {
+        return query;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
-    public Answer getAnswer() {
-        return answer;
-    }
-
-    public void setAnswer(Answer answer) {
-        this.answer = answer;
+    public void setQuery(Query query) {
+        this.query = query;
     }
 }

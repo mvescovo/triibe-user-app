@@ -1,13 +1,16 @@
 package com.example.triibe.triibeuserapp.takeSurvey;
 
+import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,33 +21,39 @@ import android.widget.TextView;
 
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.Answer;
+import com.example.triibe.triibeuserapp.data.Option;
+import com.example.triibe.triibeuserapp.data.Query;
 import com.example.triibe.triibeuserapp.data.Question;
 import com.example.triibe.triibeuserapp.data.Survey;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TakeSurveyActivity extends AppCompatActivity {
+public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher {
 
     private static final String TAG = "TakeSurveyActivity";
 
     private DatabaseReference mDatabase;
-    private Map<String, Question> mQuestions;
+    private ArrayList<Question> mQuestions;
+    private ArrayList<Answer> mAnswers;
+    private boolean mDownloadedAnswers;
     private int mCurrentQuestionNum;
+    private String mUserId;
+
+    @BindView(R.id.load_survey_progress_bar)
+    ProgressBar mLoadSurveyProgressBar;
 
     @BindView(R.id.question_logo)
     ImageView mImage;
@@ -55,11 +64,14 @@ public class TakeSurveyActivity extends AppCompatActivity {
     @BindView(R.id.intro)
     TextView mIntro;
 
-    @BindView(R.id.question)
-    TextView mQuestion;
+    @BindView(R.id.query)
+    TextView mQuery;
 
     @BindView(R.id.radio_group)
     RadioGroup mRadioGroup;
+
+    @BindView(R.id.checkbox_group)
+    LinearLayout mCheckboxGroup;
 
     @BindView(R.id.text_input_layout)
     TextInputLayout mTextInputLayout;
@@ -67,14 +79,14 @@ public class TakeSurveyActivity extends AppCompatActivity {
     @BindView(R.id.text_input_edit_text)
     TextInputEditText mTextInputEditText;
 
-    @BindView(R.id.checkbox_group)
-    LinearLayout mCheckboxGroup;
-
     @BindView(R.id.edit_text_group)
     LinearLayout mEditTextGroup;
 
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
+
+    @BindView(R.id.next_button)
+    Button mNextButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,18 +94,37 @@ public class TakeSurveyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_take_survey);
         ButterKnife.bind(this);
 
+        mLoadSurveyProgressBar.setVisibility(View.VISIBLE);
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            // User is signed in
+            mUserId = user.getUid();
+        } else {
+            // User is signed out
+            mUserId = "invalidUser";
+        }
+
+//        mUserId = "testUser5";
+
+        mDownloadedAnswers = false;
+        mCurrentQuestionNum = 1;
         getQuestions();
     }
 
+    /*
+    * Sync the questions from firebase.
+    * */
     private void getQuestions() {
-        ValueEventListener surveyListener = new ValueEventListener() {
+        ValueEventListener questionListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Survey object and use the values to update the UI
-                Survey survey = dataSnapshot.getValue(Survey.class);
-                if (survey != null) {
-                    mQuestions = survey.getQuestions();
+                GenericTypeIndicator<List<Question>> t = new GenericTypeIndicator<List<Question>>() {
+                };
+                mQuestions = (ArrayList<Question>) dataSnapshot.getValue(t);
+
+                if (mQuestions != null) {
                     displayCurrentQuestion();
                 } else {
                     Log.i(TAG, "onDataChange: No questions in survey");
@@ -102,27 +133,55 @@ public class TakeSurveyActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Getting Survey failed, log a message
-                Log.w(TAG, "loadSurvey:onCancelled", databaseError.toException());
+                // Getting questions failed, log a message
+                Log.w(TAG, "loadQuestions:onCancelled", databaseError.toException());
             }
         };
-        mDatabase.child("surveys").child("survey1").addValueEventListener(surveyListener);
+        mDatabase.child("surveys").child("triibeUser").child("questions").addValueEventListener(questionListener);
     }
 
+    /*
+    * Sync the answers from firebase.
+    * */
+    private void getAnswers() {
+        ValueEventListener answerListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<List<Answer>> t = new GenericTypeIndicator<List<Answer>>() {};
+                mAnswers = (ArrayList<Answer>) dataSnapshot.getValue(t);
+                mLoadSurveyProgressBar.setVisibility(View.GONE);
+
+                if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum && !mDownloadedAnswers) {
+                    displayCurrentAnswer();
+                } else {
+                    Log.d(TAG, "onDataChange: No answers in survey");
+                }
+
+                mDownloadedAnswers = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting answers failed, log a message
+                Log.w(TAG, "loadAnswers:onCancelled", databaseError.toException());
+            }
+        };
+        mDatabase.child("surveys").child("triibeUser").child("answers").child(mUserId).addValueEventListener(answerListener);
+    }
+
+    /*
+    * Unmarshal the current question and display to the user.
+    * */
     private void displayCurrentQuestion() {
         mRadioGroup.setVisibility(View.GONE);
         mCheckboxGroup.setVisibility(View.GONE);
         mTextInputLayout.setVisibility(View.GONE);
         mEditTextGroup.setVisibility(View.GONE);
 
-        if (mCurrentQuestionNum == 0 && mQuestions.size() > 0) {
-            mCurrentQuestionNum++;
-        }
-
         float progress = (float) mCurrentQuestionNum / mQuestions.size() * 100;
         mProgressBar.setProgress((int) progress);
 
-        Question question = mQuestions.get("question" + mCurrentQuestionNum);
+        final Question question = mQuestions.get(mCurrentQuestionNum - 1);
 
         if (!question.getImageUrl().contentEquals("")) {
             mImage.setVisibility(View.VISIBLE);
@@ -142,337 +201,523 @@ public class TakeSurveyActivity extends AppCompatActivity {
         } else {
             mIntro.setVisibility(View.GONE);
         }
-        if (!question.getQuestion().contentEquals("")) {
-            mQuestion.setVisibility(View.VISIBLE);
-            mQuestion.setText(question.getQuestion());
+        if (!question.getQuery().getPhrase().contentEquals("")) {
+            mQuery.setVisibility(View.VISIBLE);
+            mQuery.setText(question.getQuery().getPhrase());
         } else {
-            mQuestion.setVisibility(View.GONE);
+            mQuery.setVisibility(View.GONE);
         }
 
-        switch (question.getAnswer().getFormatType()) {
+        switch (question.getQuery().getType()) {
             case "radio":
                 mRadioGroup.removeAllViews();
                 mRadioGroup.setVisibility(View.VISIBLE);
-                for (Map.Entry<String, Object> entry : question.getAnswer().getAnswer().entrySet()) {
-                    String key = entry.getKey();
-                    Object value = entry.getValue();
 
-                    if (value instanceof String) {
-                        RadioButton radioButton = new RadioButton(this);
-                        radioButton.setText(key);
-                        radioButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                onRadioButtonClicked(view);
-                            }
-                        });
-                        mRadioGroup.addView(radioButton);
-                        if (((String) value).contentEquals("true")) {
-                            radioButton.toggle();
+                for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+                    RadioButton radioButton = new RadioButton(this);
+                    radioButton.setText(question.getQuery().getOptions().get(i).getPhrase());
+                    radioButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            onRadioButtonClicked(view);
                         }
-                    } else if (value instanceof Map) {
-                        Map<String, Object> convertedValue = (Map<String, Object>) value;
-                        for (Map.Entry<String, Object> insideEntry : convertedValue.entrySet()) {
-                            String insideKey = insideEntry.getKey();
-                            Object insideValue = insideEntry.getValue();
+                    });
+                    mRadioGroup.addView(radioButton, i);
+                }
+                break;
+            case "checkbox":
+                mCheckboxGroup.removeAllViews();
+                mCheckboxGroup.setVisibility(View.VISIBLE);
 
-                            if (((String) insideValue).contentEquals("false") || ((String) insideValue).contentEquals("true")) {
-                                RadioButton radioButton = new RadioButton(this);
-                                radioButton.setText(insideKey);
-                                radioButton.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        onRadioButtonClicked(view);
-                                    }
-                                });
-                                mRadioGroup.addView(radioButton);
-                                if (((String) insideValue).contentEquals("true")) {
-                                    radioButton.toggle();
-                                }
-                            } else {
+                for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+                    CheckBox checkBox = new CheckBox(this);
+                    checkBox.setText(question.getQuery().getOptions().get(i).getPhrase());
+                    checkBox.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            onCheckboxClicked(view);
+                        }
+                    });
+                    mCheckboxGroup.addView(checkBox, i);
+                }
+                break;
+            case "text":
+                mEditTextGroup.removeAllViews();
+                mEditTextGroup.setVisibility(View.VISIBLE);
+
+                for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+                    final TextInputEditText textInputEditText = new TextInputEditText(this);
+                    textInputEditText.setHint(question.getQuery().getOptions().get(i).getPhrase());
+                    mEditTextGroup.addView(textInputEditText, i);
+                    if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_PHONE")) {
+                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_PHONE);
+                    } else if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("TYPE_TEXT_VARIATION_EMAIL_ADDRESS")) {
+                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                    } else {
+                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
+                    }
+                }
+                break;
+        }
+
+        if (!mDownloadedAnswers) {
+            getAnswers();
+        } else {
+            displayCurrentAnswer();
+        }
+    }
+
+    /*
+    * Unmarshal the current answer and display to the user.
+    * */
+    private void displayCurrentAnswer() {
+        mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+        Question question = mQuestions.get(mCurrentQuestionNum - 1);
+        if (mAnswers.size() < mCurrentQuestionNum) {
+            // No answer to display
+            return;
+        }
+        Answer answer = mAnswers.get(mCurrentQuestionNum - 1);
+
+        switch (answer.getType()) {
+            case "radio":
+                if (answer.getSelectedOptions() != null) {
+                    for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+                        if (((RadioButton) mRadioGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(0).getPhrase())) {
+                            ((RadioButton) mRadioGroup.getChildAt(i)).toggle();
+                            if (question.getQuery().getOptions().get(i).HasExtraInput()) {
                                 mTextInputLayout.setVisibility(View.VISIBLE);
-                                mTextInputEditText.setHint(insideKey);
-                                mTextInputEditText.setText((String) insideValue);
+                                mTextInputEditText.setVisibility(View.VISIBLE);
+                                mTextInputEditText.setText("");
+                                if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+                                        question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
+                                    mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                }
+                                mTextInputEditText.requestFocus();
+                                if (answer.getSelectedOptions().get(0).getExtraInput() != null) {
+                                    mTextInputEditText.append(answer.getSelectedOptions().get(0).getExtraInput());
+                                }
+                                mTextInputEditText.setHint(answer.getSelectedOptions().get(0).getExtraInputHint());
+                                mTextInputEditText.addTextChangedListener(this);
+                            } else {
+                                mTextInputEditText.setText("");
+                                mTextInputEditText.setVisibility(View.GONE);
+                                mTextInputEditText.removeTextChangedListener(this);
                             }
                         }
                     }
                 }
                 break;
             case "checkbox":
-                mCheckboxGroup.removeAllViews();
-                mCheckboxGroup.setVisibility(View.VISIBLE);
-                for (Map.Entry<String, Object> entry : question.getAnswer().getAnswer().entrySet()) {
-                    String key = entry.getKey();
-                    Object value = entry.getValue();
-
-                    if (value instanceof String) {
-                        CheckBox checkbox = new CheckBox(this);
-                        checkbox.setText(key);
-                        checkbox.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                onCheckboxClicked(view);
-                            }
-                        });
-                        mCheckboxGroup.addView(checkbox);
-                        if (((String) value).contentEquals("true")) {
-                            checkbox.setChecked(true);
-                        }
-                    } else if (value instanceof Map) {
-                        Map<String, Object> convertedValue = (Map<String, Object>) value;
-                        for (Map.Entry<String, Object> insideEntry : convertedValue.entrySet()) {
-                            String insideKey = insideEntry.getKey();
-                            Object insideValue = insideEntry.getValue();
-
-                            if (((String) insideValue).contentEquals("false") || ((String) insideValue).contentEquals("true")) {
-                                CheckBox checkbox = new CheckBox(this);
-                                checkbox.setText(key);
-                                checkbox.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        onCheckboxClicked(view);
+                if (answer.getSelectedOptions() != null) {
+                    for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+                        for (int j = 0; j < answer.getSelectedOptions().size(); j++) {
+                            if (((CheckBox) mCheckboxGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(j).getPhrase())) {
+                                ((CheckBox) mCheckboxGroup.getChildAt(i)).toggle();
+                                if (question.getQuery().getOptions().get(i).HasExtraInput()) {
+                                    mTextInputLayout.setVisibility(View.VISIBLE);
+                                    mTextInputEditText.setVisibility(View.VISIBLE);
+                                    mTextInputEditText.setText("");
+                                    if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+                                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
+                                        mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
                                     }
-                                });
-                                mCheckboxGroup.addView(checkbox);
-                                if (((String) insideValue).contentEquals("true")) {
-                                    checkbox.setChecked(true);
+                                    mTextInputEditText.requestFocus();
+
+                                    for (int k = 0; k < mQuestions.get(mCurrentQuestionNum - 1).getQuery().getOptions().size(); k++) {
+                                        if (mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions().get(k).getExtraInput() != null) {
+                                            mTextInputEditText.append(answer.getSelectedOptions().get(k).getExtraInput());
+                                        }
+                                    }
+
+                                    mTextInputEditText.setHint(answer.getSelectedOptions().get(i).getExtraInputHint());
+                                    mTextInputEditText.addTextChangedListener(this);
+                                } else {
+                                    mTextInputEditText.setText("");
+                                    mTextInputEditText.setVisibility(View.GONE);
+                                    mTextInputEditText.removeTextChangedListener(this);
                                 }
-                            } else {
-                                mTextInputLayout.setVisibility(View.VISIBLE);
-                                mTextInputEditText.setHint(insideKey);
-                                mTextInputEditText.setText((String) insideValue);
                             }
                         }
                     }
                 }
                 break;
             case "text":
-                mEditTextGroup.removeAllViews();
-                mEditTextGroup.setVisibility(View.VISIBLE);
-                for (Map.Entry<String, Object> entry : question.getAnswer().getAnswer().entrySet()) {
-                    String key = entry.getKey();
-                    Object value = entry.getValue();
+                if (answer.getSelectedOptions() != null) {
+                    for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+                        final int viewNumber = i;
+                        for (int j = 0; j < answer.getSelectedOptions().size(); j++) {
+                            if (((TextInputEditText) mEditTextGroup.getChildAt(i)).getHint().equals(answer.getSelectedOptions().get(j).getPhrase())) {
+                                ((TextInputEditText) mEditTextGroup.getChildAt(i)).setText(answer.getSelectedOptions().get(j).getExtraInput());
+                                if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+                                        question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_PHONE")) {
+                                    ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_PHONE);
+                                } else if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+                                        question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("TYPE_TEXT_VARIATION_EMAIL_ADDRESS")) {
+                                    ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                                } else {
+                                    ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
+                                }
+                            }
+                            ((TextInputEditText) mEditTextGroup.getChildAt(i)).addTextChangedListener(new TextWatcher() {
+                                @Override
+                                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                    final TextInputEditText textInputEditText = new TextInputEditText(this);
-                    textInputEditText.setText(value.toString());
-                    textInputEditText.setHint(key);
-                    textInputEditText.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                                }
 
+                                @Override
+                                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                                    onTextInputEditTextChanged(viewNumber);
+                                }
+
+                                @Override
+                                public void afterTextChanged(Editable editable) {
+
+                                }
+                            });
                         }
-
-                        @Override
-                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                            onTextInputEditTextClicked(textInputEditText);
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable editable) {
-
-                        }
-                    });
-                    mEditTextGroup.addView(textInputEditText);
+                    }
                 }
                 break;
         }
     }
 
-    public void onRadioButtonClicked(View view) {
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
-        Map<String, Object> answer = new HashMap<>();
-
-        // Check which radio button was clicked
-        Question question = mQuestions.get("question" + mCurrentQuestionNum);
-        for (Map.Entry<String, Object> entry : question.getAnswer().getAnswer().entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-
-            if (value instanceof String) {
-                if (((RadioButton) view).getText().equals(key)) {
-                    if (checked) {
-                        answer.put(key, "true");
-                    } else {
-                        answer.put(key, "false");
+    /*
+    * Update the answer on firebase when the user changes the "extra text".
+    * Does not include answers with all text fields, just the ones with a "other" option.
+    * */
+    public void onExtraTextChanged(CharSequence charSequence) {
+        switch (mQuestions.get(mCurrentQuestionNum - 1).getQuery().getType()) {
+            case "radio":
+                mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions().get(0).setExtraInput(charSequence.toString());
+                break;
+            case "checkbox":
+                for (int i = 0; i < mQuestions.get(mCurrentQuestionNum - 1).getQuery().getOptions().size(); i++) {
+                    if (mQuestions.get(mCurrentQuestionNum - 1).getQuery().getOptions().get(i).HasExtraInput()) {
+                        mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions().get(i).setExtraInput(charSequence.toString());
                     }
-                } else {
-                    answer.put(key, "false");
                 }
-            } else if (value instanceof Map) {
-                Map<String, Object> radioText = new HashMap<>();
+                break;
+        }
 
-                if (key.contentEquals("radiotext")) {
-                    Map<String, Object> convertedValue = (Map<String, Object>) value;
-                    for (Map.Entry<String, Object> innerEntry : convertedValue.entrySet()) {
-                        String innerKey = innerEntry.getKey();
-                        Object innerValue = innerEntry.getValue();
+        // Add the answer to firebase
+        mDatabase.child("surveys").child("triibeUser").child("answers").child(mUserId).setValue(mAnswers);
+    }
 
-                        if ((innerValue.toString().contentEquals("false")) || (innerValue.toString().contentEquals("true"))) {
-                            // Got the radio button question (in this inner hashmap)
-                            if (((RadioButton) view).getText().equals(innerKey)) {
-                                if (checked) {
-                                    radioText.put(innerKey, "true");
-                                } else {
-                                    radioText.put(innerKey, "false");
-                                }
-                            } else {
-                                radioText.put(innerKey, "false");
-                            }
-                        } else {
-                            // Got the EditText question (in this inner hashmap)
-                            radioText.put(innerKey, mTextInputEditText.getText().toString());
-                        }
+    /*
+    * Update the answer on firebase when the user selects a radio option.
+    * */
+    public void onRadioButtonClicked(View view) {
+        mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+        Question question = mQuestions.get(mCurrentQuestionNum - 1);
+
+        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+            if (question.getQuery().getOptions().get(i).getPhrase().contentEquals(((RadioButton) view).getText())) {
+                if (question.getQuery().getOptions().get(i).HasExtraInput()) {
+                    mTextInputLayout.setVisibility(View.VISIBLE);
+                    mTextInputEditText.setVisibility(View.VISIBLE);
+                    mTextInputEditText.addTextChangedListener(this);
+                    mTextInputEditText.setHint(question.getQuery().getOptions().get(i).getExtraInputHint());
+                    if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
+                        mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
                     }
-                    answer.put("radiotext", radioText);
+                    mTextInputEditText.requestFocus();
+
+                } else {
+                    mTextInputEditText.setText("");
+                    mTextInputEditText.setHint("");
+                    mTextInputEditText.setVisibility(View.GONE);
+                    mTextInputEditText.removeTextChangedListener(this);
                 }
             }
         }
-        mQuestions.get("question" + mCurrentQuestionNum).getAnswer().setAnswer(answer);
-        updateQuestions(mQuestions);
+
+        ArrayList<Option> selectedOptions = new ArrayList<>();
+
+        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+            Option option = question.getQuery().getOptions().get(i);
+            if (option.getPhrase().contentEquals(((RadioButton) view).getText())) {
+                selectedOptions.add(option);
+            }
+        }
+
+        Answer answer = new Answer(Integer.toString(mCurrentQuestionNum), "radio", selectedOptions);
+        if (mAnswers == null) {
+            mAnswers = new ArrayList<>();
+        }
+        if (mAnswers.size() > mCurrentQuestionNum - 1) {
+            mAnswers.remove(mCurrentQuestionNum - 1);
+        }
+        if (mAnswers.size() > 0) {
+            mAnswers.add(mCurrentQuestionNum - 1, answer);
+        } else {
+            mAnswers.add(answer);
+        }
+
+        // Add the answer to firebase
+        mDatabase.child("surveys").child("triibeUser").child("answers").child(mUserId).setValue(mAnswers);
     }
 
+    /*
+    * Update the answer on firebase when the user selects a checkbox option.
+    * */
     public void onCheckboxClicked(View view) {
+        mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
         // Is the view now checked?
         boolean checked = ((CheckBox) view).isChecked();
-        Map<String, Object> answer = new HashMap<>();
 
-        // Check which checkbox was clicked
-        Question question = mQuestions.get("question" + mCurrentQuestionNum);
-        for (Map.Entry<String, Object> entry : question.getAnswer().getAnswer().entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
+        Question question = mQuestions.get(mCurrentQuestionNum - 1);
+        Option dummyOption = new Option("", false);
 
-            if (value instanceof String) {
-                if (((CheckBox) view).getText().equals(key)) {
-                    if (checked) {
-                        answer.put(key, "true");
-                    } else {
-                        answer.put(key, "false");
+        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+            if (question.getQuery().getOptions().get(i).getPhrase().contentEquals(((CheckBox) view).getText())) {
+                if (question.getQuery().getOptions().get(i).HasExtraInput() && checked) {
+                    mTextInputLayout.setVisibility(View.VISIBLE);
+                    mTextInputEditText.setVisibility(View.VISIBLE);
+                    mTextInputEditText.addTextChangedListener(this);
+                    mTextInputEditText.setHint(question.getQuery().getOptions().get(i).getExtraInputHint());
+                    if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
+                        mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
                     }
-                } else {
-                    answer.put(key, "false");
+                    mTextInputEditText.requestFocus();
+
+                } else if (question.getQuery().getOptions().get(i).HasExtraInput() && !checked) {
+                    mTextInputEditText.setText("");
+                    mTextInputEditText.setHint("");
+                    mTextInputEditText.setVisibility(View.GONE);
+                    mTextInputEditText.removeTextChangedListener(this);
                 }
-            } else if (value instanceof Map) {
-                Map<String, Object> checkboxText = new HashMap<>();
+            }
+        }
 
-                if (key.contentEquals("checkboxtext")) {
-                    Map<String, Object> convertedValue = (Map<String, Object>) value;
-                    for (Map.Entry<String, Object> innerEntry : convertedValue.entrySet()) {
-                        String innerKey = innerEntry.getKey();
-                        Object innerValue = innerEntry.getValue();
+        ArrayList<Option> selectedOptions;
+        if (mAnswers.size() < mCurrentQuestionNum) {
+            selectedOptions = new ArrayList<>();
+        } else {
+            selectedOptions = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
+            if (selectedOptions == null) {
+                selectedOptions = new ArrayList<>();
+            }
+        }
 
-                        if ((innerValue.toString().contentEquals("false")) || (innerValue.toString().contentEquals("true"))) {
-                            // Got the checkbox button question (in this inner hashmap)
-                            if (((CheckBox) view).getText().equals(innerKey)) {
-                                if (checked) {
-                                    checkboxText.put(innerKey, "true");
-                                } else {
-                                    checkboxText.put(innerKey, "false");
-                                }
-                            } else {
-                                checkboxText.put(innerKey, "false");
-                            }
-                        } else {
-                            // Got the EditText question (in this inner hashmap)
-                            checkboxText.put(innerKey, mTextInputEditText.getText().toString());
+        if (selectedOptions.size() < question.getQuery().getOptions().size()) {
+            int optionsSize = question.getQuery().getOptions().size() - selectedOptions.size();
+            for (int i = 0; i < optionsSize; i++) {
+                selectedOptions.add(i, dummyOption);
+            }
+        }
+
+        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+            Option option = question.getQuery().getOptions().get(i);
+            if (option.getPhrase().contentEquals(((CheckBox) view).getText())) {
+                if (checked) {
+                    selectedOptions.remove(i);
+                    selectedOptions.add(i, option);
+                } else {
+                    selectedOptions.remove(i);
+                    selectedOptions.add(i, dummyOption);
+                }
+            }
+        }
+
+        Answer answer = new Answer(Integer.toString(mCurrentQuestionNum), "checkbox", selectedOptions);
+        if (mAnswers == null) {
+            mAnswers = new ArrayList<>();
+        }
+        if (mAnswers.size() > mCurrentQuestionNum - 1) {
+            mAnswers.remove(mCurrentQuestionNum - 1);
+        }
+        if (mAnswers.size() > 0) {
+            mAnswers.add(mCurrentQuestionNum - 1, answer);
+        } else {
+            mAnswers.add(answer);
+        }
+
+        // Add the answer to firebase
+        mDatabase.child("surveys").child("triibeUser").child("answers").child(mUserId).setValue(mAnswers);
+    }
+
+    /*
+    * Update the answer on firebase when the user changes input text fields.
+    * */
+    public void onTextInputEditTextChanged(int viewNumber) {
+        Question question = mQuestions.get(mCurrentQuestionNum - 1);
+        Option dummyOption = new Option("", false);
+
+        ArrayList<Option> selectedOptions;
+        if (mAnswers.size() < mCurrentQuestionNum) {
+            selectedOptions = new ArrayList<>();
+        } else {
+            selectedOptions = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
+            if (selectedOptions == null) {
+                selectedOptions = new ArrayList<>();
+            }
+        }
+
+        if (selectedOptions.size() < question.getQuery().getOptions().size()) {
+            int optionsSize = question.getQuery().getOptions().size() - selectedOptions.size();
+            for (int i = 0; i < optionsSize; i++) {
+                selectedOptions.add(i, dummyOption);
+            }
+        }
+
+        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+            Option option = question.getQuery().getOptions().get(i);
+            if (option.getPhrase().contentEquals(((TextInputEditText) mEditTextGroup.getChildAt(viewNumber)).getHint())) {
+                option.setExtraInput(((TextInputEditText) mEditTextGroup.getChildAt(viewNumber)).getText().toString());
+                selectedOptions.remove(i);
+                selectedOptions.add(i, option);
+            }
+        }
+
+        Answer answer = new Answer(Integer.toString(mCurrentQuestionNum), "text", selectedOptions);
+        if (mAnswers == null) {
+            mAnswers = new ArrayList<>();
+        }
+        if (mAnswers.size() > mCurrentQuestionNum - 1) {
+            mAnswers.remove(mCurrentQuestionNum - 1);
+        }
+        if (mAnswers.size() > 0) {
+            mAnswers.add(mCurrentQuestionNum - 1, answer);
+        } else {
+            mAnswers.add(answer);
+        }
+
+        // Add the answer to firebase
+        mDatabase.child("surveys").child("triibeUser").child("answers").child(mUserId).setValue(mAnswers);
+    }
+
+    /*
+    * Go to the next question.
+    * */
+    public void nextQuestion(View view) {
+        if (mNextButton.getText().toString().contentEquals(getString(R.string.finish_survey))) {
+            finish();
+        }
+        if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum) {
+            if (mCurrentQuestionNum < mQuestions.size()) {
+                boolean answerOk = false;
+                Question question = mQuestions.get(mCurrentQuestionNum - 1);
+                if (question.getQuery().getRequiredPhrase() != null) {
+                    String requiredPhrase = mQuestions.get(mCurrentQuestionNum - 1).getQuery().getRequiredPhrase();
+                    ArrayList<Option> options = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
+                    for (int i = 0; i < options.size(); i++) {
+                        if (options.get(i).getPhrase().contentEquals(requiredPhrase)) {
+                            answerOk = true;
                         }
                     }
-                    answer.put("checkboxtext", checkboxText);
+                } else {
+                    ArrayList<Option> options = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
+                    if (question.getQuery().getType().contentEquals("text")) {
+                        answerOk = true;
+                        for (int i = 0; i < options.size(); i++) {
+                            if (options.get(i).getExtraInput().contentEquals("")) {
+                                answerOk = false;
+                            }
+                        }
+                    } else {
+                        for (int i = 0; i < options.size(); i++) {
+                            if (!options.get(i).getPhrase().contentEquals("")) {
+                                answerOk = !options.get(i).HasExtraInput() || options.get(i).getExtraInput() != null && !options.get(i).getExtraInput().contentEquals("");
+                            }
+                        }
+                    }
+                }
+
+                if (answerOk) {
+                    mCurrentQuestionNum++;
+                    mTextInputEditText.removeTextChangedListener(this);
+                    displayCurrentQuestion();
+                    if (mCurrentQuestionNum == mQuestions.size()) {
+                        mNextButton.setText(R.string.finish_survey);
+                    }
+                } else {
+                    if (question.getQuery().getIncorrectAnswerPhrase() != null) {
+                        Snackbar snackbar = Snackbar.make(view, question.getQuery().getIncorrectAnswerPhrase(), Snackbar.LENGTH_SHORT);
+                        snackbar.show();
+                    } else {
+                        Snackbar snackbar = Snackbar.make(view, R.string.question_incomplete, Snackbar.LENGTH_SHORT);
+                        snackbar.show();
+                    }
                 }
             }
-        }
-        mQuestions.get("question" + mCurrentQuestionNum).getAnswer().setAnswer(answer);
-        updateQuestions(mQuestions);
-    }
-
-    public void onTextInputEditTextClicked(View view) {
-        Map<String, Object> answer = new HashMap<>();
-
-        // Check which textInputEditText was clicked
-        Question question = mQuestions.get("question" + mCurrentQuestionNum);
-        for (Map.Entry<String, Object> entry : question.getAnswer().getAnswer().entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-
-            if (((TextInputEditText) view).getHint().toString().equals(key)) {
-                answer.put(key, ((TextInputEditText) view).getText().toString());
-            } else {
-                answer.put(key, value);
-            }
+        } else {
+            Snackbar snackbar = Snackbar.make(view, R.string.question_incomplete, Snackbar.LENGTH_SHORT);
+            snackbar.show();
         }
 
-        mQuestions.get("question" + mCurrentQuestionNum).getAnswer().setAnswer(answer);
-        updateQuestions(mQuestions);
     }
 
-    public void nextQuestion(View view) {
-        if (mCurrentQuestionNum < mQuestions.size()) {
-            mCurrentQuestionNum++;
-            displayCurrentQuestion();
-        }
-    }
-
+    /*
+    * Go to the previous question.
+    * */
     public void previousQuestion(View view) {
+        mNextButton.setText(R.string.next_question);
         if (mCurrentQuestionNum > 1) {
             mCurrentQuestionNum--;
+            mTextInputEditText.removeTextChangedListener(this);
             displayCurrentQuestion();
+        } else {
+            Snackbar snackbar = Snackbar.make(view, R.string.at_first_question, Snackbar.LENGTH_SHORT);
+            snackbar.show();
         }
     }
 
-    private void updateQuestions(Map<String, Question> questions) {
-        Survey newSurvey = new Survey("TRIIBE user survey v1.0", questions);
-        mDatabase.child("surveys").child("survey1").setValue(newSurvey);
-    }
-
+    /*
+    * Helper method to add questions to firebase from the app. Only for manual use.
+    * Set visible/gone the "Add question" button in "activity_take_survey.xml" to enable.
+    * Fill out the appropriate fields before attempting to add a question.
+    * */
     public void addNewQuestion(View view) {
-        Map<String, Object> answer = new HashMap<>();
-        answer.put("Name", "");
-        answer.put("Email", "");
-        answer.put("Phone", "");
-
-        // Comment out or fill out these next 4 lines for radio groups with a text area at the end
-//        Map<String, Object> checkboxtext = new HashMap<>();
-//        checkboxtext.put("Other, please specify:", "false");
-//        checkboxtext.put("textquestion", "");
-//        answer.put("checkboxtext", checkboxtext);
+        // Enter the options
+        ArrayList<Option> options = new ArrayList<>();
+        Option option1 = new Option("$0 - $18,200", false);
+        Option option2 = new Option("$18,201 - $37,000", false);
+        Option option3 = new Option("$37,001 - $80,000", false);
+        Option option4 = new Option("$80,001 - $180,000", false);
+        Option option5 = new Option("$180,001 and over", false);
+        options.add(option1);
+        options.add(option2);
+        options.add(option3);
+        options.add(option4);
+        options.add(option5);
 
         // Enter the answer type. E.g. "checkbox" or "radio" or "text"
-        Answer newAnswer = new Answer("text", answer);
+        // Enter two extra string paramaters to indicate a required answer. The second one is for the "incorectAnswerPhrase"
+        Query query = new Query("radio", "What is your average annual FAMILY income (in Australian dollars, before tax)?", options);
 
         // Enter the question details
-        Question question = new Question("https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/The_Westfield_Group_logo.svg/500px-The_Westfield_Group_logo.svg.png", "Prize", "", "Please provide us the following information to perform a draw and award the prize:", newAnswer);
+        Question question = new Question("5", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/The_Westfield_Group_logo.svg/500px-The_Westfield_Group_logo.svg.png", "About You", "", query);
 
-        // Enter the question number below before adding a new question (increment or set the number)
-        mQuestions.put("question31", question);
-
-        updateQuestions(mQuestions);
+        // Add the question
+        mDatabase.child("surveys").child("triibeUser").child("questions").child("7").setValue(question);
+//        mQuestions.add(question);
+//        updateSurvey(mQuestions);
     }
 
-    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
-        List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
-        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
-            @Override
-            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
-                return (o1.getValue()).compareTo(o2.getValue());
-            }
-        });
-
-        Map<K, V> result = new LinkedHashMap<>();
-        for (Map.Entry<K, V> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
-        }
-        return result;
+    /*
+    * Add a whole new survey if all the questions were populated.
+    * */
+    private void updateSurvey(ArrayList<Question> questions) {
+        Survey newSurvey = new Survey("TRIIBE user survey", "2.1", questions);
+        mDatabase.child("surveys").child("triibeUser").setValue(newSurvey);
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            // Respond to the action bar's Up/Home button
-//            case android.R.id.home:
-//                NavUtils.navigateUpFromSameTask(this);
-//                return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        onExtraTextChanged(charSequence);
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+    }
 }

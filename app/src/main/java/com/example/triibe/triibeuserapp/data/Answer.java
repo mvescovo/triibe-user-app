@@ -2,7 +2,7 @@ package com.example.triibe.triibeuserapp.data;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.util.Map;
+import java.util.ArrayList;
 
 /**
  * Answer entity.
@@ -12,31 +12,40 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Answer {
 
-    private String formatType;
-    private Map<String, Object> answer;
+    private String questionId;
+    private String type;
+    ArrayList<Option> selectedOptions;
 
-    public Answer() {
+    // Empty constructor required for firebase
+    public Answer() {}
 
+    public Answer(String questionId, String type, ArrayList<Option> selectedOptions) {
+        this.questionId = questionId;
+        this.type = type;
+        this.selectedOptions = selectedOptions;
     }
 
-    public Answer(String formatType, Map<String, Object> answer) {
-        this.formatType = formatType;
-        this.answer = answer;
+    public String getQuestionId() {
+        return questionId;
     }
 
-    public String getFormatType() {
-        return formatType;
+    public void setQuestionId(String questionId) {
+        this.questionId = questionId;
     }
 
-    public void setFormatType(String formatType) {
-        this.formatType = formatType;
+    public String getType() {
+        return type;
     }
 
-    public Map<String, Object> getAnswer() {
-        return answer;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public void setAnswer(Map<String, Object> answer) {
-        this.answer = answer;
+    public ArrayList<Option> getSelectedOptions() {
+        return selectedOptions;
+    }
+
+    public void setSelectedOptions(ArrayList<Option> selectedOptions) {
+        this.selectedOptions = selectedOptions;
     }
 }

@@ -2,7 +2,7 @@ package com.example.triibe.triibeuserapp.data;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.util.Map;
+import java.util.ArrayList;
 
 /**
  * Survey entity. Used for Firebase realtime database so an entire survey can be
@@ -14,14 +14,15 @@ import java.util.Map;
 public class Survey {
 
     private String description;
-    private Map<String, Question> questions;
+    private String version;
+    private ArrayList<Question> questions;
 
-    public Survey() {
+    // Empty constructor required for firebase
+    public Survey() {}
 
-    }
-
-    public Survey(String description, Map<String, Question> questions) {
+    public Survey(String description, String version, ArrayList<Question> questions) {
         this.description = description;
+        this.version = version;
         this.questions = questions;
     }
 
@@ -33,11 +34,19 @@ public class Survey {
         this.description = description;
     }
 
-    public Map<String, Question> getQuestions() {
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public ArrayList<Question> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(Map<String, Question> questions) {
+    public void setQuestions(ArrayList<Question> questions) {
         this.questions = questions;
     }
 }
