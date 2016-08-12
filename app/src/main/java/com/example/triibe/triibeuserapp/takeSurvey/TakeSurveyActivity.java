@@ -298,7 +298,6 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
 
         if (mAnswers.size() < mCurrentQuestionNum) {
             if (question.getQuery().getType().contentEquals("text")) {
-                Log.i(TAG, "displayCurrentAnswer: displaying text answer");
                 for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
                     final int viewNumber = i;
 
@@ -319,7 +318,6 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
 
                         @Override
                         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                            Log.i(TAG, "onTextChanged: text changed");
                             onTextInputEditTextChanged(viewNumber);
                         }
 
@@ -397,7 +395,6 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                     }
                     break;
                 case "text":
-                    Log.i(TAG, "displayCurrentAnswer: displaying text answer");
                     for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
                         final int viewNumber = i;
 
@@ -418,7 +415,6 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
 
                             @Override
                             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                                Log.i(TAG, "onTextChanged: text changed");
                                 onTextInputEditTextChanged(viewNumber);
                             }
 
@@ -628,7 +624,6 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                 option.setExtraInput(((TextInputEditText) mEditTextGroup.getChildAt(viewNumber)).getText().toString());
                 selectedOptions.remove(i);
                 selectedOptions.add(i, option);
-                Log.i(TAG, "onTextInputEditTextChanged: added option with text: " + ((TextInputEditText) mEditTextGroup.getChildAt(viewNumber)).getText().toString());
             }
         }
 
@@ -653,11 +648,8 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * Go to the next question.
     * */
     public void nextQuestion(View view) {
-        if (mNextButton.getText().toString().contentEquals(getString(R.string.finish_survey))) {
-            finish();
-        }
         if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum) {
-            if (mCurrentQuestionNum < mQuestions.size()) {
+
                 boolean answerOk = false;
                 Question question = mQuestions.get(mCurrentQuestionNum - 1);
                 if (question.getQuery().getRequiredPhrase() != null) {
@@ -687,11 +679,15 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                 }
 
                 if (answerOk) {
-                    mCurrentQuestionNum++;
-                    mTextInputEditText.removeTextChangedListener(this);
-                    displayCurrentQuestion();
-                    if (mCurrentQuestionNum == mQuestions.size()) {
-                        mNextButton.setText(R.string.finish_survey);
+                    if (mNextButton.getText().toString().contentEquals(getString(R.string.finish_survey))) {
+                        finish();
+                    } else {
+                        mCurrentQuestionNum++;
+                        mTextInputEditText.removeTextChangedListener(this);
+                        displayCurrentQuestion();
+                        if (mCurrentQuestionNum == mQuestions.size()) {
+                            mNextButton.setText(R.string.finish_survey);
+                        }
                     }
                 } else {
                     if (question.getQuery().getIncorrectAnswerPhrase() != null) {
@@ -702,7 +698,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                         snackbar.show();
                     }
                 }
-            }
+
         } else {
             Snackbar snackbar = Snackbar.make(view, R.string.question_incomplete, Snackbar.LENGTH_SHORT);
             snackbar.show();
