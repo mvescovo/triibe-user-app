@@ -36,7 +36,7 @@
     <string name="next_question">NEXT &gt;</string>
     <string name="previous_question">&lt; BACK</string>
     <string name="add_question">Add query</string>
-    <string name="at_first_question">You are at the first question</string>
+    <string name="at_first_question">You\'re at the first question.</string>
     <string name="question_incomplete">Question incomplete</string>
     <string name="finish_survey">Finish</string>
 </resources>

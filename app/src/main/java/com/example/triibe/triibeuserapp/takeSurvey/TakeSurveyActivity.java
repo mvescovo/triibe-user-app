@@ -675,6 +675,9 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                                 answerOk = !options.get(i).HasExtraInput() || options.get(i).getExtraInput() != null && !options.get(i).getExtraInput().contentEquals("");
                             }
                         }
+                        if (question.getQuery().isAllowedToSkip()) {
+                            answerOk = true;
+                        }
                     }
                 }
 
