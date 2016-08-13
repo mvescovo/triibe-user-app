@@ -27,6 +27,7 @@ import com.example.triibe.triibeuserapp.data.Option;
 import com.example.triibe.triibeuserapp.data.Query;
 import com.example.triibe.triibeuserapp.data.Question;
 import com.example.triibe.triibeuserapp.data.Survey;
+import com.example.triibe.triibeuserapp.util.Globals;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -163,6 +164,13 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                 }
 
                 mDownloadedAnswers = true;
+
+                // Prevent users from changing their responses to qualifying questions
+                if (mAnswers != null && mAnswers.size() > Globals.NUM_QUALIFYING_QUESTIONS &&
+                        mCurrentQuestionNum <= Globals.NUM_QUALIFYING_QUESTIONS) {
+                    mCurrentQuestionNum = Globals.NUM_QUALIFYING_QUESTIONS + 1;
+                    displayCurrentQuestion();
+                }
             }
 
             @Override
@@ -651,53 +659,53 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         Question question = mQuestions.get(mCurrentQuestionNum - 1);
 
         if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum) {
-                boolean answerOk = false;
-                if (question.getQuery().getRequiredPhrase() != null) {
-                    String requiredPhrase = mQuestions.get(mCurrentQuestionNum - 1).getQuery().getRequiredPhrase();
-                    ArrayList<Option> options = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
-                    for (int i = 0; i < options.size(); i++) {
-                        if (options.get(i).getPhrase().contentEquals(requiredPhrase)) {
-                            answerOk = true;
-                        }
-                    }
-                } else {
-                    ArrayList<Option> options = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
-                    if (question.getQuery().getType().contentEquals("text")) {
+            boolean answerOk = false;
+            if (question.getQuery().getRequiredPhrase() != null) {
+                String requiredPhrase = mQuestions.get(mCurrentQuestionNum - 1).getQuery().getRequiredPhrase();
+                ArrayList<Option> options = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
+                for (int i = 0; i < options.size(); i++) {
+                    if (options.get(i).getPhrase().contentEquals(requiredPhrase)) {
                         answerOk = true;
-                        for (int i = 0; i < options.size(); i++) {
-                            if (options.get(i).getExtraInput() == null || options.get(i).getExtraInput().contentEquals("")) {
-                                answerOk = false;
-                            }
-                        }
-                    } else {
-                        for (int i = 0; i < options.size(); i++) {
-                            if (!options.get(i).getPhrase().contentEquals("")) {
-                                answerOk = !options.get(i).HasExtraInput() || options.get(i).getExtraInput() != null && !options.get(i).getExtraInput().contentEquals("");
-                            }
-                        }
                     }
                 }
-
-                if (answerOk) {
-                    if (mNextButton.getText().toString().contentEquals(getString(R.string.finish_survey))) {
-                        finish();
-                    } else {
-                        mCurrentQuestionNum++;
-                        mTextInputEditText.removeTextChangedListener(this);
-                        displayCurrentQuestion();
-                        if (mCurrentQuestionNum == mQuestions.size()) {
-                            mNextButton.setText(R.string.finish_survey);
+            } else {
+                ArrayList<Option> options = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
+                if (question.getQuery().getType().contentEquals("text")) {
+                    answerOk = true;
+                    for (int i = 0; i < options.size(); i++) {
+                        if (options.get(i).getExtraInput() == null || options.get(i).getExtraInput().contentEquals("")) {
+                            answerOk = false;
                         }
                     }
                 } else {
-                    if (question.getQuery().getIncorrectAnswerPhrase() != null) {
-                        Snackbar snackbar = Snackbar.make(view, question.getQuery().getIncorrectAnswerPhrase(), Snackbar.LENGTH_SHORT);
-                        snackbar.show();
-                    } else {
-                        Snackbar snackbar = Snackbar.make(view, R.string.question_incomplete, Snackbar.LENGTH_SHORT);
-                        snackbar.show();
+                    for (int i = 0; i < options.size(); i++) {
+                        if (!options.get(i).getPhrase().contentEquals("")) {
+                            answerOk = !options.get(i).HasExtraInput() || options.get(i).getExtraInput() != null && !options.get(i).getExtraInput().contentEquals("");
+                        }
                     }
                 }
+            }
+
+            if (answerOk) {
+                if (mNextButton.getText().toString().contentEquals(getString(R.string.finish_survey))) {
+                    finish();
+                } else {
+                    mCurrentQuestionNum++;
+                    mTextInputEditText.removeTextChangedListener(this);
+                    displayCurrentQuestion();
+                    if (mCurrentQuestionNum == mQuestions.size()) {
+                        mNextButton.setText(R.string.finish_survey);
+                    }
+                }
+            } else {
+                if (question.getQuery().getIncorrectAnswerPhrase() != null) {
+                    Snackbar snackbar = Snackbar.make(view, question.getQuery().getIncorrectAnswerPhrase(), Snackbar.LENGTH_SHORT);
+                    snackbar.show();
+                } else {
+                    Snackbar snackbar = Snackbar.make(view, R.string.question_incomplete, Snackbar.LENGTH_SHORT);
+                    snackbar.show();
+                }
+            }
 
         } else if (question.getQuery().getRequiredPhrase() != null) {
             Snackbar snackbar = Snackbar.make(view, question.getQuery().getIncorrectAnswerPhrase(), Snackbar.LENGTH_SHORT);
@@ -713,11 +721,17 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * Go to the previous question.
     * */
     public void previousQuestion(View view) {
-        mNextButton.setText(R.string.next_question);
-        if (mCurrentQuestionNum > 1) {
-            mCurrentQuestionNum--;
-            mTextInputEditText.removeTextChangedListener(this);
-            displayCurrentQuestion();
+        // Prevent users from changing their responses to qualifying questions
+        if (mCurrentQuestionNum != Globals.NUM_QUALIFYING_QUESTIONS + 1) {
+            mNextButton.setText(R.string.next_question);
+            if (mCurrentQuestionNum > 1) {
+                mCurrentQuestionNum--;
+                mTextInputEditText.removeTextChangedListener(this);
+                displayCurrentQuestion();
+            } else {
+                Snackbar snackbar = Snackbar.make(view, R.string.at_first_question, Snackbar.LENGTH_SHORT);
+                snackbar.show();
+            }
         } else {
             Snackbar snackbar = Snackbar.make(view, R.string.at_first_question, Snackbar.LENGTH_SHORT);
             snackbar.show();

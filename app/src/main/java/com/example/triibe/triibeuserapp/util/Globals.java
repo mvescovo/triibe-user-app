@@ -9,6 +9,7 @@ import com.google.firebase.database.FirebaseDatabase;
  */
 public class Globals {
 
+    public static int NUM_QUALIFYING_QUESTIONS = 2;
     private volatile static Globals uniqueInstance;
     private boolean firebasePersistenceSet;
 
