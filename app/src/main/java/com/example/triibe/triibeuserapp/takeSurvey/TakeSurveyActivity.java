@@ -648,10 +648,10 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * Go to the next question.
     * */
     public void nextQuestion(View view) {
-        if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum) {
+        Question question = mQuestions.get(mCurrentQuestionNum - 1);
 
+        if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum) {
                 boolean answerOk = false;
-                Question question = mQuestions.get(mCurrentQuestionNum - 1);
                 if (question.getQuery().getRequiredPhrase() != null) {
                     String requiredPhrase = mQuestions.get(mCurrentQuestionNum - 1).getQuery().getRequiredPhrase();
                     ArrayList<Option> options = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
@@ -674,9 +674,6 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                             if (!options.get(i).getPhrase().contentEquals("")) {
                                 answerOk = !options.get(i).HasExtraInput() || options.get(i).getExtraInput() != null && !options.get(i).getExtraInput().contentEquals("");
                             }
-                        }
-                        if (question.getQuery().isAllowedToSkip()) {
-                            answerOk = true;
                         }
                     }
                 }
@@ -702,6 +699,9 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                     }
                 }
 
+        } else if (question.getQuery().getRequiredPhrase() != null) {
+            Snackbar snackbar = Snackbar.make(view, question.getQuery().getIncorrectAnswerPhrase(), Snackbar.LENGTH_SHORT);
+            snackbar.show();
         } else {
             Snackbar snackbar = Snackbar.make(view, R.string.question_incomplete, Snackbar.LENGTH_SHORT);
             snackbar.show();
