@@ -26,6 +26,12 @@ public class Survey {
         this.questions = questions;
     }
 
+    /*
+    * All setters are getters required by firebase even if not used in the program.
+    *
+    * Note: getters must be of the form "get<parameter name>".
+    * Boolean values cannot use "hasExtraValue" for example.
+    * */
     public String getDescription() {
         return description;
     }

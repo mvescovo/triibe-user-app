@@ -14,7 +14,7 @@ public class Answer {
 
     private String questionId;
     private String type;
-    ArrayList<Option> selectedOptions;
+    private ArrayList<Option> selectedOptions;
 
     // Empty constructor required for firebase
     public Answer() {}
@@ -25,6 +25,12 @@ public class Answer {
         this.selectedOptions = selectedOptions;
     }
 
+    /*
+    * All setters are getters required by firebase even if not used in the program.
+    *
+    * Note: getters must be of the form "get<parameter name>".
+    * Boolean values cannot use "hasExtraValue" for example.
+    * */
     public String getQuestionId() {
         return questionId;
     }

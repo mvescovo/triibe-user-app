@@ -27,14 +27,12 @@ public class Query {
         this.options = options;
     }
 
-    public Query(String type, String phrase, ArrayList<Option> options, String requiredPhrase, String incorrectAnswerPhrase) {
-        this.type = type;
-        this.phrase = phrase;
-        this.options = options;
-        this.requiredPhrase = requiredPhrase;
-        this.incorrectAnswerPhrase = incorrectAnswerPhrase;
-    }
-
+    /*
+    * All setters are getters required by firebase even if not used in the program.
+    *
+    * Note: getters must be of the form "get<parameter name>".
+    * Boolean values cannot use "hasExtraValue" for example.
+    * */
     public String getType() {
         return type;
     }

@@ -29,16 +29,12 @@ public class Question {
         this.query = query;
     }
 
-    public Question(String id, String imageUrl, String title, String intro, Query query, String introLinkKey, String introLinkUrl) {
-        this.id = id;
-        this.imageUrl = imageUrl;
-        this.title = title;
-        this.intro = intro;
-        this.query = query;
-        this.introLinkKey = introLinkKey;
-        this.introLinkUrl = introLinkUrl;
-    }
-
+    /*
+    * All setters are getters required by firebase even if not used in the program.
+    *
+    * Note: getters must be of the form "get<parameter name>".
+    * Boolean values cannot use "hasExtraValue" for example.
+    * */
     public String getId() {
         return id;
     }

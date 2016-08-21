@@ -10,13 +10,11 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Option {
 
-    private static final String TAG = "Option";
-
-    String phrase;
-    boolean hasExtraInput;
-    String extraInput;
-    String extraInputType;
-    String extraInputHint;
+    private String phrase;
+    private boolean hasExtraInput;
+    private String extraInput;
+    private String extraInputType;
+    private String extraInputHint;
 
     // Empty constructor required for firebase
     public Option() {}
@@ -26,6 +24,12 @@ public class Option {
         this.hasExtraInput = hasExtraInput;
     }
 
+    /*
+    * All setters are getters required by firebase even if not used in the program.
+    *
+    * Note: getters must be of the form "get<parameter name>".
+    * Boolean values cannot use "hasExtraValue" for example.
+    * */
     public String getPhrase() {
         return phrase;
     }
@@ -34,22 +38,6 @@ public class Option {
         this.phrase = phrase;
     }
 
-//    public Boolean HasExtraInput() {
-//        if (hasExtraInput == null) {
-//            Log.d(TAG, "HasExtraInput: IS NULL");
-//        } else {
-//            Log.i(TAG, "HasExtraInput: IS NOT NULL");
-//        }
-//        return hasExtraInput != null && hasExtraInput.contentEquals("true");
-//    }
-
-
-    /*
-    * All setters are getters requried by firebase even if not used in the program.
-    *
-    * Note: getters must be of the form "get<parameter name>".
-    * Boolean values cannot use "hasExtraValue" for example.
-    * */
     public boolean getHasExtraInput() {
         return hasExtraInput;
     }

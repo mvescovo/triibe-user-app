@@ -114,8 +114,20 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
 //        mUserId = "testUser5";
 
         mDownloadedAnswers = false;
-        mCurrentQuestionNum = 1;
+
+        if (savedInstanceState != null) {
+            mCurrentQuestionNum = savedInstanceState.getInt("currentQuestionNum");
+        } else {
+            mCurrentQuestionNum = 1;
+        }
         getQuestions();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("currentQuestionNum", mCurrentQuestionNum);
     }
 
     /*
