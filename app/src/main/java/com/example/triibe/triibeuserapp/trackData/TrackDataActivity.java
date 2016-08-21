@@ -131,6 +131,11 @@ public class TrackDataActivity extends AppCompatActivity {
         Snackbar.make(mRootView, getString(R.string.started_data_tracking), Snackbar.LENGTH_LONG).show();
         mStartTrackingButton.setVisibility(View.GONE);
         mStopTrackingButton.setVisibility(View.VISIBLE);
+
+//        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.indoor.main");
+//        if (launchIntent != null) {
+//            startActivity(launchIntent);
+//        }
     }
 
     public void stopDataTracking(View view) {

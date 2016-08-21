@@ -125,8 +125,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         ValueEventListener questionListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<List<Question>> t = new GenericTypeIndicator<List<Question>>() {
-                };
+                GenericTypeIndicator<List<Question>> t = new GenericTypeIndicator<List<Question>>() {};
                 mQuestions = (ArrayList<Question>) dataSnapshot.getValue(t);
 
                 if (mQuestions != null) {
@@ -345,7 +344,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                         for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
                             if (((RadioButton) mRadioGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(0).getPhrase())) {
                                 ((RadioButton) mRadioGroup.getChildAt(i)).toggle();
-                                if (question.getQuery().getOptions().get(i).HasExtraInput()) {
+                                if (question.getQuery().getOptions().get(i).getHasExtraInput()) {
                                     mTextInputLayout.setVisibility(View.VISIBLE);
                                     mTextInputEditText.setVisibility(View.VISIBLE);
                                     mTextInputEditText.setText("");
@@ -374,7 +373,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                             for (int j = 0; j < answer.getSelectedOptions().size(); j++) {
                                 if (((CheckBox) mCheckboxGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(j).getPhrase())) {
                                     ((CheckBox) mCheckboxGroup.getChildAt(i)).toggle();
-                                    if (question.getQuery().getOptions().get(i).HasExtraInput()) {
+                                    if (question.getQuery().getOptions().get(i).getHasExtraInput()) {
                                         mTextInputLayout.setVisibility(View.VISIBLE);
                                         mTextInputEditText.setVisibility(View.VISIBLE);
                                         mTextInputEditText.setText("");
@@ -456,7 +455,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                 break;
             case "checkbox":
                 for (int i = 0; i < mQuestions.get(mCurrentQuestionNum - 1).getQuery().getOptions().size(); i++) {
-                    if (mQuestions.get(mCurrentQuestionNum - 1).getQuery().getOptions().get(i).HasExtraInput()) {
+                    if (mQuestions.get(mCurrentQuestionNum - 1).getQuery().getOptions().get(i).getHasExtraInput()) {
                         mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions().get(i).setExtraInput(charSequence.toString());
                     }
                 }
@@ -471,12 +470,18 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * Update the answer on firebase when the user selects a radio option.
     * */
     public void onRadioButtonClicked(View view) {
+//        Toast.makeText(TakeSurveyActivity.this, "Radio button clicked.", Toast.LENGTH_SHORT).show();
         mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
         Question question = mQuestions.get(mCurrentQuestionNum - 1);
 
         for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+//            Toast.makeText(TakeSurveyActivity.this, "Inside for loop", Toast.LENGTH_SHORT).show();
             if (question.getQuery().getOptions().get(i).getPhrase().contentEquals(((RadioButton) view).getText())) {
-                if (question.getQuery().getOptions().get(i).HasExtraInput()) {
+//                Toast.makeText(TakeSurveyActivity.this, "Inside first if", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TakeSurveyActivity.this, "Has extra input: " + question.getQuery().getOptions().get(i).HasExtraInput() + ", extra input hint: " +
+//                        question.getQuery().getOptions().get(i).getExtraInputHint(), Toast.LENGTH_SHORT).show();
+                if (question.getQuery().getOptions().get(i).getHasExtraInput()) {
+//                    Toast.makeText(TakeSurveyActivity.this, "Has extra input but can't show it for some reason.", Toast.LENGTH_SHORT).show();
                     mTextInputLayout.setVisibility(View.VISIBLE);
                     mTextInputEditText.setVisibility(View.VISIBLE);
                     mTextInputEditText.addTextChangedListener(this);
@@ -535,7 +540,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
 
         for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
             if (question.getQuery().getOptions().get(i).getPhrase().contentEquals(((CheckBox) view).getText())) {
-                if (question.getQuery().getOptions().get(i).HasExtraInput() && checked) {
+                if (question.getQuery().getOptions().get(i).getHasExtraInput() && checked) {
                     mTextInputLayout.setVisibility(View.VISIBLE);
                     mTextInputEditText.setVisibility(View.VISIBLE);
                     mTextInputEditText.addTextChangedListener(this);
@@ -546,7 +551,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                     }
                     mTextInputEditText.requestFocus();
 
-                } else if (question.getQuery().getOptions().get(i).HasExtraInput() && !checked) {
+                } else if (question.getQuery().getOptions().get(i).getHasExtraInput() && !checked) {
                     mTextInputEditText.setText("");
                     mTextInputEditText.setHint("");
                     mTextInputEditText.setVisibility(View.GONE);
@@ -607,7 +612,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * */
     public void onTextInputEditTextChanged(int viewNumber) {
         Question question = mQuestions.get(mCurrentQuestionNum - 1);
-        Option dummyOption = new Option("", false);
+        Option dummyOption = new Option("", true);
 
         ArrayList<Option> selectedOptions;
         if (mAnswers.size() < mCurrentQuestionNum) {
@@ -680,7 +685,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                 } else {
                     for (int i = 0; i < options.size(); i++) {
                         if (!options.get(i).getPhrase().contentEquals("")) {
-                            answerOk = !options.get(i).HasExtraInput() || options.get(i).getExtraInput() != null && !options.get(i).getExtraInput().contentEquals("");
+                            answerOk = !options.get(i).getHasExtraInput() || options.get(i).getExtraInput() != null && !options.get(i).getExtraInput().contentEquals("");
                         }
                     }
                 }
