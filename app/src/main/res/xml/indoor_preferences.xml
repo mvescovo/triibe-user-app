@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="device_ids"
+        android:title="Device" >
+        <EditTextPreference
+            android:key="device_id"
+            android:persistent="true"
+            android:summary="ID:"
+            android:title="Device ID" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="debug_flags"
+        android:title="Development Information" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="debug_flag"
+            android:persistent="true"
+            android:summary="Output ADB logcat debug messages for Indoor"
+            android:title="Debug messages" />
+
+        <EditTextPreference
+            android:defaultValue="Indoor"
+            android:dependency="debug_flag"
+            android:key="debug_tag"
+            android:persistent="true"
+            android:summary="Overrides the ADB logcat tag"
+            android:title="Debug tag (by default is Indoor)" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="indoor_auto_update"
+            android:persistent="true"
+            android:summary="Current version is ?"
+            android:title="Check for updates" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="sensors"
+        android:summary="Default sensors"
+        android:title="Sensors" >
+        <PreferenceScreen
+            android:key="wifi"
+            android:summary="Wi-Fi sensor"
+            android:title="Wi-Fi" >
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="wifi_sensor"
+                android:persistent="true"
+                android:summary="Record nearby APs using a service"
+                android:title="Active" />
+
+            <EditTextPreference
+                android:defaultValue="60"
+                android:key="wifi_frequency"
+                android:persistent="true"
+                android:summary="In seconds (default = 60)"
+                android:title="WiFi nearby APs scanning frequency" />
+            <EditTextPreference
+                android:defaultValue=""
+                android:key="wifi_network"
+                android:persistent="true"
+                android:summary="Wifi Network needed to be dedected (Empty value - Indoor will scan all the Wlan networks&apos;AP)"
+                android:title="WiFi Network Name" />
+        </PreferenceScreen>
+    </PreferenceCategory>
+
+</PreferenceScreen>
