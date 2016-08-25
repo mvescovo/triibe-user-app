@@ -132,6 +132,11 @@ public class TrackDataActivity extends AppCompatActivity {
         mStartTrackingButton.setVisibility(View.GONE);
         mStopTrackingButton.setVisibility(View.VISIBLE);
 
+        // To get most recent app, this function returns string
+        AppUsageStats.getMostCurrentRecentApp(getApplicationContext());
+
+        // To get recent background apps of the day, this function returns a arraylist<string> of apps
+        AppUsageStats.getMostCurrentRecentApp(getApplicationContext());
 //        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.indoor.main");
 //        if (launchIntent != null) {
 //            startActivity(launchIntent);
