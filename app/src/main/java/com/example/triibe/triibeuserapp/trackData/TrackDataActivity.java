@@ -168,6 +168,7 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
     public void startDataTracking(View view) {
         Snackbar.make(mRootView, getString(R.string.started_data_tracking), Snackbar.LENGTH_LONG).show();
 
+
         // Check permissions before launching service
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -248,6 +249,24 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
             mStartTrackingButton.setVisibility(View.GONE);
             mStopTrackingButton.setVisibility(View.VISIBLE);
         }
+
+//        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.indoor.main");
+//        if (launchIntent != null) {
+//            startActivity(launchIntent);
+//        }
+
+        // To get most recent app, this function returns string
+        String appName = AppUsageStats.getMostCurrentRecentApp(getApplicationContext());
+        Log.d(TAG, "app name: " + appName);
+
+        // To get recent background apps of the day, this function returns a arraylist<string> of apps
+        AppUsageStats.getCurrentBackgroundApps(getApplicationContext());
+
+//        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.indoor.main");
+//        if (launchIntent != null) {
+//            startActivity(launchIntent);
+//        }
+
     }
 
     public void stopDataTracking(View view) {

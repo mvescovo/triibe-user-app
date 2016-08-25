@@ -16,6 +16,7 @@ package com.example.triibe.triibeuserapp.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.MainThread;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
@@ -23,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.example.triibe.triibeuserapp.R;
+import com.example.triibe.triibeuserapp.trackData.AppUsageStats;
 import com.example.triibe.triibeuserapp.trackData.TrackDataActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,6 +57,12 @@ public class AuthUiActivity extends AppCompatActivity {
                             .setTheme(R.style.AppTheme)
                             .build(),
                     RC_SIGN_IN);
+        }
+
+        // Check if UsageStatsManager for app tracking permission enabled
+        if (AppUsageStats.getUsageStatsList(this).isEmpty()){
+            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+            startActivity(intent);
         }
     }
 
