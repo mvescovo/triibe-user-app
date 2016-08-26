@@ -5,48 +5,81 @@
                 android:layout_height="match_parent"
                 tools:context="com.example.triibe.triibeuserapp.trackData.TrackDataActivity">
 
-    <Button
-        android:id="@+id/take_survey_button"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:onClick="takeSurvey"
-        android:text="@string/take_survey"/>
+    <LinearLayout
+        android:id="@+id/buttonsLayout"
+        android:layout_width="250dp"
+        android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/start_tracking_button"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/take_survey_button"
-        android:layout_centerInParent="true"
-        android:enabled="false"
-        android:onClick="startDataTracking"
-        android:text="@string/start_data_tracking"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/stop_tracking_button"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/take_survey_button"
-        android:layout_centerInParent="true"
-        android:onClick="stopDataTracking"
-        android:text="@string/stop_data_tracking"
-        android:visibility="gone"/>
+            <Button
+                android:id="@+id/take_survey_button"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:onClick="takeSurvey"
+                android:text="@string/take_survey"/>
+
+            <Button
+                android:id="@+id/start_tracking_button"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/take_survey_button"
+                android:layout_centerInParent="true"
+                android:enabled="false"
+                android:onClick="startDataTracking"
+                android:text="@string/start_data_tracking"/>
+
+            <Button
+                android:id="@+id/stop_tracking_button"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/take_survey_button"
+                android:layout_centerInParent="true"
+                android:onClick="stopDataTracking"
+                android:text="@string/stop_data_tracking"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/level"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"/>
+
+            <TextView
+                android:id="@+id/longLat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/level"/>
+
+            <TextView
+                android:id="@+id/nearest_ap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/longLat"
+                android:layout_marginTop="8dp"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/mapView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="700dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true">
+
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
                   xmlns:tools="http://schemas.android.com/tools"
                   android:id="@+id/map"
                   android:name="com.google.android.gms.maps.SupportMapFragment"
-                  android:layout_width="1dp"
-                  android:layout_height="1dp"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
                   android:enabled="false"
                   android:visibility="gone"
                   tools:context="com.example.triibe.triibeuserapp.trackData.TrackDataActivity"/>
-    </LinearLayout>
 
+    </LinearLayout>
 
 </RelativeLayout>

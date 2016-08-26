@@ -13,6 +13,7 @@ public class Globals {
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private volatile static Globals uniqueInstance;
     private boolean firebasePersistenceSet;
+//    public static GoogleMap mMap;
 
     private Globals() {}
 

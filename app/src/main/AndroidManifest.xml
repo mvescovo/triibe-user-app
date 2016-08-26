@@ -7,7 +7,9 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions"/>
 
     <application
         android:allowBackup="true"
@@ -63,10 +65,15 @@
             android:name=".trackWIFI.MapsActivity"
             android:label="@string/title_activity_maps">
         </activity>
-        <!--<activity-->
-            <!--android:name=".trackWIFI.IndoorMapActivity"-->
-            <!--android:label="@string/title_activity_maps">-->
-        <!--</activity>-->
+        <!-- <activity -->
+        <!-- android:name=".trackWIFI.IndoorMapActivity" -->
+        <!-- android:label="@string/title_activity_maps"> -->
+        <!-- </activity> -->
+        <service
+            android:name=".trackWIFI.TestMapsService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
     </application>
 
 </manifest>

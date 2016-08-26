@@ -1,10 +1,13 @@
 package com.example.triibe.triibeuserapp.trackData;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -19,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.auth.AuthUiActivity;
@@ -60,10 +64,21 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
     @BindView(R.id.stop_tracking_button)
     View mStopTrackingButton;
 
+    @BindView(R.id.level)
+    TextView mLevelTextView;
+
+    @BindView(R.id.longLat)
+    TextView mLongLatTextView;
+
+    @BindView(R.id.nearest_ap)
+    TextView mNearestApTextView;
+
     Intent mTrackRssiIntent;
+    Intent mTestMapsServiceIntent;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     private GoogleMap mMap;
+    boolean mTrackLocation = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +90,7 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
             Globals.getInstance().setFirebasePersistenceEnabled();
         }
 
-        displayProfileInfo();
+//        displayProfileInfo();
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -165,7 +180,11 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
         startActivity(new Intent(this, TakeSurveyActivity.class));
     }
 
-    public void startDataTracking(View view) {
+    public void startDataTracking(final View view) {
+        mTrackLocation = true;
+        mStartTrackingButton.setVisibility(View.GONE);
+        mStopTrackingButton.setVisibility(View.VISIBLE);
+
         Snackbar.make(mRootView, getString(R.string.started_data_tracking), Snackbar.LENGTH_LONG).show();
 
 
@@ -194,12 +213,15 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
             }
         } else {
             Log.i(TAG, "startDataTracking: Already have permission");
-            mTrackRssiIntent = new Intent(this, TrackRssiIntentService.class);
+//            mTrackRssiIntent = new Intent(this, TrackRssiIntentService.class);
 //            startService(mTrackRssiIntent);
 
 //            Intent mapsIntent = new Intent(this, MapsActivity.class);
 //            startActivity(mapsIntent);
 
+
+//            mTestMapsServiceIntent = new Intent(this, TestMapsService.class);
+//            startService(mTestMapsServiceIntent);
 
 
 //            // Get last known location from location API
@@ -228,26 +250,24 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
 //                        ", hasSpeed: " + mLastLocation.hasSpeed() + ", hasBearing: " + mLastLocation.hasBearing());
 //            }
 
-            if (mMap.isIndoorEnabled()) {
-                if (mMap.getFocusedBuilding() != null) {
-                    IndoorBuilding indoorBuilding = mMap.getFocusedBuilding();
-                    if (indoorBuilding.getLevels() != null) {
-                        List<IndoorLevel> levels = indoorBuilding.getLevels();
-                        for (int i = 0; i < levels.size(); i++) {
-                            Log.d(TAG, "Level " + levels.get(i).getName() + " exists.");
+            new Thread(new Runnable() {
+                public void run() {
+                    while (mTrackLocation) {
+                        runOnUiThread(new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                trackLocation();
+                            }
+                        }));
+
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                        Log.d(TAG, "Current level: " + indoorBuilding.getActiveLevelIndex());
                     }
                 }
-            } else {
-                Log.d(TAG, "Not indoor enabled");
-            }
-
-            LatLng location = mMap.getCameraPosition().target;
-            Log.d(TAG, "Location: " + location.latitude + ", " + location.longitude);
-
-            mStartTrackingButton.setVisibility(View.GONE);
-            mStopTrackingButton.setVisibility(View.VISIBLE);
+            }).start();
         }
 
 //        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.indoor.main");
@@ -256,11 +276,11 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
 //        }
 
         // To get most recent app, this function returns string
-        String appName = AppUsageStats.getMostCurrentRecentApp(getApplicationContext());
-        Log.d(TAG, "app name: " + appName);
+//        String appName = AppUsageStats.getMostCurrentRecentApp(getApplicationContext());
+//        Log.d(TAG, "app name: " + appName);
 
         // To get recent background apps of the day, this function returns a arraylist<string> of apps
-        AppUsageStats.getCurrentBackgroundApps(getApplicationContext());
+//        AppUsageStats.getCurrentBackgroundApps(getApplicationContext());
 
 //        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.indoor.main");
 //        if (launchIntent != null) {
@@ -269,11 +289,63 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
 
     }
 
+    public void trackLocation() {
+        if (mMap.isIndoorEnabled()) {
+            if (mMap.getFocusedBuilding() != null) {
+                IndoorBuilding indoorBuilding = mMap.getFocusedBuilding();
+                if (indoorBuilding.getLevels() != null) {
+                    List<IndoorLevel> levels = indoorBuilding.getLevels();
+                    for (int i = 0; i < levels.size(); i++) {
+                        Log.d(TAG, "Level " + levels.get(i).getName() + " exists.");
+                    }
+                    Log.d(TAG, "Current level: " + indoorBuilding.getActiveLevelIndex());
+                    mLevelTextView.setText("Current level: " + indoorBuilding.getActiveLevelIndex());
+                }
+            }
+        } else {
+            Log.d(TAG, "Not indoor enabled");
+        }
+
+        LatLng location = mMap.getCameraPosition().target;
+        Log.d(TAG, "Location: " + location.latitude + ", " + location.longitude);
+        mLongLatTextView.setText("Location: " + location.latitude + ", " + location.longitude);
+
+
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        // Level of a Scan Result
+        int strongestLevel = -1000;
+        String strongestAp = "unknown";
+        List<ScanResult> wifiList = wifiManager.getScanResults();
+        for (ScanResult scanResult : wifiList) {
+            String ssid = scanResult.SSID;
+            int rssi = scanResult.level;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                String venueName = scanResult.venueName.toString();
+                Log.d(TAG, "ssid: " + ssid + ", rssi: " + rssi + ", venue: " + venueName);
+            }
+            if (rssi > strongestLevel) {
+                strongestLevel = rssi;
+                strongestAp = ssid;
+            }
+        }
+        Log.i(TAG, "Strongest AP level: " + strongestAp);
+        String nearestAp = "Nearest AP: " + strongestAp + " at " + strongestLevel + " dBm";
+        mNearestApTextView.setText(nearestAp);
+
+        // Level of current connection
+        String ssid = wifiManager.getConnectionInfo().getSSID();
+        int rssi = wifiManager.getConnectionInfo().getRssi();
+        Log.d(TAG, "Connected ssid: " + ssid + ", rssi: " + rssi);
+
+    }
+
     public void stopDataTracking(View view) {
-        Snackbar.make(mRootView, getString(R.string.stopped_data_tracking), Snackbar.LENGTH_LONG).show();
+        mTrackLocation = false;
         mStopTrackingButton.setVisibility(View.GONE);
         mStartTrackingButton.setVisibility(View.VISIBLE);
-        stopService(mTrackRssiIntent);
+        Snackbar.make(mRootView, getString(R.string.stopped_data_tracking), Snackbar.LENGTH_LONG).show();
+//        stopService(mTrackRssiIntent);
+//        stopService(mTestMapsServiceIntent);
     }
 
     @Override
@@ -340,14 +412,25 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
         Log.d(TAG, "onMapReady: READY");
 
         mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+
 
         // Add a marker in Southland and move the camera
         LatLng southland = new LatLng(-37.958561, 145.053818);
         mMap.addMarker(new MarkerOptions().position(southland).title("Marker in Westfield Southland"));
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(southland));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(southland, 18));
-
-
 
 
         // Some buildings have indoor maps. Center the camera over
