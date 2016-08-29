@@ -1,13 +1,9 @@
 package com.example.triibe.triibeuserapp.trackData;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.net.Uri;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -22,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.auth.AuthUiActivity;
@@ -31,21 +26,12 @@ import com.example.triibe.triibeuserapp.util.Globals;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.IndoorBuilding;
-import com.google.android.gms.maps.model.IndoorLevel;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,21 +49,12 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
     @BindView(R.id.stop_tracking_button)
     View mStopTrackingButton;
 
-    @BindView(R.id.level)
-    TextView mLevelTextView;
-
-    @BindView(R.id.longLat)
-    TextView mLongLatTextView;
-
-    @BindView(R.id.nearest_ap)
-    TextView mNearestApTextView;
-
-    Intent mTrackRssiIntent;
-    Intent mTestMapsServiceIntent;
-    GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
-    private GoogleMap mMap;
-    boolean mTrackLocation = false;
+//    Intent mTrackRssiIntent;
+//    Intent mTestMapsServiceIntent;
+//    GoogleApiClient mGoogleApiClient;
+//    Location mLastLocation;
+//    private GoogleMap mMap;
+//    boolean mTrackLocation = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,17 +69,17 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
 //        displayProfileInfo();
 
         // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
+//        if (mGoogleApiClient == null) {
+//            mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                    .addConnectionCallbacks(this)
+//                    .addOnConnectionFailedListener(this)
+//                    .addApi(LocationServices.API)
+//                    .build();
+//        }
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+//                .findFragmentById(R.id.map);
+//        mapFragment.getMapAsync(this);
     }
 
     /*
@@ -180,7 +157,7 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
     }
 
     public void startDataTracking(final View view) {
-        mTrackLocation = true;
+//        mTrackLocation = true;
         mStartTrackingButton.setVisibility(View.GONE);
         mStopTrackingButton.setVisibility(View.VISIBLE);
 
@@ -249,25 +226,25 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
 //                        ", hasSpeed: " + mLastLocation.hasSpeed() + ", hasBearing: " + mLastLocation.hasBearing());
 //            }
 
-            new Thread(new Runnable() {
-                public void run() {
-                    while (mTrackLocation) {
-                        runOnUiThread(new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                trackLocation();
-                            }
-                        }));
-
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).start();
-        }
+//            new Thread(new Runnable() {
+//                public void run() {
+//                    while (mTrackLocation) {
+//                        runOnUiThread(new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                trackLocation();
+//                            }
+//                        }));
+//
+//                        try {
+//                            Thread.sleep(2000);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }).start();
+//        }
 
 //        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.indoor.main");
 //        if (launchIntent != null) {
@@ -284,62 +261,62 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
 //        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.indoor.main");
 //        if (launchIntent != null) {
 //            startActivity(launchIntent);
+        }
+
+    }
+
+//    public void trackLocation() {
+//        if (mMap.isIndoorEnabled()) {
+//            if (mMap.getFocusedBuilding() != null) {
+//                IndoorBuilding indoorBuilding = mMap.getFocusedBuilding();
+//                if (indoorBuilding.getLevels() != null) {
+//                    List<IndoorLevel> levels = indoorBuilding.getLevels();
+//                    for (int i = 0; i < levels.size(); i++) {
+//                        Log.d(TAG, "Level " + levels.get(i).getName() + " exists.");
+//                    }
+//                    Log.d(TAG, "Current level: " + indoorBuilding.getActiveLevelIndex());
+//                    mLevelTextView.setText("Current level: " + indoorBuilding.getActiveLevelIndex());
+//                }
+//            }
+//        } else {
+//            Log.d(TAG, "Not indoor enabled");
 //        }
-
-    }
-
-    public void trackLocation() {
-        if (mMap.isIndoorEnabled()) {
-            if (mMap.getFocusedBuilding() != null) {
-                IndoorBuilding indoorBuilding = mMap.getFocusedBuilding();
-                if (indoorBuilding.getLevels() != null) {
-                    List<IndoorLevel> levels = indoorBuilding.getLevels();
-                    for (int i = 0; i < levels.size(); i++) {
-                        Log.d(TAG, "Level " + levels.get(i).getName() + " exists.");
-                    }
-                    Log.d(TAG, "Current level: " + indoorBuilding.getActiveLevelIndex());
-                    mLevelTextView.setText("Current level: " + indoorBuilding.getActiveLevelIndex());
-                }
-            }
-        } else {
-            Log.d(TAG, "Not indoor enabled");
-        }
-
-        LatLng location = mMap.getCameraPosition().target;
-        Log.d(TAG, "Location: " + location.latitude + ", " + location.longitude);
-        mLongLatTextView.setText("Location: " + location.latitude + ", " + location.longitude);
-
-
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        // Level of a Scan Result
-        int strongestLevel = -1000;
-        String strongestAp = "unknown";
-        List<ScanResult> wifiList = wifiManager.getScanResults();
-        for (ScanResult scanResult : wifiList) {
-            String ssid = scanResult.SSID;
-            int rssi = scanResult.level;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                String venueName = scanResult.venueName.toString();
-                Log.d(TAG, "ssid: " + ssid + ", rssi: " + rssi + ", venue: " + venueName);
-            }
-            if (rssi > strongestLevel) {
-                strongestLevel = rssi;
-                strongestAp = ssid;
-            }
-        }
-        Log.i(TAG, "Strongest AP level: " + strongestAp);
-        String nearestAp = "Nearest AP: " + strongestAp + " at " + strongestLevel + " dBm";
-        mNearestApTextView.setText(nearestAp);
-
-        // Level of current connection
-        String ssid = wifiManager.getConnectionInfo().getSSID();
-        int rssi = wifiManager.getConnectionInfo().getRssi();
-        Log.d(TAG, "Connected ssid: " + ssid + ", rssi: " + rssi);
-
-    }
+//
+//        LatLng location = mMap.getCameraPosition().target;
+//        Log.d(TAG, "Location: " + location.latitude + ", " + location.longitude);
+//        mLongLatTextView.setText("Location: " + location.latitude + ", " + location.longitude);
+//
+//
+//        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+//        // Level of a Scan Result
+//        int strongestLevel = -1000;
+//        String strongestAp = "unknown";
+//        List<ScanResult> wifiList = wifiManager.getScanResults();
+//        for (ScanResult scanResult : wifiList) {
+//            String ssid = scanResult.SSID;
+//            int rssi = scanResult.level;
+//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+//                String venueName = scanResult.venueName.toString();
+//                Log.d(TAG, "ssid: " + ssid + ", rssi: " + rssi + ", venue: " + venueName);
+//            }
+//            if (rssi > strongestLevel) {
+//                strongestLevel = rssi;
+//                strongestAp = ssid;
+//            }
+//        }
+//        Log.i(TAG, "Strongest AP level: " + strongestAp);
+//        String nearestAp = "Nearest AP: " + strongestAp + " at " + strongestLevel + " dBm";
+//        mNearestApTextView.setText(nearestAp);
+//
+//        // Level of current connection
+//        String ssid = wifiManager.getConnectionInfo().getSSID();
+//        int rssi = wifiManager.getConnectionInfo().getRssi();
+//        Log.d(TAG, "Connected ssid: " + ssid + ", rssi: " + rssi);
+//
+//    }
 
     public void stopDataTracking(View view) {
-        mTrackLocation = false;
+//        mTrackLocation = false;
         mStopTrackingButton.setVisibility(View.GONE);
         mStartTrackingButton.setVisibility(View.VISIBLE);
         Snackbar.make(mRootView, getString(R.string.stopped_data_tracking), Snackbar.LENGTH_LONG).show();
@@ -381,13 +358,13 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
 
     @Override
     protected void onStart() {
-        mGoogleApiClient.connect();
+//        mGoogleApiClient.connect();
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        mGoogleApiClient.disconnect();
+//        mGoogleApiClient.disconnect();
         super.onStop();
     }
 
@@ -408,47 +385,47 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d(TAG, "onMapReady: READY");
-
-        mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        mMap.setMyLocationEnabled(true);
-
-
-        // Add a marker in Southland and move the camera
-        LatLng southland = new LatLng(-37.958561, 145.053818);
-        mMap.addMarker(new MarkerOptions().position(southland).title("Marker in Westfield Southland"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(southland));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(southland, 18));
-
-
-        // Some buildings have indoor maps. Center the camera over
-        // the building, and a floor picker will automatically appear.
-//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-37.958561, 145.053818), 18));
-
-//        if (mMap.isIndoorEnabled()) {
-//            if (mMap.getFocusedBuilding() != null) {
-//                IndoorBuilding indoorBuilding = mMap.getFocusedBuilding();
-//                if (indoorBuilding.getLevels() != null) {
-//                    List<IndoorLevel> levels = indoorBuilding.getLevels();
-//                    for (int i = 0; i < levels.size(); i++) {
-//                        Log.d(TAG, "Level " + levels.get(i).getName() + " exists.");
-//                    }
-//                    Log.d(TAG, "Current level: " + indoorBuilding.getActiveLevelIndex());
-//                }
-//            }
-//        } else {
-//            Log.d(TAG, "Not indoor enabled");
+//        Log.d(TAG, "onMapReady: READY");
+//
+//        mMap = googleMap;
+//        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            return;
 //        }
+//        mMap.setMyLocationEnabled(true);
+//
+//
+//        // Add a marker in Southland and move the camera
+//        LatLng southland = new LatLng(-37.958561, 145.053818);
+//        mMap.addMarker(new MarkerOptions().position(southland).title("Marker in Westfield Southland"));
+////        mMap.moveCamera(CameraUpdateFactory.newLatLng(southland));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(southland, 18));
+//
+//
+//        // Some buildings have indoor maps. Center the camera over
+//        // the building, and a floor picker will automatically appear.
+////        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-37.958561, 145.053818), 18));
+//
+////        if (mMap.isIndoorEnabled()) {
+////            if (mMap.getFocusedBuilding() != null) {
+////                IndoorBuilding indoorBuilding = mMap.getFocusedBuilding();
+////                if (indoorBuilding.getLevels() != null) {
+////                    List<IndoorLevel> levels = indoorBuilding.getLevels();
+////                    for (int i = 0; i < levels.size(); i++) {
+////                        Log.d(TAG, "Level " + levels.get(i).getName() + " exists.");
+////                    }
+////                    Log.d(TAG, "Current level: " + indoorBuilding.getActiveLevelIndex());
+////                }
+////            }
+////        } else {
+////            Log.d(TAG, "Not indoor enabled");
+////        }
     }
 }
