@@ -27,7 +27,6 @@ import android.widget.TextView;
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.auth.AuthUiActivity;
 import com.example.triibe.triibeuserapp.takeSurvey.TakeSurveyActivity;
-import com.example.triibe.triibeuserapp.trackWIFI.TrackRssiIntentService;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.ConnectionResult;
@@ -361,8 +360,8 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
                     // permission was granted, yay! Do the
                     // task you need to do.
                     Log.d(TAG, "onRequestPermissionsResult: GOT PERMISSION!");
-                    mTrackRssiIntent = new Intent(this, TrackRssiIntentService.class);
-                    startService(mTrackRssiIntent);
+//                    mTrackRssiIntent = new Intent(this, TrackRssiIntentService.class);
+//                    startService(mTrackRssiIntent);
 
                     mStartTrackingButton.setVisibility(View.GONE);
                     mStopTrackingButton.setVisibility(View.VISIBLE);

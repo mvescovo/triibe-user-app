@@ -62,7 +62,7 @@
             android:value="@string/google_maps_key"/>
 
         <activity
-            android:name=".trackWIFI.MapsActivity"
+            android:name=".trackLocation.MapsActivity"
             android:label="@string/title_activity_maps">
         </activity>
         <!-- <activity -->

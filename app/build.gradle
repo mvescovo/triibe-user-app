@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         applicationId "com.example.triibe.triibeuserapp"
         minSdkVersion 21
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
     }
@@ -24,27 +24,40 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
 
+    // Android support libraries
+    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:design:24.2.0'
 
-    apt 'com.jakewharton:butterknife-compiler:8.2.1'
+    // Google play services
+    compile 'com.google.android.gms:play-services-auth:9.4.0'
+    compile 'com.google.android.gms:play-services-maps:9.4.0'
+    compile 'com.google.android.gms:play-services-location:9.4.0'
+    compile 'com.google.android.gms:play-services:9.4.0'
 
+    // Firebase UI (Note: this is different from standard firebase)
+    compile 'com.firebaseui:firebase-ui-auth:0.5.1'
+    compile 'com.firebaseui:firebase-ui-database:0.5.1'
+
+    // Firebase (standard Firebase)
+    compile 'com.google.firebase:firebase-storage:9.4.0'
+
+    // Butterknife - for getting view references easily
+    compile 'com.jakewharton:butterknife:8.4.0'
+    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+
+    // Picaso - for image loading
+    compile 'com.squareup.picasso:picasso:2.5.2'
+
+
+    /*
+    * Stuff for the old app. Not currently in use but keeping in case we re-enable later.
+    * */
     // https://mvnrepository.com/artifact/com.opencsv/opencsv
-    compile group: 'com.opencsv', name: 'opencsv', version: '3.7'
-
+//    compile group: 'com.opencsv', name: 'opencsv', version: '3.7'
 //    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
 //    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.3.5'
-//
 //    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore
-    compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.5'
-
-
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.firebaseui:firebase-ui-auth:0.4.3'
-    compile 'com.google.android.gms:play-services-auth:9.2.1'
-    compile 'com.google.firebase:firebase-database:9.2.1'
-    compile 'com.google.firebase:firebase-storage:9.2.1'
-    compile 'com.jakewharton:butterknife:8.2.1'
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.google.android.gms:play-services:9.2.1'
+//    compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.5'
 }
 
 apply plugin: 'com.google.gms.google-services'

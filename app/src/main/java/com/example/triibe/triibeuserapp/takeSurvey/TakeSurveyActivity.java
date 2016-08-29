@@ -234,7 +234,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                 String scheme = "";
                 Linkify.addLinks(mIntro, pattern, scheme, null, mentionFilter);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    mIntro.setLinkTextColor(getResources().getColor(R.color.linkColor, getTheme()));
+                    mIntro.setLinkTextColor(getResources().getColor(R.color.wallet_link_text_light, getTheme()));
                 }
             }
         } else {
