@@ -27,12 +27,13 @@ dependencies {
     // Android support libraries
     compile 'com.android.support:appcompat-v7:24.2.0'
     compile 'com.android.support:design:24.2.0'
+    compile 'com.android.support:recyclerview-v7:24.2.0'
+    compile 'com.android.support:cardview-v7:24.2.0'
 
     // Google play services
     compile 'com.google.android.gms:play-services-auth:9.4.0'
     compile 'com.google.android.gms:play-services-maps:9.4.0'
     compile 'com.google.android.gms:play-services-location:9.4.0'
-    compile 'com.google.android.gms:play-services:9.4.0'
 
     // Firebase UI (Note: this is different from standard firebase)
     compile 'com.firebaseui:firebase-ui-auth:0.5.1'
@@ -60,4 +61,5 @@ dependencies {
 //    compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.5'
 }
 
+// To load the google-services.json file needed for firebase
 apply plugin: 'com.google.gms.google-services'

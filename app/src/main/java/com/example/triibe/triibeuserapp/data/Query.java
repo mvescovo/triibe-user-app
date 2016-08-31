@@ -12,19 +12,19 @@ import java.util.ArrayList;
 @IgnoreExtraProperties
 public class Query {
 
-    private String type;
-    private String phrase;
-    private ArrayList<Option> options;
-    private String requiredPhrase;
-    private String incorrectAnswerPhrase;
+    private String mType;
+    private String mPhrase;
+    private ArrayList<Option> mOptions;
+    private String mRequiredPhrase;
+    private String mIncorrectAnswerPhrase;
 
     // Empty constructor required for firebase
     public Query() {}
 
     public Query(String type, String phrase, ArrayList<Option> options) {
-        this.type = type;
-        this.phrase = phrase;
-        this.options = options;
+        mType = type;
+        mPhrase = phrase;
+        mOptions = options;
     }
 
     /*
@@ -34,42 +34,42 @@ public class Query {
     * Boolean values cannot use "hasExtraValue" for example.
     * */
     public String getType() {
-        return type;
+        return mType;
     }
 
     public void setType(String type) {
-        this.type = type;
+        mType = type;
     }
 
     public String getPhrase() {
-        return phrase;
+        return mPhrase;
     }
 
     public void setPhrase(String phrase) {
-        this.phrase = phrase;
+        mPhrase = phrase;
     }
 
     public ArrayList<Option> getOptions() {
-        return options;
+        return mOptions;
     }
 
     public void setOptions(ArrayList<Option> options) {
-        this.options = options;
+        mOptions = options;
     }
 
     public String getRequiredPhrase() {
-        return requiredPhrase;
+        return mRequiredPhrase;
     }
 
     public void setRequiredPhrase(String requiredPhrase) {
-        this.requiredPhrase = requiredPhrase;
+        mRequiredPhrase = requiredPhrase;
     }
 
     public String getIncorrectAnswerPhrase() {
-        return incorrectAnswerPhrase;
+        return mIncorrectAnswerPhrase;
     }
 
     public void setIncorrectAnswerPhrase(String incorrectAnswerPhrase) {
-        this.incorrectAnswerPhrase = incorrectAnswerPhrase;
+        mIncorrectAnswerPhrase = incorrectAnswerPhrase;
     }
 }

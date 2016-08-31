@@ -3,6 +3,9 @@ package com.example.triibe.triibeuserapp.data;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Survey entity. Used for Firebase realtime database so an entire survey can be
@@ -13,17 +16,25 @@ import java.util.ArrayList;
 @IgnoreExtraProperties
 public class Survey {
 
-    private String description;
-    private String version;
-    private ArrayList<Question> questions;
+    private String mId;
+    private String mVersion;
+    private String mDescription;
+    private ArrayList<Question> mQuestions;
+    private List mAnswers;
+
+    private int mDurationTillExpiry;
+    private int mPoints;
+    private Map<String, Date> mLocations; // needs to be a date range
+    private List mTimes;
+    private List<DemographicProfile> mDemographicProfiles;
 
     // Empty constructor required for firebase
     public Survey() {}
 
     public Survey(String description, String version, ArrayList<Question> questions) {
-        this.description = description;
-        this.version = version;
-        this.questions = questions;
+        mDescription = description;
+        mVersion = version;
+        mQuestions = questions;
     }
 
     /*
@@ -32,27 +43,35 @@ public class Survey {
     * Note: getters must be of the form "get<parameter name>".
     * Boolean values cannot use "hasExtraValue" for example.
     * */
+    public String getId() {
+        return mId;
+    }
+
+    public void setId(String id) {
+        mId = id;
+    }
+
     public String getDescription() {
-        return description;
+        return mDescription;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        mDescription = description;
     }
 
     public String getVersion() {
-        return version;
+        return mVersion;
     }
 
     public void setVersion(String version) {
-        this.version = version;
+        mVersion = version;
     }
 
     public ArrayList<Question> getQuestions() {
-        return questions;
+        return mQuestions;
     }
 
     public void setQuestions(ArrayList<Question> questions) {
-        this.questions = questions;
+        mQuestions = questions;
     }
 }

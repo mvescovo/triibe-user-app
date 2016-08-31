@@ -10,18 +10,18 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Option {
 
-    private String phrase;
-    private boolean hasExtraInput;
-    private String extraInput;
-    private String extraInputType;
-    private String extraInputHint;
+    private String mPhrase;
+    private boolean mHasExtraInput;
+    private String mExtraInput;
+    private String mExtraInputType;
+    private String mExtraInputHint;
 
     // Empty constructor required for firebase
     public Option() {}
 
     public Option(String phrase, boolean hasExtraInput) {
-        this.phrase = phrase;
-        this.hasExtraInput = hasExtraInput;
+        mPhrase = phrase;
+        mHasExtraInput = hasExtraInput;
     }
 
     /*
@@ -31,42 +31,42 @@ public class Option {
     * Boolean values cannot use "hasExtraValue" for example.
     * */
     public String getPhrase() {
-        return phrase;
+        return mPhrase;
     }
 
     public void setPhrase(String phrase) {
-        this.phrase = phrase;
+        mPhrase = phrase;
     }
 
     public boolean getHasExtraInput() {
-        return hasExtraInput;
+        return mHasExtraInput;
     }
 
     public void setHasExtraInput(boolean hasExtraInput) {
-        this.hasExtraInput = hasExtraInput;
+        mHasExtraInput = hasExtraInput;
     }
 
     public String getExtraInput() {
-        return extraInput;
+        return mExtraInput;
     }
 
     public void setExtraInput(String extraInput) {
-        this.extraInput = extraInput;
+        mExtraInput = extraInput;
     }
 
     public String getExtraInputType() {
-        return extraInputType;
+        return mExtraInputType;
     }
 
     public void setExtraInputType(String extraInputType) {
-        this.extraInputType = extraInputType;
+        mExtraInputType = extraInputType;
     }
 
     public String getExtraInputHint() {
-        return extraInputHint;
+        return mExtraInputHint;
     }
 
     public void setExtraInputHint(String extraInputHint) {
-        this.extraInputHint = extraInputHint;
+        mExtraInputHint = extraInputHint;
     }
 }

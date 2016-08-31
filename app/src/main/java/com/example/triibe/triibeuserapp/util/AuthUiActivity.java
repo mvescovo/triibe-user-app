@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.example.triibe.triibeuserapp.auth;
+package com.example.triibe.triibeuserapp.util;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,7 +23,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.example.triibe.triibeuserapp.R;
-import com.example.triibe.triibeuserapp.trackData.TrackDataActivity;
+import com.example.triibe.triibeuserapp.data.User;
+import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -36,15 +37,17 @@ public class AuthUiActivity extends AppCompatActivity {
 
     @BindView(android.R.id.content)
     View mRootView;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
 
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() != null) {
-            startActivity(new Intent(this, TrackDataActivity.class));
+        mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+            setUser();
+            startActivity(new Intent(this, ViewSurveysActivity.class));
             finish();
         } else {
             startActivityForResult(
@@ -56,6 +59,10 @@ public class AuthUiActivity extends AppCompatActivity {
                             .build(),
                     RC_SIGN_IN);
         }
+
+        // This code will move to the action of a question that will ask the user if they want
+        // to do this (maybe it puts them on double points). Just leaving commented out for now
+        // until that part is ready.
 
         // Check if UsageStatsManager for app tracking permission enabled
 //        if (AppUsageStats.getUsageStatsList(this).isEmpty()){
@@ -78,7 +85,8 @@ public class AuthUiActivity extends AppCompatActivity {
     @MainThread
     private void handleSignInResponse(int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            startActivity(new Intent(this, TrackDataActivity.class));
+            setUser();
+            startActivity(new Intent(this, ViewSurveysActivity.class));
             finish();
             return;
         }
@@ -94,5 +102,12 @@ public class AuthUiActivity extends AppCompatActivity {
     @MainThread
     private void showSnackbar(@StringRes int errorMessageRes) {
         Snackbar.make(mRootView, errorMessageRes, Snackbar.LENGTH_LONG).show();
+    }
+
+    private void setUser() {
+        if (mAuth.getCurrentUser() != null) {
+            User user = new User(mAuth.getCurrentUser().getUid());
+            Globals.getInstance().setUser(user);
+        }
     }
 }

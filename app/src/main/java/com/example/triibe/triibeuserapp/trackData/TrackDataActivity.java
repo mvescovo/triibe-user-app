@@ -20,7 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.triibe.triibeuserapp.R;
-import com.example.triibe.triibeuserapp.auth.AuthUiActivity;
+import com.example.triibe.triibeuserapp.util.AuthUiActivity;
 import com.example.triibe.triibeuserapp.takeSurvey.TakeSurveyActivity;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.firebase.ui.auth.AuthUI;

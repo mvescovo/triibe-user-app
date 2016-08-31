@@ -10,23 +10,24 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Question {
 
-    private String id;
-    private String imageUrl;
-    private String title;
-    private String intro;
-    private Query query;
-    private String introLinkKey;
-    private String introLinkUrl;
+    private String mId;
+    private String mImageUrl;
+    private String mTitle;
+    private String mIntro;
+    private Query mQuery;
+    private String mIntroLinkKey;
+    private String mIntroLinkUrl;
+    private String mAction;
 
     // Empty constructor required for firebase
     public Question() {}
 
     public Question(String id, String imageUrl, String title, String intro, Query query) {
-        this.id = id;
-        this.imageUrl = imageUrl;
-        this.title = title;
-        this.intro = intro;
-        this.query = query;
+        mId = id;
+        mImageUrl = imageUrl;
+        mTitle = title;
+        mIntro = intro;
+        mQuery = query;
     }
 
     /*
@@ -36,58 +37,58 @@ public class Question {
     * Boolean values cannot use "hasExtraValue" for example.
     * */
     public String getId() {
-        return id;
+        return mId;
     }
 
     public void setId(String id) {
-        this.id = id;
+        mId = id;
     }
 
     public String getImageUrl() {
-        return imageUrl;
+        return mImageUrl;
     }
 
     public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+        mImageUrl = imageUrl;
     }
 
     public String getTitle() {
-        return title;
+        return mTitle;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        mTitle = title;
     }
 
     public String getIntro() {
-        return intro;
+        return mIntro;
     }
 
     public void setIntro(String intro) {
-        this.intro = intro;
+        mIntro = intro;
     }
 
     public Query getQuery() {
-        return query;
+        return mQuery;
     }
 
     public void setQuery(Query query) {
-        this.query = query;
+        mQuery = query;
     }
 
     public String getIntroLinkKey() {
-        return introLinkKey;
+        return mIntroLinkKey;
     }
 
     public void setIntroLinkKey(String introLinkKey) {
-        this.introLinkKey = introLinkKey;
+        mIntroLinkKey = introLinkKey;
     }
 
     public String getIntroLinkUrl() {
-        return introLinkUrl;
+        return mIntroLinkUrl;
     }
 
     public void setIntroLinkUrl(String introLinkUrl) {
-        this.introLinkUrl = introLinkUrl;
+        mIntroLinkUrl = introLinkUrl;
     }
 }
