@@ -27,6 +27,7 @@ import com.example.triibe.triibeuserapp.data.Option;
 import com.example.triibe.triibeuserapp.data.Query;
 import com.example.triibe.triibeuserapp.data.Question;
 import com.example.triibe.triibeuserapp.data.Survey;
+import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -56,6 +57,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     private boolean mDownloadedAnswers;
     private int mCurrentQuestionNum;
     private String mUserId;
+    private String mSurveyId;
 
     @BindView(R.id.load_survey_progress_bar)
     ProgressBar mLoadSurveyProgressBar;
@@ -98,6 +100,13 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_survey);
         ButterKnife.bind(this);
+
+
+        if (getIntent().getStringExtra("surveyId") != null) {
+            mSurveyId = getIntent().getStringExtra("surveyId");
+        } else {
+            mSurveyId = "-1";
+        }
 
         mLoadSurveyProgressBar.setVisibility(View.VISIBLE);
 
@@ -153,7 +162,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                 Log.w(TAG, "loadQuestions:onCancelled", databaseError.toException());
             }
         };
-        mDatabase.child("surveys").child("triibeUser").child("questions").addValueEventListener(questionListener);
+        mDatabase.child("surveys").child(mSurveyId).child("questions").addValueEventListener(questionListener);
     }
 
     /*
@@ -190,7 +199,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                 Log.w(TAG, "loadAnswers:onCancelled", databaseError.toException());
             }
         };
-        mDatabase.child("surveys").child("triibeUser").child("answers").child(mUserId).addValueEventListener(answerListener);
+        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).addValueEventListener(answerListener);
     }
 
     /*
@@ -234,7 +243,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                 String scheme = "";
                 Linkify.addLinks(mIntro, pattern, scheme, null, mentionFilter);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    mIntro.setLinkTextColor(getResources().getColor(R.color.wallet_link_text_light, getTheme()));
+                    mIntro.setLinkTextColor(getResources().getColor(R.color.linkColor, getTheme()));
                 }
             }
         } else {
@@ -475,7 +484,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         }
 
         // Add the answer to firebase
-        mDatabase.child("surveys").child("triibeUser").child("answers").child(mUserId).setValue(mAnswers);
+        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).setValue(mAnswers);
     }
 
     /*
@@ -536,7 +545,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         }
 
         // Add the answer to firebase
-        mDatabase.child("surveys").child("triibeUser").child("answers").child(mUserId).setValue(mAnswers);
+        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).setValue(mAnswers);
     }
 
     /*
@@ -616,7 +625,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         }
 
         // Add the answer to firebase
-        mDatabase.child("surveys").child("triibeUser").child("answers").child(mUserId).setValue(mAnswers);
+        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).setValue(mAnswers);
     }
 
     /*
@@ -666,7 +675,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         }
 
         // Add the answer to firebase
-        mDatabase.child("surveys").child("triibeUser").child("answers").child(mUserId).setValue(mAnswers);
+        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).setValue(mAnswers);
     }
 
     /*
@@ -782,7 +791,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         Question question = new Question("5", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/The_Westfield_Group_logo.svg/500px-The_Westfield_Group_logo.svg.png", "About You", "", query);
 
         // Add the question
-        mDatabase.child("surveys").child("triibeUser").child("questions").child("7").setValue(question);
+        mDatabase.child("surveys").child(mSurveyId).child("questions").child("7").setValue(question);
 //        mQuestions.add(question);
 //        updateSurvey(mQuestions);
     }
@@ -791,8 +800,9 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * Add a whole new survey if all the questions were populated.
     * */
     private void updateSurvey(ArrayList<Question> questions) {
-        Survey newSurvey = new Survey("TRIIBE user survey", "2.1", questions);
-        mDatabase.child("surveys").child("triibeUser").setValue(newSurvey);
+        SurveyDetails surveyDetails = new SurveyDetails("triibeUser", "2.1", "TRIIBE user survey", "1", "10");
+        Survey newSurvey = new Survey(surveyDetails, questions);
+        mDatabase.child("surveys").child(mSurveyId).setValue(newSurvey);
     }
 
     @Override

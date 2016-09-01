@@ -8,6 +8,9 @@
     <string name="unknown_sign_in_response">Unknown response from AuthUI sign-in</string>
     <string name="sign_out_failed">Sign out failed</string>
 
+    <!--ViewSurveysActivity-->
+    <string name="no_surveys">No surveys available.</string>
+
     <!--TrackDataActivity-->
     <string name="title_activity_track_data">Track data</string>
     <string name="sign_out">Sign out</string>

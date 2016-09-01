@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".auth.AuthUiActivity">
+        <activity android:name=".util.AuthUiActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -36,19 +36,20 @@
                 android:value="com.example.triibe.triibeuserapp.trackData.TrackDataActivity"/>
         </activity>
 
-        <!--<service-->
-            <!--android:name=".trackWIFI.TrackRssiIntentService"-->
-            <!--android:enabled="true"-->
-            <!--android:exported="true">-->
-        <!--</service>-->
+        <!-- <service -->
+        <!-- android:name=".trackWIFI.TrackRssiIntentService" -->
+        <!-- android:enabled="true" -->
+        <!-- android:exported="true"> -->
+        <!-- </service> -->
 
-        <!--<provider-->
-            <!--android:name=".util.IndoorProvider"-->
-            <!--android:authorities="com.example.triibe.triibeuserapp.util.indoor"-->
-            <!--android:exported="true"-->
-            <!--android:readPermission="com.indoor.READ_CONTEXT_DATA"-->
-            <!--android:writePermission="com.indoor.WRITE_CONTEXT_DATA">-->
-        <!--</provider>-->
+
+        <!-- <provider -->
+        <!-- android:name=".util.IndoorProvider" -->
+        <!-- android:authorities="com.example.triibe.triibeuserapp.util.indoor" -->
+        <!-- android:exported="true" -->
+        <!-- android:readPermission="com.indoor.READ_CONTEXT_DATA" -->
+        <!-- android:writePermission="com.indoor.WRITE_CONTEXT_DATA"> -->
+        <!-- </provider> -->
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -69,11 +70,15 @@
         <!-- android:name=".trackWIFI.IndoorMapActivity" -->
         <!-- android:label="@string/title_activity_maps"> -->
         <!-- </activity> -->
-        <!--<service-->
-            <!--android:name=".trackWIFI.TestMapsService"-->
-            <!--android:enabled="true"-->
-            <!--android:exported="true">-->
-        <!--</service>-->
+        <!-- <service -->
+        <!-- android:name=".trackWIFI.TestMapsService" -->
+        <!-- android:enabled="true" -->
+        <!-- android:exported="true"> -->
+        <!-- </service> -->
+        <activity android:name=".view_surveys.ViewSurveysActivity">
+        </activity>
+        <activity android:name=".view_survey_details.ViewSurveyDetailsActivity">
+        </activity>
     </application>
 
 </manifest>

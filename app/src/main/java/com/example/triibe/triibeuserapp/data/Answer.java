@@ -12,17 +12,17 @@ import java.util.ArrayList;
 @IgnoreExtraProperties
 public class Answer {
 
-    private String questionId;
-    private String type;
-    private ArrayList<Option> selectedOptions;
+    private String mQuestionId;
+    private String mType;
+    private ArrayList<Option> mSelectedOptions;
 
     // Empty constructor required for firebase
     public Answer() {}
 
     public Answer(String questionId, String type, ArrayList<Option> selectedOptions) {
-        this.questionId = questionId;
-        this.type = type;
-        this.selectedOptions = selectedOptions;
+        mQuestionId = questionId;
+        mType = type;
+        mSelectedOptions = selectedOptions;
     }
 
     /*
@@ -32,26 +32,26 @@ public class Answer {
     * Boolean values cannot use "hasExtraValue" for example.
     * */
     public String getQuestionId() {
-        return questionId;
+        return mQuestionId;
     }
 
     public void setQuestionId(String questionId) {
-        this.questionId = questionId;
+        mQuestionId = questionId;
     }
 
     public String getType() {
-        return type;
+        return mType;
     }
 
     public void setType(String type) {
-        this.type = type;
+        mType = type;
     }
 
     public ArrayList<Option> getSelectedOptions() {
-        return selectedOptions;
+        return mSelectedOptions;
     }
 
     public void setSelectedOptions(ArrayList<Option> selectedOptions) {
-        this.selectedOptions = selectedOptions;
+        mSelectedOptions = selectedOptions;
     }
 }
