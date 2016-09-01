@@ -3,9 +3,7 @@ package com.example.triibe.triibeuserapp.data;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Survey entity. Used for Firebase realtime database so an entire survey can be
@@ -16,24 +14,15 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Survey {
 
-    private String mId;
-    private String mVersion;
-    private String mDescription;
+    private SurveyDetails mSurveyDetails;
     private ArrayList<Question> mQuestions;
     private List mAnswers;
-
-    private int mDurationTillExpiry;
-    private int mPoints;
-    private Map<String, Date> mLocations; // needs to be a date range
-    private List mTimes;
-    private List<DemographicProfile> mDemographicProfiles;
 
     // Empty constructor required for firebase
     public Survey() {}
 
-    public Survey(String description, String version, ArrayList<Question> questions) {
-        mDescription = description;
-        mVersion = version;
+    public Survey(SurveyDetails surveyDetails, ArrayList<Question> questions) {
+        mSurveyDetails = surveyDetails;
         mQuestions = questions;
     }
 
@@ -43,28 +32,13 @@ public class Survey {
     * Note: getters must be of the form "get<parameter name>".
     * Boolean values cannot use "hasExtraValue" for example.
     * */
-    public String getId() {
-        return mId;
+
+    public SurveyDetails getSurveyDetails() {
+        return mSurveyDetails;
     }
 
-    public void setId(String id) {
-        mId = id;
-    }
-
-    public String getDescription() {
-        return mDescription;
-    }
-
-    public void setDescription(String description) {
-        mDescription = description;
-    }
-
-    public String getVersion() {
-        return mVersion;
-    }
-
-    public void setVersion(String version) {
-        mVersion = version;
+    public void setSurveyDetails(SurveyDetails surveyDetails) {
+        mSurveyDetails = surveyDetails;
     }
 
     public ArrayList<Question> getQuestions() {
@@ -73,5 +47,13 @@ public class Survey {
 
     public void setQuestions(ArrayList<Question> questions) {
         mQuestions = questions;
+    }
+
+    public List getAnswers() {
+        return mAnswers;
+    }
+
+    public void setAnswers(List answers) {
+        mAnswers = answers;
     }
 }

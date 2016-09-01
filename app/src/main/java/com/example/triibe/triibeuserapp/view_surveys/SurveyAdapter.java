@@ -2,14 +2,13 @@ package com.example.triibe.triibeuserapp.view_surveys;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.triibe.triibeuserapp.R;
-import com.example.triibe.triibeuserapp.data.Survey;
+import com.example.triibe.triibeuserapp.data.SurveyDetails;
 
 import java.util.ArrayList;
 
@@ -21,11 +20,11 @@ public class SurveyAdapter extends RecyclerView.Adapter {
     private static final String TAG = "SurveyAdapter";
 
     private ViewSurveysContract.UserActionsListener mUserActionsListener;
-    private ArrayList<String> mDataset;
+    private ArrayList<SurveyDetails> mSurveys;
 
-    public SurveyAdapter(ViewSurveysContract.UserActionsListener userActionsListener, ArrayList<String> dataset) {
+    public SurveyAdapter(ViewSurveysContract.UserActionsListener userActionsListener, ArrayList<SurveyDetails> surveys) {
         mUserActionsListener = userActionsListener;
-        mDataset = dataset;
+        mSurveys = surveys;
     }
 
     @Override
@@ -37,12 +36,16 @@ public class SurveyAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         TextView textView = (TextView) ((SurveyViewHolder)holder).getView().findViewById(R.id.survey_description);
-        textView.setText("Survey number: " + position);
+        textView.setText(mSurveys.get(position).getDescription());
+        textView = (TextView) ((SurveyViewHolder)holder).getView().findViewById(R.id.survey_points);
+        textView.setText("Points: " + mSurveys.get(position).getPoints());
+        textView = (TextView) ((SurveyViewHolder)holder).getView().findViewById(R.id.survey_expiry);
+        textView.setText("Expiry time: " + mSurveys.get(position).getDurationTillExpiry() + "hour.");
     }
 
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        return mSurveys.size();
     }
 
     /*
@@ -58,9 +61,7 @@ public class SurveyAdapter extends RecyclerView.Adapter {
             mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Survey survey = new Survey();
-                    survey.setId("triibeUser");
-                    mUserActionsListener.openSurveyDetails(survey);
+                    mUserActionsListener.openSurveyDetails(mSurveys.get(getAdapterPosition()).getId());
                 }
             });
         }
@@ -70,11 +71,8 @@ public class SurveyAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public void replaceData(@NonNull ArrayList<String> surveys) {
-        if (surveys == null) {
-            Log.d(TAG, "replaceData: SURVEY NULL");
-        }
-        mDataset = surveys;
+    public void replaceData(@NonNull ArrayList<SurveyDetails> surveys) {
+        mSurveys = surveys;
         notifyDataSetChanged();
     }
 }

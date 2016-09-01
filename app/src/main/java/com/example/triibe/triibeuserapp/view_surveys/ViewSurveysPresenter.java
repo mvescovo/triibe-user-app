@@ -3,7 +3,7 @@ package com.example.triibe.triibeuserapp.view_surveys;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.example.triibe.triibeuserapp.data.Survey;
+import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.User;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.google.firebase.database.DataSnapshot;
@@ -22,10 +22,12 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
     private static final String TAG = "ViewSurveysPresenter";
     private ViewSurveysContract.View mView;
     private DatabaseReference mDatabase;
+    private ArrayList<SurveyDetails> mSurveyDetails;
 
     public ViewSurveysPresenter(ViewSurveysContract.View view) {
         mView = view;
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        mSurveyDetails = new ArrayList<>();
     }
 
     @Override
@@ -69,12 +71,34 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
     @Override
     public void loadSurveys() {
         ArrayList<String> surveyIds = Globals.getInstance().getUser().getSurveyIds();
-        mView.showSurveys(surveyIds);
-        mView.setProgressIndicator(false);
+        mSurveyDetails.clear();
+
+        for (int i = 0; i < surveyIds.size(); i++) {
+            ValueEventListener surveyDetailsDataListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    SurveyDetails surveyDetails = dataSnapshot.getValue(SurveyDetails.class);
+                    mSurveyDetails.add(surveyDetails);
+                    mView.showSurveys(mSurveyDetails);
+                    mView.setProgressIndicator(false);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Getting survey details data failed, log a message
+                    Log.w(TAG, "loadSurveyDetailsData:onCancelled", databaseError.toException());
+                    mView.setProgressIndicator(false);
+                }
+            };
+            mDatabase.child("surveys")
+                    .child(surveyIds.get(i))
+                    .child("surveyDetails")
+                    .addValueEventListener(surveyDetailsDataListener);
+        }
     }
 
     @Override
-    public void openSurveyDetails(@NonNull Survey requestedSurvey) {
-        mView.showSurveyDetails(requestedSurvey.getId());
+    public void openSurveyDetails(@NonNull String surveyId) {
+        mView.showSurveyDetails(surveyId);
     }
 }

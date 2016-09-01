@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.triibe.triibeuserapp.R;
+import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.takeSurvey.TakeSurveyActivity;
 
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
         * */
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mSurveyAdapter = new SurveyAdapter(mUserActionsListener, new ArrayList<String>(0));
+        mSurveyAdapter = new SurveyAdapter(mUserActionsListener, new ArrayList<SurveyDetails>(0));
         mRecyclerView.setAdapter(mSurveyAdapter);
 
 //        if (adapter.getItemCount() == 0) {
@@ -88,7 +89,7 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     }
 
     @Override
-    public void showSurveys(@NonNull ArrayList<String> surveys) {
+    public void showSurveys(@NonNull ArrayList<SurveyDetails> surveys) {
         mSurveyAdapter.replaceData(surveys);
 
         if (surveys.size() == 0) {

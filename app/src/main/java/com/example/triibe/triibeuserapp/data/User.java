@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * User entity.
+ *
  * @author michael.
  */
 @IgnoreExtraProperties

@@ -27,6 +27,7 @@ import com.example.triibe.triibeuserapp.data.Option;
 import com.example.triibe.triibeuserapp.data.Query;
 import com.example.triibe.triibeuserapp.data.Question;
 import com.example.triibe.triibeuserapp.data.Survey;
+import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -799,7 +800,8 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * Add a whole new survey if all the questions were populated.
     * */
     private void updateSurvey(ArrayList<Question> questions) {
-        Survey newSurvey = new Survey("TRIIBE user survey", "2.1", questions);
+        SurveyDetails surveyDetails = new SurveyDetails("triibeUser", "2.1", "TRIIBE user survey", "1", "10");
+        Survey newSurvey = new Survey(surveyDetails, questions);
         mDatabase.child("surveys").child(mSurveyId).setValue(newSurvey);
     }
 

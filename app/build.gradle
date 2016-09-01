@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
@@ -17,6 +18,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
     }
 }
 
@@ -48,7 +52,7 @@ dependencies {
 
     // Picaso - for image loading
     compile 'com.squareup.picasso:picasso:2.5.2'
-
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     /*
     * Stuff for the old app. Not currently in use but keeping in case we re-enable later.
@@ -63,3 +67,6 @@ dependencies {
 
 // To load the google-services.json file needed for firebase
 apply plugin: 'com.google.gms.google-services'
+repositories {
+    mavenCentral()
+}
