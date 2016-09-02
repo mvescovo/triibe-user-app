@@ -52,6 +52,11 @@ dependencies {
 
     // Picaso - for image loading
     compile 'com.squareup.picasso:picasso:2.5.2'
+
+    // Floating action button menu
+    compile 'com.github.clans:fab:1.6.4'
+
+    // Kotlin
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     /*

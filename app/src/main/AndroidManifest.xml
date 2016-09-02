@@ -75,9 +75,30 @@
         <!-- android:enabled="true" -->
         <!-- android:exported="true"> -->
         <!-- </service> -->
-        <activity android:name=".view_surveys.ViewSurveysActivity">
+        <activity
+            android:name=".view_surveys.ViewSurveysActivity"
+            android:label="@string/title_activity_view_surveys"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name=".view_survey_details.ViewSurveyDetailsActivity">
+        </activity>
+        <activity
+            android:name=".create_survey.CreateSurveyActivity"
+            android:label="@string/title_activity_create_surveys"
+            android:parentActivityName=".view_surveys.ViewSurveysActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
+        </activity>
+        <activity
+            android:name=".create_question.CreateQuestionActivity"
+            android:label="@string/title_activity_create_questions"
+            android:parentActivityName=".view_surveys.ViewSurveysActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
         </activity>
     </application>
 

@@ -9,7 +9,22 @@
     <string name="sign_out_failed">Sign out failed</string>
 
     <!--ViewSurveysActivity-->
+    <string name="title_activity_view_surveys">Surveys</string>
     <string name="no_surveys">No surveys available.</string>
+
+    <!--CreateSurveyActivity-->
+    <string name="title_activity_create_surveys">Create Survey</string>
+    <string name="add_survey_details_title">Survey Details</string>
+    <string name="add_name_hint">Name</string>
+    <string name="add_description_hint">Description</string>
+    <string name="add_time_till_expiry_hint">Time till expiry</string>
+    <string name="add_points_hint">Points</string>
+    <string name="add_version_hint">Version</string>
+    <string name="successfully_saved_survey">Survey saved</string>
+
+    <!--CreateQuestionActivity-->
+    <string name="title_activity_create_questions">Create Question</string>
+    <string name="successfully_saved_question">Question saved</string>
 
     <!--TrackDataActivity-->
     <string name="title_activity_track_data">Track data</string>
@@ -36,11 +51,13 @@
     <string name="query">Query</string>
     <string name="response">Answer</string>
     <string name="image_url">Image url</string>
-    <string name="next_question">NEXT &gt;</string>
-    <string name="previous_question">&lt; BACK</string>
+    <string name="next_question">NEXT</string>
+    <string name="previous_question">BACK</string>
     <string name="add_question">Add query</string>
     <string name="at_first_question">You\'re at the first question.</string>
     <string name="question_incomplete">Question incomplete</string>
     <string name="finish_survey">Finish</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_test">TestActivity</string>
+
 </resources>

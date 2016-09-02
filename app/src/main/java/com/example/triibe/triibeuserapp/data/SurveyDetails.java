@@ -7,6 +7,7 @@ public class SurveyDetails {
 
     private String mId;
     private String mVersion;
+    private String mName;
     private String mDescription;
     private String mDurationTillExpiry;
     private String mPoints;
@@ -14,9 +15,10 @@ public class SurveyDetails {
     // Empty constructor required for firebase
     public SurveyDetails() {}
 
-    public SurveyDetails(String id, String version, String description, String durationTillExpiry, String points) {
+    public SurveyDetails(String id, String version, String name, String description, String durationTillExpiry, String points) {
         mId = id;
         mVersion = version;
+        mName = name;
         mDescription = description;
         mDurationTillExpiry = durationTillExpiry;
         mPoints = points;
@@ -43,6 +45,14 @@ public class SurveyDetails {
 
     public void setVersion(String version) {
         mVersion = version;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public void setName(String name) {
+        mName = name;
     }
 
     public String getDescription() {

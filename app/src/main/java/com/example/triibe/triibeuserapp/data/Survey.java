@@ -21,9 +21,8 @@ public class Survey {
     // Empty constructor required for firebase
     public Survey() {}
 
-    public Survey(SurveyDetails surveyDetails, ArrayList<Question> questions) {
+    public Survey(SurveyDetails surveyDetails) {
         mSurveyDetails = surveyDetails;
-        mQuestions = questions;
     }
 
     /*

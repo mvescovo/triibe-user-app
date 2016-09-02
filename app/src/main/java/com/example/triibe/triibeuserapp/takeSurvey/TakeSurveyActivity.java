@@ -800,8 +800,8 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * Add a whole new survey if all the questions were populated.
     * */
     private void updateSurvey(ArrayList<Question> questions) {
-        SurveyDetails surveyDetails = new SurveyDetails("triibeUser", "2.1", "TRIIBE user survey", "1", "10");
-        Survey newSurvey = new Survey(surveyDetails, questions);
+        SurveyDetails surveyDetails = new SurveyDetails("triibeUser2.1", "2.1", "triibeUser", "TRIIBE user survey", "1", "10");
+        Survey newSurvey = new Survey(surveyDetails);
         mDatabase.child("surveys").child(mSurveyId).setValue(newSurvey);
     }
 
