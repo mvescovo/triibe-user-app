@@ -30,10 +30,10 @@
         <activity
             android:name=".takeSurvey.TakeSurveyActivity"
             android:label="@string/title_activity_take_survey"
-            android:parentActivityName=".trackData.TrackDataActivity">
+            android:parentActivityName=".view_surveys.ViewSurveysActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.triibe.triibeuserapp.trackData.TrackDataActivity"/>
+                android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
         </activity>
 
         <!-- <service -->
@@ -85,8 +85,8 @@
         <activity
             android:name=".create_survey.CreateSurveyActivity"
             android:label="@string/title_activity_create_surveys"
-            android:parentActivityName=".view_surveys.ViewSurveysActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".view_surveys.ViewSurveysActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>

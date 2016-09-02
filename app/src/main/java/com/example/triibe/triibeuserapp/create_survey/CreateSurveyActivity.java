@@ -15,6 +15,8 @@ import butterknife.ButterKnife;
 
 public class CreateSurveyActivity extends AppCompatActivity implements CreateSurveyContract.View {
 
+    private static final String TAG = "CreateSurveyActivity";
+
     CreateSurveyContract.UserActionsListener mUserActionsListener;
 
     @BindView(R.id.submit)
@@ -46,15 +48,20 @@ public class CreateSurveyActivity extends AppCompatActivity implements CreateSur
 
         ButterKnife.bind(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         mSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mUserActionsListener.createSurvey(mName.getText().toString(),
-                        mDescription.getText().toString(), mVersion.getText().toString(),
-                        mPoints.getText().toString(), mTimeTillExpiry.getText().toString());
+                if (validate()) {
+                    mUserActionsListener.createSurvey(mName.getText().toString(),
+                            mDescription.getText().toString(), mVersion.getText().toString(),
+                            mPoints.getText().toString(), mTimeTillExpiry.getText().toString());
+                }
             }
         });
     }
@@ -68,5 +75,32 @@ public class CreateSurveyActivity extends AppCompatActivity implements CreateSur
     public void showSurveys() {
         setResult(Activity.RESULT_OK);
         finish();
+    }
+
+    private boolean validate() {
+
+        if (mName.getText().toString().trim().contentEquals("")) {
+            mName.setError("Name must not be empty");
+            mName.requestFocus();
+            return false;
+        } else if (mDescription.getText().toString().trim().contentEquals("")) {
+            mDescription.setError("Description must not be empty");
+            mDescription.requestFocus();
+            return false;
+        } else if (mVersion.getText().toString().trim().contentEquals("")) {
+            mVersion.setError("Version must not be empty");
+            mVersion.requestFocus();
+            return false;
+        } else if (mPoints.getText().toString().trim().contentEquals("")) {
+            mPoints.setError("Points must not be empty");
+            mPoints.requestFocus();
+            return false;
+        } else if (mTimeTillExpiry.getText().toString().trim().contentEquals("")) {
+            mTimeTillExpiry.setError("Time till expiry must not be empty");
+            mTimeTillExpiry.requestFocus();
+            return false;
+        }
+
+        return true;
     }
 }

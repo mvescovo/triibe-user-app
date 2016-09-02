@@ -19,10 +19,12 @@ public class CreateSurveyPresenter implements CreateSurveyContract.UserActionsLi
     }
 
     @Override
-    public void createSurvey(String name, String description, String version, String points, String timeTillExpiry) {
+    public void createSurvey(String name, String description, String version, String points,
+                             String timeTillExpiry) {
         mView.setProgressIndicator(true);
 
-        SurveyDetails surveyDetails = new SurveyDetails(name, version, name, description, timeTillExpiry, points);
+        SurveyDetails surveyDetails = new SurveyDetails(name + version, version, name, description,
+                timeTillExpiry, points);
         Survey survey = new Survey(surveyDetails);
 
         mDatabase.child("surveys").child(surveyDetails.getId()).setValue(survey);

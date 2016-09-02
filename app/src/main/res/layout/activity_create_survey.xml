@@ -62,7 +62,8 @@
                         android:id="@+id/survey_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/add_name_hint"/>
+                        android:hint="@string/add_name_hint"
+                        android:inputType="textAutoComplete|textCapSentences|textAutoCorrect"/>
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -74,7 +75,8 @@
                         android:id="@+id/survey_description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/add_description_hint"/>
+                        android:hint="@string/add_description_hint"
+                        android:inputType="textAutoComplete|textCapSentences|textAutoCorrect"/>
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -86,7 +88,8 @@
                         android:id="@+id/survey_version"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/add_version_hint"/>
+                        android:hint="@string/add_version_hint"
+                        android:inputType="number"/>
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -98,7 +101,8 @@
                         android:id="@+id/survey_points"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/add_points_hint"/>
+                        android:hint="@string/add_points_hint"
+                        android:inputType="number"/>
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -110,7 +114,8 @@
                         android:id="@+id/survey_time_till_expiry"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/add_time_till_expiry_hint"/>
+                        android:hint="@string/add_time_till_expiry_hint"
+                        android:inputType="time"/>
 
                 </android.support.design.widget.TextInputLayout>
 

@@ -40,20 +40,20 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                 if (dataSnapshot.exists()) {
                     User user = dataSnapshot.getValue(User.class);
                     Globals.getInstance().setUser(user);
+                    if (Globals.getInstance().getUser().getSurveyIds() == null) {
+                        ArrayList<String> surveyIds = new ArrayList<>();
+                        Globals.getInstance().getUser().setSurveyIds(surveyIds);
+                    }
+                    loadSurveys();
                 } else {
                     // Add new user.
                     ArrayList<String> surveyIds = new ArrayList<>();
-                    surveyIds.add("triibeUser");
+                    surveyIds.add("enrollmentSurvey");
                     Globals.getInstance().getUser().setSurveyIds(surveyIds);
                     mDatabase.child("users")
                             .child(Globals.getInstance().getUser().getId())
                             .setValue(Globals.getInstance().getUser());
                 }
-                if (Globals.getInstance().getUser().getSurveyIds() == null) {
-                    ArrayList<String> surveyIds = new ArrayList<>();
-                    Globals.getInstance().getUser().setSurveyIds(surveyIds);
-                }
-                loadSurveys();
             }
 
             @Override
@@ -70,8 +70,9 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
 
     @Override
     public void loadSurveys() {
-        ArrayList<String> surveyIds = Globals.getInstance().getUser().getSurveyIds();
         mSurveyDetails.clear();
+        ArrayList<String> surveyIds = Globals.getInstance().getUser().getSurveyIds();
+        Log.d(TAG, "loadSurveys: NUM SURVEY IDs: " + surveyIds.size());
 
         for (int i = 0; i < surveyIds.size(); i++) {
             ValueEventListener surveyDetailsDataListener = new ValueEventListener() {
