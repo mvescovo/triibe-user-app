@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
-    android:id="@+id/view_survey_root"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/view_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -54,31 +53,16 @@
             android:paddingTop="@dimen/activity_vertical_margin"
             android:scrollbars="vertical"/>
 
-        <com.github.clans.fab.FloatingActionMenu
-            android:id="@+id/fab_menu"
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/modify_survey_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_margin="@dimen/fab_margin">
-
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/create_question_fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_add_white_24dp"
-                fab:fab_label="Create Question"
-                fab:fab_size="mini"/>
-
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/create_survey_fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_add_white_24dp"
-                fab:fab_label="Create Survey"
-                fab:fab_size="mini"/>
-
-        </com.github.clans.fab.FloatingActionMenu>
+            android:layout_margin="@dimen/fab_margin_large"
+            android:backgroundTint="@color/colorFabNormal"
+            android:src="@drawable/ic_mode_edit_white_24dp"
+            app:borderWidth="0dp"/>
 
     </RelativeLayout>
 

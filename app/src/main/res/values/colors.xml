@@ -6,4 +6,5 @@
     <color name="colorAccent2">#FFFFFF</color>
     <color name="colorSurveyProgressBackground">#e0e0e0</color>
     <color name="colorFabNormal">#DA4336</color>
+    <color name="colorFabDone">#4CAF50</color>
 </resources>

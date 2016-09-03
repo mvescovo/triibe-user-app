@@ -1,5 +1,10 @@
 package com.example.triibe.triibeuserapp.data;
 
+import com.google.firebase.database.Exclude;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author michael.
  */
@@ -7,7 +12,6 @@ public class SurveyDetails {
 
     private String mId;
     private String mVersion;
-    private String mName;
     private String mDescription;
     private String mDurationTillExpiry;
     private String mPoints;
@@ -15,10 +19,10 @@ public class SurveyDetails {
     // Empty constructor required for firebase
     public SurveyDetails() {}
 
-    public SurveyDetails(String id, String version, String name, String description, String durationTillExpiry, String points) {
+    public SurveyDetails(String id, String version, String description, String durationTillExpiry,
+                         String points) {
         mId = id;
         mVersion = version;
-        mName = name;
         mDescription = description;
         mDurationTillExpiry = durationTillExpiry;
         mPoints = points;
@@ -30,7 +34,6 @@ public class SurveyDetails {
     * Note: getters must be of the form "get<parameter name>".
     * Boolean values cannot use "hasExtraValue" for example.
     * */
-
     public String getId() {
         return mId;
     }
@@ -45,14 +48,6 @@ public class SurveyDetails {
 
     public void setVersion(String version) {
         mVersion = version;
-    }
-
-    public String getName() {
-        return mName;
-    }
-
-    public void setName(String name) {
-        mName = name;
     }
 
     public String getDescription() {
@@ -77,5 +72,18 @@ public class SurveyDetails {
 
     public void setPoints(String  points) {
         mPoints = points;
+    }
+
+    // For firebase map
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("id", mId);
+        result.put("version", mVersion);
+        result.put("description", mDescription);
+        result.put("durationTillExpiry", mDurationTillExpiry);
+        result.put("points", mPoints);
+
+        return result;
     }
 }

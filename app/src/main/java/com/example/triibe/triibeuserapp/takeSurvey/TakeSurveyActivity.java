@@ -26,8 +26,6 @@ import com.example.triibe.triibeuserapp.data.Answer;
 import com.example.triibe.triibeuserapp.data.Option;
 import com.example.triibe.triibeuserapp.data.Query;
 import com.example.triibe.triibeuserapp.data.Question;
-import com.example.triibe.triibeuserapp.data.Survey;
-import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -788,10 +786,10 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         Query query = new Query("radio", "What is your average annual FAMILY income (in Australian dollars, before tax)?", options);
 
         // Enter the question details
-        Question question = new Question("5", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/The_Westfield_Group_logo.svg/500px-The_Westfield_Group_logo.svg.png", "About You", "", query);
+//        Question question = new Question("5", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/The_Westfield_Group_logo.svg/500px-The_Westfield_Group_logo.svg.png", "About You", "", query);
 
         // Add the question
-        mDatabase.child("surveys").child(mSurveyId).child("questions").child("7").setValue(question);
+//        mDatabase.child("surveys").child(mSurveyId).child("questions").child("7").setValue(question);
 //        mQuestions.add(question);
 //        updateSurvey(mQuestions);
     }
@@ -800,9 +798,9 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * Add a whole new survey if all the questions were populated.
     * */
     private void updateSurvey(ArrayList<Question> questions) {
-        SurveyDetails surveyDetails = new SurveyDetails("triibeUser2.1", "2.1", "triibeUser", "TRIIBE user survey", "1", "10");
-        Survey newSurvey = new Survey(surveyDetails);
-        mDatabase.child("surveys").child(mSurveyId).setValue(newSurvey);
+//        SurveyDetails surveyDetails = new SurveyDetails("triibeUser2.1", "2.1", "triibeUser", "TRIIBE user survey", "1", "10");
+//        Survey newSurvey = new Survey(surveyDetails);
+//        mDatabase.child("surveys").child(mSurveyId).setValue(newSurvey);
     }
 
     @Override

@@ -13,6 +13,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author michael.
@@ -41,14 +43,14 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                     User user = dataSnapshot.getValue(User.class);
                     Globals.getInstance().setUser(user);
                     if (Globals.getInstance().getUser().getSurveyIds() == null) {
-                        ArrayList<String> surveyIds = new ArrayList<>();
+                        HashMap<String, Object> surveyIds = new HashMap<>();
                         Globals.getInstance().getUser().setSurveyIds(surveyIds);
                     }
                     loadSurveys();
                 } else {
                     // Add new user.
-                    ArrayList<String> surveyIds = new ArrayList<>();
-                    surveyIds.add("enrollmentSurvey");
+                    HashMap<String, Object> surveyIds = new HashMap<>();
+                    surveyIds.put("enrollmentSurvey", true);
                     Globals.getInstance().getUser().setSurveyIds(surveyIds);
                     mDatabase.child("users")
                             .child(Globals.getInstance().getUser().getId())
@@ -71,31 +73,30 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
     @Override
     public void loadSurveys() {
         mSurveyDetails.clear();
-        ArrayList<String> surveyIds = Globals.getInstance().getUser().getSurveyIds();
+        HashMap<String, Object> surveyIds = Globals.getInstance().getUser().getSurveyIds();
         Log.d(TAG, "loadSurveys: NUM SURVEY IDs: " + surveyIds.size());
 
-        for (int i = 0; i < surveyIds.size(); i++) {
+        for (Map.Entry<String, Object> surveyId : surveyIds.entrySet()) {
             ValueEventListener surveyDetailsDataListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     SurveyDetails surveyDetails = dataSnapshot.getValue(SurveyDetails.class);
                     mSurveyDetails.add(surveyDetails);
                     mView.showSurveys(mSurveyDetails);
-                    mView.setProgressIndicator(false);
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                     // Getting survey details data failed, log a message
                     Log.w(TAG, "loadSurveyDetailsData:onCancelled", databaseError.toException());
-                    mView.setProgressIndicator(false);
                 }
             };
             mDatabase.child("surveys")
-                    .child(surveyIds.get(i))
+                    .child(surveyId.getKey())
                     .child("surveyDetails")
                     .addValueEventListener(surveyDetailsDataListener);
         }
+        mView.setProgressIndicator(false);
     }
 
     @Override

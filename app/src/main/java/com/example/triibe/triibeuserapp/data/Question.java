@@ -1,6 +1,10 @@
 package com.example.triibe.triibeuserapp.data;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Question entity.
@@ -10,6 +14,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Question {
 
+    private String mSurveyId;
     private String mId;
     private String mImageUrl;
     private String mTitle;
@@ -22,7 +27,8 @@ public class Question {
     // Empty constructor required for firebase
     public Question() {}
 
-    public Question(String id, String imageUrl, String title, String intro, Query query) {
+    public Question(String surveyId, String id, String imageUrl, String title, String intro, Query query) {
+        mSurveyId = surveyId;
         mId = id;
         mImageUrl = imageUrl;
         mTitle = title;
@@ -36,6 +42,14 @@ public class Question {
     * Note: getters must be of the form "get<parameter name>".
     * Boolean values cannot use "hasExtraValue" for example.
     * */
+    public String getSurveyId() {
+        return mSurveyId;
+    }
+
+    public void setSurveyId(String surveyId) {
+        mSurveyId = surveyId;
+    }
+
     public String getId() {
         return mId;
     }
@@ -90,5 +104,21 @@ public class Question {
 
     public void setIntroLinkUrl(String introLinkUrl) {
         mIntroLinkUrl = introLinkUrl;
+    }
+
+    // For firebase map
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("surveyId", mSurveyId);
+        result.put("id", mId);
+        result.put("imageUrl", mImageUrl);
+        result.put("title", mTitle);
+        result.put("intro", mIntro);
+        result.put("introLinkKey", mIntroLinkKey);
+        result.put("introLinkUrl", mIntroLinkUrl);
+        result.put("action", mAction);
+
+        return result;
     }
 }

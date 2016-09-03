@@ -3,10 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/view_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.example.triibe.triibeuserapp.create_question.CreateQuestionActivity">
+    tools:context=".edit_option.EditOptionActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -52,17 +53,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:text="@string/add_survey_details_title"/>
+                    android:text="@string/edit_option_details_title"/>
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <android.support.design.widget.TextInputEditText
-                        android:id="@+id/survey_name"
+                        android:id="@+id/option_id"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/add_name_hint"/>
+                        android:hint="@string/edit_option_id_hint"
+                        android:inputType="text"/>
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -71,10 +73,11 @@
                     android:layout_height="wrap_content">
 
                     <android.support.design.widget.TextInputEditText
-                        android:id="@+id/survey_description"
+                        android:id="@+id/option_phrase"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/add_description_hint"/>
+                        android:hint="@string/edit_option_phrase_hint"
+                        android:inputType="textAutoComplete|textCapSentences|textAutoCorrect"/>
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -83,10 +86,11 @@
                     android:layout_height="wrap_content">
 
                     <android.support.design.widget.TextInputEditText
-                        android:id="@+id/survey_version"
+                        android:id="@+id/option_extra_input_type"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/add_version_hint"/>
+                        android:hint="@string/edit_option_extra_input_type_hint"
+                        android:inputType="text"/>
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -95,22 +99,11 @@
                     android:layout_height="wrap_content">
 
                     <android.support.design.widget.TextInputEditText
-                        android:id="@+id/survey_points"
+                        android:id="@+id/option_extra_input_hint"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/add_points_hint"/>
-
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <android.support.design.widget.TextInputEditText
-                        android:id="@+id/survey_time_till_expiry"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/add_time_till_expiry_hint"/>
+                        android:hint="@string/edit_option_extra_input_hint_hint"
+                        android:inputType="textAutoComplete|textCapSentences|textAutoCorrect"/>
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -119,13 +112,15 @@
         </ScrollView>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/submit"
+            android:id="@+id/done_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_margin="@dimen/fab_margin"
-            android:backgroundTint="@color/colorFabNormal"
+            android:layout_marginBottom="@dimen/fab_margin_large"
+            android:layout_marginEnd="@dimen/fab_margin_large"
+            android:layout_marginTop="@dimen/fab_margin_top"
+            android:backgroundTint="@color/colorFabDone"
             android:src="@drawable/ic_done_white_24dp"
             app:borderWidth="0dp"/>
 

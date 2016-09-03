@@ -44,7 +44,8 @@ dependencies {
     compile 'com.firebaseui:firebase-ui-database:0.5.1'
 
     // Firebase (standard Firebase)
-    compile 'com.google.firebase:firebase-storage:9.4.0'
+    compile 'com.google.firebase:firebase-core:9.4.0'
+    compile 'com.google.firebase:firebase-messaging:9.4.0'
 
     // Butterknife - for getting view references easily
     compile 'com.jakewharton:butterknife:8.4.0'
@@ -54,7 +55,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
 
     // Floating action button menu
-    compile 'com.github.clans:fab:1.6.4'
+//    compile 'com.github.clans:fab:1.6.4'
 
     // Kotlin
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

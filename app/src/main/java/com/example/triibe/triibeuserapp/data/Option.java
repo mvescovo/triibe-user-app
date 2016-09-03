@@ -1,6 +1,10 @@
 package com.example.triibe.triibeuserapp.data;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Option entity.
@@ -10,6 +14,8 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Option {
 
+    private String mQuestionId;
+    private String mId;
     private String mPhrase;
     private boolean mHasExtraInput;
     private String mExtraInput;
@@ -30,6 +36,22 @@ public class Option {
     * Note: getters must be of the form "get<parameter name>".
     * Boolean values cannot use "hasExtraValue" for example.
     * */
+    public String getQuestionId() {
+        return mQuestionId;
+    }
+
+    public void setQuestionId(String questionId) {
+        mQuestionId = questionId;
+    }
+
+    public String getId() {
+        return mId;
+    }
+
+    public void setId(String id) {
+        mId = id;
+    }
+
     public String getPhrase() {
         return mPhrase;
     }
@@ -68,5 +90,16 @@ public class Option {
 
     public void setExtraInputHint(String extraInputHint) {
         mExtraInputHint = extraInputHint;
+    }
+
+    // For firebase map
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("questionId", mQuestionId);
+        result.put("id", mId);
+        result.put("phrase", mPhrase);
+
+        return result;
     }
 }

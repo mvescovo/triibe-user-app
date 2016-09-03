@@ -12,19 +12,35 @@
     <string name="title_activity_view_surveys">Surveys</string>
     <string name="no_surveys">No surveys available.</string>
 
-    <!--CreateSurveyActivity-->
-    <string name="title_activity_create_surveys">Create Survey</string>
-    <string name="add_survey_details_title">Survey Details</string>
-    <string name="add_name_hint">Name</string>
-    <string name="add_description_hint">Description</string>
-    <string name="add_time_till_expiry_hint">Time till expiry</string>
-    <string name="add_points_hint">Points</string>
-    <string name="add_version_hint">Version</string>
+    <!--EditSurveyActivity-->
+    <string name="title_activity_edit_survey">Edit Survey</string>
+    <string name="edit_survey_details_title">Survey Details</string>
+    <string name="edit_survey_id_hint">Survey ID</string>
+    <string name="edit_description_hint">Description</string>
+    <string name="edit_time_till_expiry_hint">Time till expiry</string>
+    <string name="edit_points_hint">Points</string>
+    <string name="edit_version_hint">Version</string>
     <string name="successfully_saved_survey">Survey saved</string>
+    <string name="delete_survey">Delete survey</string>
+    <string name="edit_trigger">Edit trigger</string>
 
-    <!--CreateQuestionActivity-->
-    <string name="title_activity_create_questions">Create Question</string>
+    <!--EditQuestionActivity-->
+    <string name="title_activity_edit_question">Edit Question</string>
     <string name="successfully_saved_question">Question saved</string>
+    <string name="edit_question_details_title">Question Details</string>
+    <string name="edit_question_id_hint">Question ID</string>
+    <string name="edit_title_hint">Title</string>
+    <string name="edit_intro_hint">Intro</string>
+    <string name="edit_image_url_hint">Image url</string>
+
+    <!--EditOptionActivity-->
+    <string name="title_activity_edit_option">Edit Option</string>
+    <string name="successfully_saved_option">Option saved</string>
+    <string name="edit_option_details_title">Option Details</string>
+    <string name="edit_option_id_hint">Option ID</string>
+    <string name="edit_option_phrase_hint">Phrase</string>
+    <string name="edit_option_extra_input_type_hint">Extra input type</string>
+    <string name="edit_option_extra_input_hint_hint">Extra input hint</string>
 
     <!--TrackDataActivity-->
     <string name="title_activity_track_data">Track data</string>

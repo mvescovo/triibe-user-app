@@ -83,23 +83,43 @@
         <activity android:name=".view_survey_details.ViewSurveyDetailsActivity">
         </activity>
         <activity
-            android:name=".create_survey.CreateSurveyActivity"
-            android:label="@string/title_activity_create_surveys"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".view_surveys.ViewSurveysActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
-        </activity>
-        <activity
-            android:name=".create_question.CreateQuestionActivity"
-            android:label="@string/title_activity_create_questions"
+            android:name=".edit_survey.EditSurveyActivity"
+            android:label="@string/title_activity_edit_survey"
             android:parentActivityName=".view_surveys.ViewSurveysActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
         </activity>
+        <activity
+            android:name=".edit_question.EditQuestionActivity"
+            android:label="@string/title_activity_edit_question"
+            android:parentActivityName=".view_surveys.ViewSurveysActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
+        </activity>
+        <activity
+            android:name=".edit_option.EditOptionActivity"
+            android:label="@string/title_activity_edit_option"
+            android:parentActivityName=".edit_question.EditQuestionActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.triibe.triibeuserapp.edit_question.EditQuestionActivity"/>
+        </activity>
+
+        <service android:name=".util.FirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name=".trackLocation.TrackLocationService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
     </application>
 
 </manifest>
