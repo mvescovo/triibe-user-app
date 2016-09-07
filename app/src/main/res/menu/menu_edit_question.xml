@@ -12,10 +12,4 @@
         android:icon="@drawable/ic_done_white_24dp"
         android:title="@string/menu_done"
         app:showAsAction="ifRoom"/>
-
-    <item
-        android:id="@+id/delete_survey"
-        android:icon="@drawable/ic_delete_white_24dp"
-        android:title="@string/delete_survey"
-        app:showAsAction="never"/>
 </menu>

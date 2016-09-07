@@ -111,19 +111,6 @@
 
         </ScrollView>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/done_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="@dimen/fab_margin_large"
-            android:layout_marginEnd="@dimen/fab_margin_large"
-            android:layout_marginTop="@dimen/fab_margin_top"
-            android:backgroundTint="@color/colorFabDone"
-            android:src="@drawable/ic_done_white_24dp"
-            app:borderWidth="0dp"/>
-
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

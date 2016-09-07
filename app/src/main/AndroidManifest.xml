@@ -94,11 +94,11 @@
         <activity
             android:name=".edit_question.EditQuestionActivity"
             android:label="@string/title_activity_edit_question"
-            android:parentActivityName=".view_surveys.ViewSurveysActivity"
+            android:parentActivityName=".edit_survey.EditSurveyActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
+                android:value="com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity"/>
         </activity>
         <activity
             android:name=".edit_option.EditOptionActivity"
@@ -120,6 +120,7 @@
             android:enabled="true"
             android:exported="true">
         </service>
+
     </application>
 
 </manifest>

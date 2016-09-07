@@ -3,8 +3,9 @@ package com.example.triibe.triibeuserapp.edit_survey;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.example.triibe.triibeuserapp.R;
@@ -28,15 +30,19 @@ public class EditSurveyActivity extends AppCompatActivity implements EditSurveyC
 
     private static final int REQUEST_EDIT_QUESTION = 1;
     EditSurveyContract.UserActionsListener mUserActionsListener;
+    BottomSheetBehavior mBottomSheetBehavior;
 
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
 
-    @BindView(R.id.edit_question_fab)
-    FloatingActionButton mEditQuestionFab;
+    @BindView(R.id.bottom_sheet)
+    View mBottomSheet;
 
-    @BindView(R.id.done_fab)
-    FloatingActionButton mDoneFab;
+    @BindView(R.id.edit_question_button_layout)
+    LinearLayout mEditQuestionButtonLayout;
+
+    @BindView(R.id.edit_trigger_button_layout)
+    LinearLayout mEditTriggerButtonLayout;
 
     @BindView(R.id.survey_id)
     TextInputEditText mSurveyId;
@@ -70,9 +76,10 @@ public class EditSurveyActivity extends AppCompatActivity implements EditSurveyC
 
         mUserActionsListener = new EditSurveyPresenter(this);
 
-        mEditQuestionFab.setOnClickListener(new View.OnClickListener() {
+        mEditQuestionButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 if (validate()) {
                     mUserActionsListener.editSurvey(mSurveyId.getText().toString(),
                             mDescription.getText().toString(), mVersion.getText().toString(),
@@ -82,16 +89,26 @@ public class EditSurveyActivity extends AppCompatActivity implements EditSurveyC
             }
         });
 
-        mDoneFab.setOnClickListener(new View.OnClickListener() {
+        mEditTriggerButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (validate()) {
-                    mUserActionsListener.editSurvey(mSurveyId.getText().toString(),
-                            mDescription.getText().toString(), mVersion.getText().toString(),
-                            mPoints.getText().toString(), mTimeTillExpiry.getText().toString(),
-                            false);
-                }
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             }
+        });
+
+
+        // The View with the BottomSheetBehavior
+        mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+            }
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+            }
+
         });
     }
 
@@ -162,8 +179,20 @@ public class EditSurveyActivity extends AppCompatActivity implements EditSurveyC
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.edit_trigger:
-                Log.d(TAG, "onOptionsItemSelected: EDIT TRIGGER");
+            case R.id.more_options:
+                // Hide keyboard (currently not working as desired so leaving commented)
+//                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                imm.hideSoftInputFromWindow(mRootView.getWindowToken(), 0);
+                // Show bottomsheet
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                return true;
+            case R.id.done:
+                if (validate()) {
+                    mUserActionsListener.editSurvey(mSurveyId.getText().toString(),
+                            mDescription.getText().toString(), mVersion.getText().toString(),
+                            mPoints.getText().toString(), mTimeTillExpiry.getText().toString(),
+                            false);
+                }
                 return true;
             case R.id.delete_survey:
                 Log.d(TAG, "onOptionsItemSelected: DELETE SURVEY");

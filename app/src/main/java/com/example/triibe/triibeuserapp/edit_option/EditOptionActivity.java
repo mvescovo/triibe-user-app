@@ -3,10 +3,12 @@ package com.example.triibe.triibeuserapp.edit_option;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -23,9 +25,6 @@ public class EditOptionActivity extends AppCompatActivity implements EditOptionC
 
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
-
-    @BindView(R.id.done_fab)
-    FloatingActionButton mDoneFab;
 
     @BindView(R.id.option_id)
     TextInputEditText mOptionId;
@@ -64,19 +63,6 @@ public class EditOptionActivity extends AppCompatActivity implements EditOptionC
         if (getIntent().getStringExtra("questionId") != null) {
             mQuestionId = getIntent().getStringExtra("questionId");
         }
-
-        mDoneFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (validate()) {
-                    mUserActionsListener.editOption(mSurveyId, mQuestionId,
-                            mOptionId.getText().toString().trim(),
-                            mOptionPhrase.getText().toString().trim(),
-                            "false", mExtraInputType.getText().toString().trim(),
-                            mOptionExtraInputHint.getText().toString().trim());
-                }
-            }
-        });
     }
 
     @Override
@@ -103,5 +89,29 @@ public class EditOptionActivity extends AppCompatActivity implements EditOptionC
         }
 
         return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_edit_option, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.done:
+                if (validate()) {
+                    mUserActionsListener.editOption(mSurveyId, mQuestionId,
+                            mOptionId.getText().toString().trim(),
+                            mOptionPhrase.getText().toString().trim(),
+                            "false", mExtraInputType.getText().toString().trim(),
+                            mOptionExtraInputHint.getText().toString().trim());
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

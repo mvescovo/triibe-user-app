@@ -19,7 +19,6 @@ import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity;
 import com.example.triibe.triibeuserapp.takeSurvey.TakeSurveyActivity;
-import com.example.triibe.triibeuserapp.trackLocation.TrackLocationService;
 
 import java.util.ArrayList;
 
@@ -101,8 +100,8 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
 //        addSurveyIdToUser();
 
         // Start up location tracking service
-        mServiceIntent = new Intent(this, TrackLocationService.class);
-        startService(mServiceIntent);
+//        mServiceIntent = new Intent(this, TrackLocationService.class);
+//        startService(mServiceIntent);
     }
 
     @Override
@@ -148,7 +147,7 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT_SURVEY && resultCode == Activity.RESULT_OK) {
-            Snackbar.make(mRootView, getString(R.string.successfully_saved_survey),
+            Snackbar.make(mModifySurveyFab, getString(R.string.successfully_saved_survey),
                     Snackbar.LENGTH_SHORT).show();
         }
     }
