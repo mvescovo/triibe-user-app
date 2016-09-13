@@ -20,8 +20,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.triibe.triibeuserapp.R;
-import com.example.triibe.triibeuserapp.util.AuthUiActivity;
 import com.example.triibe.triibeuserapp.takeSurvey.TakeSurveyActivity;
+import com.example.triibe.triibeuserapp.util.AuthUiActivity;
+import com.example.triibe.triibeuserapp.util.Constants;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.ConnectionResult;
@@ -185,7 +186,7 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
 
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        Globals.MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                        Constants.MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             }
         } else {
             Log.i(TAG, "startDataTracking: Already have permission");
@@ -329,7 +330,7 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
                                            String permissions[],
                                            int[] grantResults) {
         switch (requestCode) {
-            case Globals.MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+            case Constants.MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {

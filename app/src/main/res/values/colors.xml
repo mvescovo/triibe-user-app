@@ -4,7 +4,9 @@
     <color name="colorPrimaryDark">#D32F2F</color>
     <color name="colorAccent">#000000</color>
     <color name="colorAccent2">#FFFFFF</color>
-
     <color name="colorSurveyProgressBackground">#e0e0e0</color>
-
+    <color name="colorBottomSheetBackground">#EEEEEE</color>
+    <color name="colorFabNormal">#DA4336</color>
+    <color name="colorFabDone">#4CAF50</color>
+    <color name="white">#FFFFFF</color>
 </resources>

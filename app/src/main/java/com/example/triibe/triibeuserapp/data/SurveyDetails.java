@@ -1,5 +1,10 @@
 package com.example.triibe.triibeuserapp.data;
 
+import com.google.firebase.database.Exclude;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author michael.
  */
@@ -14,7 +19,8 @@ public class SurveyDetails {
     // Empty constructor required for firebase
     public SurveyDetails() {}
 
-    public SurveyDetails(String id, String version, String description, String durationTillExpiry, String points) {
+    public SurveyDetails(String id, String version, String description, String durationTillExpiry,
+                         String points) {
         mId = id;
         mVersion = version;
         mDescription = description;
@@ -28,7 +34,6 @@ public class SurveyDetails {
     * Note: getters must be of the form "get<parameter name>".
     * Boolean values cannot use "hasExtraValue" for example.
     * */
-
     public String getId() {
         return mId;
     }
@@ -67,5 +72,18 @@ public class SurveyDetails {
 
     public void setPoints(String  points) {
         mPoints = points;
+    }
+
+    // For firebase map
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("id", mId);
+        result.put("version", mVersion);
+        result.put("description", mDescription);
+        result.put("durationTillExpiry", mDurationTillExpiry);
+        result.put("points", mPoints);
+
+        return result;
     }
 }

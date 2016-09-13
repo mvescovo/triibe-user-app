@@ -62,7 +62,7 @@ public class AuthUiActivity extends AppCompatActivity {
 
         // This code will move to the action of a question that will ask the user if they want
         // to do this (maybe it puts them on double points). Just leaving commented out for now
-        // until that part is ready.
+        // until that part is ready. Or maybe not depending on time.
 
         // Check if UsageStatsManager for app tracking permission enabled
 //        if (AppUsageStats.getUsageStatsList(this).isEmpty()){

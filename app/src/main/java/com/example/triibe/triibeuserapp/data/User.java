@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +22,7 @@ public class User {
     private String mPhone;
     private String mEmail;
     private DemographicProfile mDemographicProfile;
-    private ArrayList<String> mSurveyIds;
+    private HashMap<String, Object> mSurveyIds;
     private Map<Integer, Date> mLocations;
     private List<Answer> mResponses;
     private boolean mEnrolled;
@@ -81,11 +81,11 @@ public class User {
         mDemographicProfile = demographicProfile;
     }
 
-    public ArrayList<String> getSurveyIds() {
+    public HashMap<String, Object> getSurveyIds() {
         return mSurveyIds;
     }
 
-    public void setSurveyIds(@NonNull ArrayList<String> surveyIds) {
+    public void setSurveyIds(@NonNull HashMap<String, Object> surveyIds) {
         mSurveyIds = surveyIds;
     }
 

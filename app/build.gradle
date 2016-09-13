@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
@@ -29,6 +28,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     // Android support libraries
+    compile 'com.android.support:support-v4:24.2.0'
     compile 'com.android.support:appcompat-v7:24.2.0'
     compile 'com.android.support:design:24.2.0'
     compile 'com.android.support:recyclerview-v7:24.2.0'
@@ -44,7 +44,8 @@ dependencies {
     compile 'com.firebaseui:firebase-ui-database:0.5.1'
 
     // Firebase (standard Firebase)
-    compile 'com.google.firebase:firebase-storage:9.4.0'
+    compile 'com.google.firebase:firebase-core:9.4.0'
+    compile 'com.google.firebase:firebase-messaging:9.4.0'
 
     // Butterknife - for getting view references easily
     compile 'com.jakewharton:butterknife:8.4.0'
@@ -52,7 +53,12 @@ dependencies {
 
     // Picaso - for image loading
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    // Make permissions in Android 23+ easy
+    compile 'pub.devrel:easypermissions:0.1.9'
+
+    // Floating action button menu
+//    compile 'com.github.clans:fab:1.6.4'
 
     /*
     * Stuff for the old app. Not currently in use but keeping in case we re-enable later.

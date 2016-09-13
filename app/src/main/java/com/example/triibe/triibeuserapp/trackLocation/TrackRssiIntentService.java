@@ -1,4 +1,4 @@
-//package com.example.triibe.triibeuserapp.trackWIFI;
+//package com.example.triibe.triibeuserapp.trackLocation;
 //
 //import android.app.Service;
 //import android.content.Context;

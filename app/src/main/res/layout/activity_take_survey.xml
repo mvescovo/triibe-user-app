@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".takeSurvey.TakeSurveyActivity">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".takeSurvey.TakeSurveyActivity">
 
     <ProgressBar
         android:id="@+id/load_survey_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 
     <RelativeLayout
         android:id="@+id/bottom_nav"
@@ -21,20 +21,28 @@
         android:paddingBottom="8dp"
         android:paddingTop="8dp">
 
+        <ImageButton
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:src="@drawable/ic_chevron_left_black_24dp"/>
+
         <Button
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
             android:onClick="previousQuestion"
-            android:text="@string/previous_question" />
+            android:text="@string/previous_question"/>
 
         <ProgressBar
             android:id="@+id/progress_bar"
             style="@android:style/Widget.ProgressBar.Horizontal"
-            android:layout_width="150dp"
+            android:layout_width="130dp"
             android:layout_height="5dp"
             android:layout_centerInParent="true"
-            android:progressTint="@color/colorPrimary" />
+            android:progressTint="@color/colorPrimary"/>
 
         <Button
             android:id="@+id/next_button"
@@ -42,8 +50,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:layout_marginEnd="30dp"
             android:onClick="nextQuestion"
-            android:text="@string/next_question" />
+            android:text="@string/next_question"/>
+
+        <ImageButton
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:clickable="false"
+            android:src="@drawable/ic_chevron_right_black_24dp"/>
 
     </RelativeLayout>
 
@@ -67,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:contentDescription="@string/question_logo"
-                android:visibility="gone" />
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/title"
@@ -76,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
                 android:text="@string/title"
-                android:visibility="gone" />
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/intro"
@@ -85,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/intro"
-                android:visibility="gone" />
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/query"
@@ -94,15 +111,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/query"
-                android:visibility="gone" />
+                android:visibility="gone"/>
 
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/radio_group"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="vertical"
-                android:visibility="gone" />
+                        android:id="@+id/radio_group"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="vertical"
+                        android:visibility="gone"/>
 
             <LinearLayout
                 android:id="@+id/checkbox_group"
@@ -110,7 +127,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:orientation="vertical"
-                android:visibility="gone" />
+                android:visibility="gone"/>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/text_input_layout"
@@ -122,7 +139,7 @@
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/text_input_edit_text"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -132,14 +149,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:orientation="vertical"
-                android:visibility="gone" />
+                android:visibility="gone"/>
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="addNewQuestion"
                 android:text="@string/add_question"
-                android:visibility="gone" />
+                android:visibility="gone"/>
 
         </LinearLayout>
 
