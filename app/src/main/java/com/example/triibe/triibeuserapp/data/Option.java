@@ -99,7 +99,6 @@ public class Option {
         result.put("questionId", mQuestionId);
         result.put("id", mId);
         result.put("phrase", mPhrase);
-
         return result;
     }
 }

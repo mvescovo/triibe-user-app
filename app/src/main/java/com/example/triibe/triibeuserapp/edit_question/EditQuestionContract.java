@@ -18,6 +18,6 @@ public interface EditQuestionContract {
 
     interface UserActionsListener {
 
-        void editQuestion(String surveyId, String id, String imageUrl, String title, String intro, Query query, boolean editOption);
+        void editQuestion(String surveyId, String questionid, String imageUrl, String title, String intro, Query query, boolean editOption);
     }
 }

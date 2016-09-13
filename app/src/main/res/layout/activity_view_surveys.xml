@@ -59,10 +59,21 @@
         android:id="@+id/modify_survey_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:backgroundTint="@color/colorFabNormal"
         android:src="@drawable/ic_mode_edit_white_24dp"
+        app:borderWidth="0dp"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/track_location_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
+        android:layout_marginBottom="88dp"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="@color/colorFabNormal"
+        android:src="@drawable/ic_edit_location_white_24dp"
         app:borderWidth="0dp"/>
 
 </android.support.design.widget.CoordinatorLayout>

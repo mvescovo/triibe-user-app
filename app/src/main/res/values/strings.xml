@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">TRIIBE User</string>
 
+    <!--Boot detection receiver-->
+    <string name="foreground_service_started">Foreground service started</string>
+
     <!--AuthUiActivity-->
     <string name="title_activity_auth">Sign in</string>
     <string name="unknown_response">Unexpected onActivityResult response code</string>
@@ -21,6 +24,8 @@
     <string name="edit_points_hint">Points</string>
     <string name="edit_version_hint">Version</string>
     <string name="successfully_saved_survey">Survey saved</string>
+    <string name="successfully_saved_question">Question saved</string>
+    <string name="successfully_saved_trigger">Trigger saved</string>
     <string name="delete_survey">Delete survey</string>
     <string name="edit_trigger">Edit trigger</string>
     <string name="more_options">More options</string>
@@ -31,7 +36,6 @@
 
     <!--EditQuestionActivity-->
     <string name="title_activity_edit_question">Edit Question</string>
-    <string name="successfully_saved_question">Question saved</string>
     <string name="edit_question_details_title">Question Details</string>
     <string name="edit_question_id_hint">Question ID</string>
     <string name="edit_title_hint">Title</string>
@@ -48,6 +52,15 @@
     <string name="edit_option_phrase_hint">Phrase</string>
     <string name="edit_option_extra_input_type_hint">Extra input type</string>
     <string name="edit_option_extra_input_hint_hint">Extra input hint</string>
+
+    <!--EditTriggerActivity-->
+    <string name="title_activity_edit_trigger">Edit Trigger</string>
+    <string name="edit_trigger_details_title">Trigger Details</string>
+    <string name="edit_trigger_id_hint">Trigger ID</string>
+    <string name="edit_trigger_lat_hint">Latitude</string>
+    <string name="edit_trigger_lon_hint">Longitude</string>
+    <string name="edit_trigger_level_hint">Level</string>
+    <string name="edit_trigger_time_hint">Time</string>
 
     <!--TrackDataActivity-->
     <string name="title_activity_track_data">Track data</string>

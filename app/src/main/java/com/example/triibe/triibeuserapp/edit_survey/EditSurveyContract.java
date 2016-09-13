@@ -12,11 +12,15 @@ public interface EditSurveyContract {
         void showSurveys();
 
         void showEditQuestion();
+
+        void showEditTrigger();
     }
 
     interface UserActionsListener {
 
-        void editSurvey(String name, String description, String version, String points,
+        void editSurvey(String surveyId, String description, String version, String points,
                         String timeTillExpiry, boolean editQuestion);
+
+        void editTrigger(String surveyId);
     }
 }

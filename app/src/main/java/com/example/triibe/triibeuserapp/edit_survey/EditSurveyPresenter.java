@@ -54,16 +54,16 @@ public class EditSurveyPresenter implements EditSurveyContract.UserActionsListen
     }
 
     @Override
-    public void editSurvey(String id, String description, String version, String points,
+    public void editSurvey(String surveyId, String description, String version, String points,
                            String timeTillExpiry, boolean editQuestion) {
         mView.setProgressIndicator(true);
 
-        SurveyDetails surveyDetails = new SurveyDetails(id, version, description, timeTillExpiry,
+        SurveyDetails surveyDetails = new SurveyDetails(surveyId, version, description, timeTillExpiry,
                 points);
         Map<String, Object> surveyDetailsValues = surveyDetails.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/surveys/" + id + "/surveyDetails", surveyDetailsValues);
-        childUpdates.put("/surveyIds/" + id, true);
+        childUpdates.put("/surveys/" + surveyId + "/surveyDetails", surveyDetailsValues);
+        childUpdates.put("/surveyIds/" + surveyId, true);
         mDatabase.updateChildren(childUpdates);
 
         mView.setProgressIndicator(false);
@@ -73,5 +73,10 @@ public class EditSurveyPresenter implements EditSurveyContract.UserActionsListen
         } else {
             mView.showSurveys();
         }
+    }
+
+    @Override
+    public void editTrigger(String surveyId) {
+        mView.showEditTrigger();
     }
 }

@@ -26,7 +26,7 @@ import com.example.triibe.triibeuserapp.data.Answer;
 import com.example.triibe.triibeuserapp.data.Option;
 import com.example.triibe.triibeuserapp.data.Query;
 import com.example.triibe.triibeuserapp.data.Question;
-import com.example.triibe.triibeuserapp.util.Globals;
+import com.example.triibe.triibeuserapp.util.Constants;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -184,9 +184,9 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                 mDownloadedAnswers = true;
 
                 // Prevent users from changing their responses to qualifying questions
-                if (mAnswers != null && mAnswers.size() > Globals.NUM_QUALIFYING_QUESTIONS &&
-                        mCurrentQuestionNum <= Globals.NUM_QUALIFYING_QUESTIONS) {
-                    mCurrentQuestionNum = Globals.NUM_QUALIFYING_QUESTIONS + 1;
+                if (mAnswers != null && mAnswers.size() > Constants.NUM_QUALIFYING_QUESTIONS &&
+                        mCurrentQuestionNum <= Constants.NUM_QUALIFYING_QUESTIONS) {
+                    mCurrentQuestionNum = Constants.NUM_QUALIFYING_QUESTIONS + 1;
                     displayCurrentQuestion();
                 }
             }
@@ -746,7 +746,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * */
     public void previousQuestion(View view) {
         // Prevent users from changing their responses to qualifying questions
-        if (mCurrentQuestionNum != Globals.NUM_QUALIFYING_QUESTIONS + 1) {
+        if (mCurrentQuestionNum != Constants.NUM_QUALIFYING_QUESTIONS + 1) {
             mNextButton.setText(R.string.next_question);
             if (mCurrentQuestionNum > 1) {
                 mCurrentQuestionNum--;

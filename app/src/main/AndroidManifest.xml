@@ -7,9 +7,11 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION"/>
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:allowBackup="true"
@@ -21,6 +23,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
+                <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -35,46 +38,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
         </activity>
-
-        <!-- <service -->
-        <!-- android:name=".trackWIFI.TrackRssiIntentService" -->
-        <!-- android:enabled="true" -->
-        <!-- android:exported="true"> -->
-        <!-- </service> -->
-
-
-        <!-- <provider -->
-        <!-- android:name=".util.IndoorProvider" -->
-        <!-- android:authorities="com.example.triibe.triibeuserapp.util.indoor" -->
-        <!-- android:exported="true" -->
-        <!-- android:readPermission="com.indoor.READ_CONTEXT_DATA" -->
-        <!-- android:writePermission="com.indoor.WRITE_CONTEXT_DATA"> -->
-        <!-- </provider> -->
-        <!--
-             The API key for Google Maps-based APIs is defined as a string resource.
-             (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
-        -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key"/>
-
-        <activity
-            android:name=".trackLocation.MapsActivity"
-            android:label="@string/title_activity_maps">
-        </activity>
-        <!-- <activity -->
-        <!-- android:name=".trackWIFI.IndoorMapActivity" -->
-        <!-- android:label="@string/title_activity_maps"> -->
-        <!-- </activity> -->
-        <!-- <service -->
-        <!-- android:name=".trackWIFI.TestMapsService" -->
-        <!-- android:enabled="true" -->
-        <!-- android:exported="true"> -->
-        <!-- </service> -->
         <activity
             android:name=".view_surveys.ViewSurveysActivity"
             android:label="@string/title_activity_view_surveys"
@@ -109,18 +72,105 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.triibe.triibeuserapp.edit_question.EditQuestionActivity"/>
         </activity>
+        <activity
+            android:name=".edit_trigger.EditTriggerActivity"
+            android:label="@string/title_activity_edit_trigger"
+            android:parentActivityName=".edit_survey.EditSurveyActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity"/>
+        </activity>
+        <!--<activity-->
+            <!--android:name=".trackLocation.MapsActivity"-->
+            <!--android:label="@string/title_activity_maps">-->
+        <!--</activity>-->
+        <!--<activity android:name=".trackLocation.TrackLocationActivity">-->
+        <!--</activity>-->
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
 
         <service android:name=".util.FirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
+        <!--<service-->
+            <!--android:name=".trackLocation.TrackLocationService"-->
+            <!--android:enabled="true"-->
+            <!--android:exported="true">-->
+        <!--</service>-->
+        <!--<service-->
+            <!--android:name=".trackLocation.DetectedActivitiesIntentService"-->
+            <!--android:exported="false">-->
+        <!--</service>-->
         <service
-            android:name=".trackLocation.TrackLocationService"
-            android:enabled="true"
-            android:exported="true">
+            android:name=".trackLocation.GeofenceTransitionsIntentService"
+            android:exported="false">
         </service>
+        <!--<service android:name=".trackLocation.AddGeofencesIntentServiceOLD"/>-->
 
+        <receiver android:name=".trackLocation.BootDetectionBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- <service -->
+        <!-- android:name=".trackWIFI.TrackRssiIntentService" -->
+        <!-- android:enabled="true" -->
+        <!-- android:exported="true"> -->
+        <!-- </service> -->
+
+
+        <!-- <provider -->
+        <!-- android:name=".util.IndoorProvider" -->
+        <!-- android:authorities="com.example.triibe.triibeuserapp.util.indoor" -->
+        <!-- android:exported="true" -->
+        <!-- android:readPermission="com.indoor.READ_CONTEXT_DATA" -->
+        <!-- android:writePermission="com.indoor.WRITE_CONTEXT_DATA"> -->
+        <!-- </provider> -->
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+        -->
+
+
+        <!-- <activity -->
+        <!-- android:name=".trackWIFI.IndoorMapActivity" -->
+        <!-- android:label="@string/title_activity_maps"> -->
+        <!-- </activity> -->
+        <!-- <service -->
+        <!-- android:name=".trackWIFI.TestMapsService" -->
+        <!-- android:enabled="true" -->
+        <!-- android:exported="true"> -->
+        <!-- </service> -->
+        <!--<activity-->
+            <!--android:name=".trackLocation.TestActivity"-->
+            <!--android:icon="@drawable/the_westfield_group_logo">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN"/>-->
+
+                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+
+        <service
+            android:name=".trackLocation.AddGeofencesIntentService"
+            android:exported="false">
+        </service>
+        <service android:name=".util.RunAppWhenAtMallService"
+                 android:exported="false">
+        </service>
     </application>
 
 </manifest>

@@ -1,7 +1,9 @@
 package com.example.triibe.triibeuserapp.view_surveys;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
@@ -11,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,13 +22,18 @@ import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity;
 import com.example.triibe.triibeuserapp.takeSurvey.TakeSurveyActivity;
+import com.example.triibe.triibeuserapp.trackLocation.AddGeofencesIntentService;
+import com.example.triibe.triibeuserapp.util.Constants;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import pub.devrel.easypermissions.EasyPermissions;
 
-public class ViewSurveysActivity extends AppCompatActivity implements ViewSurveysContract.View {
+public class ViewSurveysActivity extends AppCompatActivity implements ViewSurveysContract.View,
+        EasyPermissions.PermissionCallbacks {
 
     private static final String TAG = "ViewSurveysActivity";
 
@@ -33,6 +41,12 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     private static final int REQUEST_EDIT_TRIGGER = 3;
     private static final int REQUEST_LINK_TRIGGER = 4;
     private Intent mServiceIntent;
+    String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
+    private static final int FINE_LOCAITON = 123;
+    private ViewSurveysContract.UserActionsListener mUserActionsListener;
+    private SurveyAdapter mSurveyAdapter;
+//    private ArrayList<String> mSurveys;
+//    private User mUser;
 
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
@@ -49,10 +63,8 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     @BindView(R.id.modify_survey_fab)
     FloatingActionButton mModifySurveyFab;
 
-    private ViewSurveysContract.UserActionsListener mUserActionsListener;
-    private SurveyAdapter mSurveyAdapter;
-//    private ArrayList<String> mSurveys;
-//    private User mUser;
+    @BindView(R.id.track_location_fab)
+    FloatingActionButton mTrackLocationFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +81,14 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
                 showCreateSurvey();
             }
         });
+
+//        mTrackLocationFab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(getApplicationContext(), TrackLocationActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
         mUserActionsListener = new ViewSurveysPresenter(this);
 
@@ -102,6 +122,20 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
         // Start up location tracking service
 //        mServiceIntent = new Intent(this, TrackLocationService.class);
 //        startService(mServiceIntent);
+
+        // Add mall geofences if not already added (will also be added automatically on boot)
+        SharedPreferences preferences = getSharedPreferences(Constants.MALL_GEOFENCES, 0);
+        boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_GEOFENCES_ADDED, false);
+        if (!mallGeofencesAdded) {
+            if (EasyPermissions.hasPermissions(this, perms)) {
+                // Have permission
+                startAddGeofencesService();
+            } else {
+                // Do not have permissions, request them now
+                EasyPermissions.requestPermissions(this, "Need location access to monitor location",
+                        FINE_LOCAITON, perms);
+            }
+        }
     }
 
     @Override
@@ -150,5 +184,31 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
             Snackbar.make(mModifySurveyFab, getString(R.string.successfully_saved_survey),
                     Snackbar.LENGTH_SHORT).show();
         }
+    }
+
+    /*
+    * Location permission stuff
+    * */
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        Log.d(TAG, "onPermissionsGranted: GRANTED");
+        startAddGeofencesService();
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        Log.d(TAG, "onPermissionsDenied: DENIED");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    private void startAddGeofencesService() {
+        Intent addGeofencesIntent = new Intent(this, AddGeofencesIntentService.class);
+        startService(addGeofencesIntent);
     }
 }
