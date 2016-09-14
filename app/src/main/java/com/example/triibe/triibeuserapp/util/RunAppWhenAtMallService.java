@@ -10,6 +10,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.Process;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -23,6 +24,9 @@ import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
  * @author michael.
  */
 public class RunAppWhenAtMallService extends Service {
+    //code to allow the service to run while the screen is switched off.
+    PowerManager mgr;
+    PowerManager.WakeLock wakeLock;
 
     private static final String TAG = "RunAppWhenAtMallService";
 
@@ -50,6 +54,12 @@ public class RunAppWhenAtMallService extends Service {
         HandlerThread thread = new HandlerThread("ServiceStartArguments",
                 Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
+
+        //power managment.
+        mgr = (PowerManager)this.getSystemService(Context.POWER_SERVICE);
+        wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
+        wakeLock.acquire();
+
 
         // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();
@@ -81,6 +91,10 @@ public class RunAppWhenAtMallService extends Service {
         // I'm going to change the class where they're currently set so it's better not to do it yourself otherwise there'll be merge conflicts. Just tell me which permissions you need.
 
         // I think maybe also put a comment where you add stuff so I can see what it's for in case I accidentally think I'd done it myself and delete it.
+
+
+        // Method to start the service
+        startService(new Intent(getBaseContext(), IpService.class));
 
 
 
@@ -126,6 +140,9 @@ public class RunAppWhenAtMallService extends Service {
 
     @Override
     public void onDestroy() {
+        stopService(new Intent(getBaseContext(), IpService.class));
+        wakeLock.release();
         Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
     }
+
 }
