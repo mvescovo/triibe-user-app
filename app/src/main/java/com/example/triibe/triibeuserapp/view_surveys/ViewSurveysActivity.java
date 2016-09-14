@@ -22,7 +22,8 @@ import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity;
 import com.example.triibe.triibeuserapp.takeSurvey.TakeSurveyActivity;
-import com.example.triibe.triibeuserapp.trackLocation.AddGeofencesIntentService;
+import com.example.triibe.triibeuserapp.trackLocation.AddLandmarkGeofencesIntentService;
+import com.example.triibe.triibeuserapp.trackLocation.AddMallGeofencesIntentService;
 import com.example.triibe.triibeuserapp.util.Constants;
 
 import java.util.ArrayList;
@@ -208,7 +209,10 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     }
 
     private void startAddGeofencesService() {
-        Intent addGeofencesIntent = new Intent(this, AddGeofencesIntentService.class);
+        Intent addGeofencesIntent = new Intent(this, AddMallGeofencesIntentService.class);
         startService(addGeofencesIntent);
+
+        Intent addGeofencesIntentLandmark = new Intent(this, AddLandmarkGeofencesIntentService.class);
+        startService(addGeofencesIntentLandmark);
     }
 }

@@ -81,12 +81,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity"/>
         </activity>
-        <!--<activity-->
-            <!--android:name=".trackLocation.MapsActivity"-->
-            <!--android:label="@string/title_activity_maps">-->
-        <!--</activity>-->
-        <!--<activity android:name=".trackLocation.TrackLocationActivity">-->
-        <!--</activity>-->
+        <!-- <activity -->
+        <!-- android:name=".trackLocation.MapsActivity" -->
+        <!-- android:label="@string/title_activity_maps"> -->
+        <!-- </activity> -->
+        <!-- <activity android:name=".trackLocation.TrackLocationActivity"> -->
+        <!-- </activity> -->
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -100,20 +100,16 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
-        <!--<service-->
-            <!--android:name=".trackLocation.TrackLocationService"-->
-            <!--android:enabled="true"-->
-            <!--android:exported="true">-->
-        <!--</service>-->
-        <!--<service-->
-            <!--android:name=".trackLocation.DetectedActivitiesIntentService"-->
-            <!--android:exported="false">-->
-        <!--</service>-->
-        <service
-            android:name=".trackLocation.GeofenceTransitionsIntentService"
-            android:exported="false">
-        </service>
-        <!--<service android:name=".trackLocation.AddGeofencesIntentServiceOLD"/>-->
+        <!-- <service -->
+        <!-- android:name=".trackLocation.TrackLocationService" -->
+        <!-- android:enabled="true" -->
+        <!-- android:exported="true"> -->
+        <!-- </service> -->
+        <!-- <service -->
+        <!-- android:name=".trackLocation.DetectedActivitiesIntentService" -->
+        <!-- android:exported="false"> -->
+        <!-- </service> -->
+        <!-- <service android:name=".trackLocation.AddGeofencesIntentServiceOLD"/> -->
 
         <receiver android:name=".trackLocation.BootDetectionBroadcastReceiver">
             <intent-filter>
@@ -154,22 +150,36 @@
         <!-- android:enabled="true" -->
         <!-- android:exported="true"> -->
         <!-- </service> -->
-        <!--<activity-->
-            <!--android:name=".trackLocation.TestActivity"-->
-            <!--android:icon="@drawable/the_westfield_group_logo">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN"/>-->
+        <!-- <activity -->
+        <!-- android:name=".trackLocation.TestActivity" -->
+        <!-- android:icon="@drawable/the_westfield_group_logo"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.MAIN"/> -->
 
-                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
+
+        <!-- <category android:name="android.intent.category.LAUNCHER"/> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
 
         <service
-            android:name=".trackLocation.AddGeofencesIntentService"
+            android:name=".util.RunAppWhenAtMallService"
             android:exported="false">
         </service>
-        <service android:name=".util.RunAppWhenAtMallService"
-                 android:exported="false">
+        <service
+            android:name=".trackLocation.AddMallGeofencesIntentService"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".trackLocation.AddLandmarkGeofencesIntentService"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".trackLocation.MallGeofenceTransitionIntentService"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".trackLocation.LandmarkGeofenceTransitionIntentService"
+            android:exported="false">
         </service>
     </application>
 

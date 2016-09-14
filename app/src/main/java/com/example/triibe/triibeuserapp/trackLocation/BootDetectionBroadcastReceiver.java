@@ -16,7 +16,7 @@ public class BootDetectionBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            Intent addGeofenceIntent = new Intent(context, AddGeofencesIntentService.class);
+            Intent addGeofenceIntent = new Intent(context, AddMallGeofencesIntentService.class);
             context.startService(addGeofenceIntent);
         }
     }
