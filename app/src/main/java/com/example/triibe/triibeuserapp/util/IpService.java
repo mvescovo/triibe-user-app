@@ -100,7 +100,7 @@ public class IpService extends Service {
                         System.out.println("----------total screentime ---------");
                         for (Map.Entry<String, ScreenActive> entry : timeMap.entrySet()) {
                             if(!(entry.getValue().getStopTime()==null)){
-                                System.out.println(entry.getValue().getStartTime().toString()+" - "+entry.getValue().getStopTime());
+                                System.out.println(entry.getValue().getStartTime()+" - "+entry.getValue().getStopTime());
                             }
                         }
                         System.out.println("------------------------------------");}
@@ -130,7 +130,7 @@ public class IpService extends Service {
                     System.out.println("line: " + s);
                     strOutPut = strOutPut + tokens[0]+ " connection to " + tokens[4] + "\n";
                     Date date = new Date();
-                    tempCon = new Connection(tokens[0],tokens[4],date);
+                    tempCon = new Connection(tokens[0],tokens[4],date.toString());
                     //add each connection to the current connections map.
                     currentConMap.put(tempCon.getIpAddrURL(),tempCon);
                 }
@@ -179,7 +179,7 @@ public class IpService extends Service {
                 String key = GenerateId();
                 totalConMap.put(key,previousConMap.get(entry.getValue().getIpAddrURL()));
                 Date date = new Date();
-                totalConMap.get(key).setEndConnection(date);
+                totalConMap.get(key).setEndConnection(date.toString());
                 /*********FIREBASE*********/
                 mDatabase.child("data").child("connections").setValue(totalConMap.get(key));
                 /**************************/
@@ -187,7 +187,7 @@ public class IpService extends Service {
             }
         }
     }
-
+    //used to generate an id with witch to add connections to their hashmaps.
     public String GenerateId() {
         return new BigInteger(130, random).toString(32);
     }
@@ -200,14 +200,14 @@ public class IpService extends Service {
         if (!screenOn) {
             System.out.println("SCREEN ON");
             Date date = new Date();
-            tempActive = new ScreenActive(date);
-            timeKey = tempActive.getStartTime().toString();
+            tempActive = new ScreenActive(date.toString());
+            timeKey = tempActive.getStartTime();
             timeMap.put(timeKey,tempActive);
         } else {
             System.out.println("SCREEN OFF");
             if (!timeMap.isEmpty()){
                 Date date = new Date();
-                timeMap.get(timeKey).setStopTime(date);
+                timeMap.get(timeKey).setStopTime(date.toString());
                 /*********FIREBASE*********/
                 mDatabase.child("data").child("screenTime").setValue(timeMap.get(timeKey));
                 /**************************/

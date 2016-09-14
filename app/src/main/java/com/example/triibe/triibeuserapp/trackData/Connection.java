@@ -9,14 +9,14 @@ public class Connection {
 
     private String connectionProtocol;
     private String ipAddrURL;
-    private Date startConncetion;
-    private Date endConnection;
+    private String startConncetion;
+    private String endConnection;
 
 
     // Empty constructor required for firebase???
     public Connection() {}
 
-    public Connection(String connectionProtocol, String ipAddrURL, Date startConncetion) {
+    public Connection(String connectionProtocol, String ipAddrURL, String startConncetion) {
         this.connectionProtocol = connectionProtocol;
         this.ipAddrURL = ipAddrURL;
         this.startConncetion = startConncetion;
@@ -30,11 +30,11 @@ public class Connection {
         this.ipAddrURL = ipAddrURL;
     }
 
-    public void setStartConncetion(Date startConncetion) {
+    public void setStartConncetion(String startConncetion) {
         this.startConncetion = startConncetion;
     }
 
-    public void setEndConnection(Date endConnection) {
+    public void setEndConnection(String endConnection) {
         this.endConnection = endConnection;
     }
 
