@@ -25,6 +25,7 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
     private ViewSurveysContract.View mView;
     private DatabaseReference mDatabase;
     private ArrayList<SurveyDetails> mSurveyDetails;
+    private boolean hasLoadedSurveys = false;
 
     public ViewSurveysPresenter(ViewSurveysContract.View view) {
         mView = view;
@@ -39,6 +40,7 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
         ValueEventListener userDataListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange: USER DATA CHANGED");
                 if (dataSnapshot.exists()) {
                     User user = dataSnapshot.getValue(User.class);
                     Globals.getInstance().setUser(user);
@@ -46,7 +48,12 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                         HashMap<String, Object> surveyIds = new HashMap<>();
                         Globals.getInstance().getUser().setSurveyIds(surveyIds);
                     }
-                    loadSurveys();
+                    if (!hasLoadedSurveys) {
+                        hasLoadedSurveys = true;
+                        loadSurveys();
+                    } else {
+                        mView.setProgressIndicator(false);
+                    }
                 } else {
                     // Add new user.
                     HashMap<String, Object> surveyIds = new HashMap<>();
