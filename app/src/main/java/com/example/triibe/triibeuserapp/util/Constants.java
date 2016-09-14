@@ -15,6 +15,7 @@ public final class Constants {
     public static final String ACTIVITY_EXTRA = "activityResult";
     public static final String BROADCAST_ACTION = "activityRecognition";
     public static final float GEOFENCE_MALL_RADIUS_IN_METERS = 1000;
+    public static final long GEOFENCE_MALL_DWELL_IN_MILLISECONDS = 5000;
     public static final float GEOFENCE_LANDMARK_RADIUS_IN_METERS = 20;
     public static final long GEOFENCE_EXPIRATION_IN_HOURS = 12;
     public static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS =
@@ -25,7 +26,6 @@ public final class Constants {
     public static final String GEOFENCE_TYPE = "geofenceType";
     public static final String GEOFENCE_TYPE_MALL = "geofenceTypeMall";
     public static final String GEOFENCE_TYPE_LANDMARK = "geofenceTypeLandmark";
-
 
     private Constants() {
     }
