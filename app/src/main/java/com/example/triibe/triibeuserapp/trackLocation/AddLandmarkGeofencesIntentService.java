@@ -61,9 +61,9 @@
 //                    .setCircularRegion(
 //                            entry.getValue().latitude,
 //                            entry.getValue().longitude,
-//                            Constants.GEOFENCE_LANDMARK_RADIUS_IN_METERS
+//                            Constants.FENCE_LANDMARK_RADIUS_IN_METERS
 //                    )
-//                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+//                    .setExpirationDuration(Constants.FENCE_EXPIRATION_IN_MILLISECONDS)
 //                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
 //                            Geofence.GEOFENCE_TRANSITION_EXIT)
 //                    .build());
@@ -93,9 +93,9 @@
 //        }
 //
 //        // Mark geofences as added.
-//        SharedPreferences preferences = getSharedPreferences(Constants.MALL_GEOFENCES, 0);
+//        SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
 //        SharedPreferences.Editor editor = preferences.edit();
-//        editor.putBoolean(Constants.MALL_GEOFENCES_ADDED, true);
+//        editor.putBoolean(Constants.MALL_FENCES_ADDED, true);
 //        editor.apply();
 //    }
 //

@@ -124,8 +124,8 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
 //        startService(mServiceIntent);
 
         // Add mall geofences if not already added (will also be added automatically on boot)
-        SharedPreferences preferences = getSharedPreferences(Constants.MALL_GEOFENCES, 0);
-        boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_GEOFENCES_ADDED, false);
+        SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
+        boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED, false);
         if (!mallGeofencesAdded) {
             if (EasyPermissions.hasPermissions(this, perms)) {
                 // Have permission

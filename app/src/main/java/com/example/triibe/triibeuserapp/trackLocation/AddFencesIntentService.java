@@ -88,8 +88,8 @@ public class AddFencesIntentService extends IntentService
             AwarenessFence location = LocationFence.in(
                     entry.getValue().latitude,
                     entry.getValue().longitude,
-                    Constants.GEOFENCE_MALL_RADIUS_IN_METERS,
-                    Constants.GEOFENCE_MALL_DWELL_IN_MILLISECONDS);
+                    Constants.FENCE_MALL_RADIUS_IN_METERS,
+                    Constants.FENCE_MALL_DWELL_IN_MILLISECONDS);
             builder.addFence(entry.getKey(), location, mPendingIntent).build();
         }
         mMallFenceUpdateRequest = builder.build();
@@ -97,8 +97,8 @@ public class AddFencesIntentService extends IntentService
         if (!mGoogleApiClient.isConnected()) {
             mGoogleApiClient.connect();
         } else {
-            SharedPreferences preferences = getSharedPreferences(Constants.MALL_GEOFENCES, 0);
-            boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_GEOFENCES_ADDED, false);
+            SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
+            boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED, false);
             if (!mallGeofencesAdded && mMallFenceUpdateRequest != null) {
                 addFences("mall");
             }
@@ -115,8 +115,8 @@ public class AddFencesIntentService extends IntentService
             AwarenessFence location = LocationFence.in(
                     entry.getValue().latitude,
                     entry.getValue().longitude,
-                    Constants.GEOFENCE_LANDMARK_RADIUS_IN_METERS,
-                    Constants.GEOFENCE_LANDMARK_DWELL_IN_MILLISECONDS);
+                    Constants.FENCE_LANDMARK_RADIUS_IN_METERS,
+                    Constants.FENCE_LANDMARK_DWELL_IN_MILLISECONDS);
             builder.addFence(entry.getKey(), location, mPendingIntent).build();
         }
         mLandmarkFenceUpdateRequest = builder.build();
@@ -145,9 +145,9 @@ public class AddFencesIntentService extends IntentService
             }
 
             // Mark mall fences as added.
-            SharedPreferences preferences = getSharedPreferences(Constants.MALL_GEOFENCES, 0);
+            SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putBoolean(Constants.MALL_GEOFENCES_ADDED, true);
+            editor.putBoolean(Constants.MALL_FENCES_ADDED, true);
             editor.apply();
         } else if (type.contentEquals("landmark")) {
             try {
@@ -163,8 +163,8 @@ public class AddFencesIntentService extends IntentService
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        SharedPreferences preferences = getSharedPreferences(Constants.MALL_GEOFENCES, 0);
-        boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_GEOFENCES_ADDED, false);
+        SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
+        boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED, false);
         if (!mallGeofencesAdded && mMallFenceUpdateRequest != null) {
             addFences("mall");
         }
