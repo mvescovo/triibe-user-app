@@ -38,6 +38,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:9.4.0'
     compile 'com.google.android.gms:play-services-maps:9.4.0'
     compile 'com.google.android.gms:play-services-location:9.4.0'
+    compile 'com.google.android.gms:play-services-contextmanager:9.4.0'
 
     // Firebase UI (Note: this is different from standard firebase)
     compile 'com.firebaseui:firebase-ui-auth:0.5.1'
