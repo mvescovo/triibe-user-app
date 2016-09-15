@@ -111,35 +111,19 @@
             </intent-filter>
         </service>
         <service
-            android:name=".trackLocation.AddMallGeofencesIntentService"
-            android:exported="false">
-        </service>
-        <service
-            android:name=".trackLocation.AddLandmarkGeofencesIntentService"
-            android:exported="false">
-        </service>
-        <service
-            android:name=".trackLocation.MallGeofenceTransitionIntentService"
-            android:exported="false">
-        </service>
-        <service
-            android:name=".trackLocation.LandmarkGeofenceTransitionIntentService"
-            android:exported="false">
-        </service>
-        <service
-            android:name=".trackLocation.AddMallFencesIntentService"
+            android:name=".trackLocation.AddFencesIntentService"
             android:exported="false">
         </service>
 
         <!--Receivers-->
         <receiver
-            android:name=".trackLocation.BootDetectionBroadcastReceiver">
+            android:name=".trackLocation.AddFencesIntentService$BootDetectionBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".trackLocation.AddMallFencesIntentService$MallFenceReceiver">
+            android:name=".trackLocation.AddFencesIntentService$MallFenceReceiver">
         </receiver>
 
 
@@ -150,6 +134,25 @@
 
 
 
+
+
+
+        <!--<service-->
+        <!--android:name=".trackLocation.AddMallGeofencesIntentService"-->
+        <!--android:exported="false">-->
+        <!--</service>-->
+        <!--<service-->
+        <!--android:name=".trackLocation.AddLandmarkGeofencesIntentService"-->
+        <!--android:exported="false">-->
+        <!--</service>-->
+        <!--<service-->
+        <!--android:name=".trackLocation.MallGeofenceTransitionIntentService"-->
+        <!--android:exported="false">-->
+        <!--</service>-->
+        <!--<service-->
+        <!--android:name=".trackLocation.LandmarkGeofenceTransitionIntentService"-->
+        <!--android:exported="false">-->
+        <!--</service>-->
 
 
 
