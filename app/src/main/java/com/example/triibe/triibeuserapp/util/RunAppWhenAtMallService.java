@@ -80,7 +80,7 @@ public class RunAppWhenAtMallService extends Service {
                         .setContentTitle("At mall")
                         .setContentText("Tracking data")
                         .addAction(R.drawable.ic_stop_black_24dp, "Stop", mStopTrackingPendingIntent);
-        Intent resultIntent = new Intent(this, ViewSurveysActivity.class);
+        Intent resultIntent = new Intent(this, AuthUiActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(ViewSurveysActivity.class);
         stackBuilder.addNextIntent(resultIntent);
