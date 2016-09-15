@@ -114,6 +114,10 @@
             android:name=".trackLocation.AddFencesIntentService"
             android:exported="false">
         </service>
+        <service
+            android:name=".util.StopTrackingIntentService"
+            android:exported="false">
+        </service>
 
         <!--Receivers-->
         <receiver

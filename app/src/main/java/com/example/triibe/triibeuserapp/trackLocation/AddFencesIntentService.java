@@ -210,17 +210,17 @@ public class AddFencesIntentService extends IntentService
             FenceState fenceState = FenceState.extract(intent);
 
             // Start or stop the app service
-            Intent startAppServiceIntent = new Intent(context, RunAppWhenAtMallService.class);
+            Intent AppServiceIntent = new Intent(context, RunAppWhenAtMallService.class);
 
             if (TextUtils.equals(fenceState.getFenceKey(), "southland")) {
                 switch (fenceState.getCurrentState()) {
                     case FenceState.TRUE:
                         Log.d(TAG, "In southland");
-                        context.startService(startAppServiceIntent);
+                        context.startService(AppServiceIntent);
                         break;
                     case FenceState.FALSE:
                         Log.d(TAG, "Not in southland");
-                        context.stopService(startAppServiceIntent);
+                        context.stopService(AppServiceIntent);
                         break;
                     case FenceState.UNKNOWN:
                         Log.d(TAG, "UNKONWN if in southland");
@@ -232,11 +232,9 @@ public class AddFencesIntentService extends IntentService
                 switch (fenceState.getCurrentState()) {
                     case FenceState.TRUE:
                         Log.d(TAG, "In eastSide");
-                        context.startService(startAppServiceIntent);
                         break;
                     case FenceState.FALSE:
                         Log.d(TAG, "Not in eastSide");
-                        context.stopService(startAppServiceIntent);
                         break;
                     case FenceState.UNKNOWN:
                         Log.d(TAG, "UNKONWN if in eastSide");
@@ -248,11 +246,9 @@ public class AddFencesIntentService extends IntentService
                 switch (fenceState.getCurrentState()) {
                     case FenceState.TRUE:
                         Log.d(TAG, "In westSide");
-                        context.startService(startAppServiceIntent);
                         break;
                     case FenceState.FALSE:
                         Log.d(TAG, "Not in westSide");
-                        context.stopService(startAppServiceIntent);
                         break;
                     case FenceState.UNKNOWN:
                         Log.d(TAG, "UNKONWN if in westSide");
@@ -264,11 +260,9 @@ public class AddFencesIntentService extends IntentService
                 switch (fenceState.getCurrentState()) {
                     case FenceState.TRUE:
                         Log.d(TAG, "In furtherSouth");
-                        context.startService(startAppServiceIntent);
                         break;
                     case FenceState.FALSE:
                         Log.d(TAG, "Not in furtherSouth");
-                        context.stopService(startAppServiceIntent);
                         break;
                     case FenceState.UNKNOWN:
                         Log.d(TAG, "UNKONWN if in furtherSouth");
