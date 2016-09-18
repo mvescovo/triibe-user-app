@@ -2,9 +2,7 @@ package com.example.triibe.triibeuserapp.view_surveys;
 
 import android.support.annotation.NonNull;
 
-import com.example.triibe.triibeuserapp.data.SurveyDetails;
-
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author michael.
@@ -15,7 +13,9 @@ public interface ViewSurveysContract {
 
         void setProgressIndicator(boolean active);
 
-        void showSurveys(@NonNull ArrayList<SurveyDetails> surveys);
+        void showSurveys(@NonNull List surveyDetails);
+
+        void showNoSurveysMessage();
 
         void showSurveyDetails(String surveyId);
     }

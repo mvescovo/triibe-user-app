@@ -13,7 +13,7 @@
 
     <!--ViewSurveysActivity-->
     <string name="title_activity_view_surveys">Surveys</string>
-    <string name="no_surveys">No surveys available.</string>
+    <string name="no_surveys">You don\'t currently have any surveys. Try going to the mall to get more surveys.</string>
 
     <!--EditSurveyActivity-->
     <string name="title_activity_edit_survey">Edit Survey</string>
@@ -53,6 +53,15 @@
     <string name="edit_option_extra_input_type_hint">Extra input type</string>
     <string name="edit_option_extra_input_hint_hint">Extra input hint</string>
 
+    <!--EditLocationActivity-->
+    <string name="title_activity_edit_location">Edit Location</string>
+    <string name="successfully_saved_location">Location saved</string>
+    <string name="edit_location_details_title">Location Details</string>
+    <string name="edit_location_id_hint">Location ID</string>
+    <string name="edit_location_name_hint">Name</string>
+    <string name="menu_use_current_location">Use current location</string>
+    <string name="menu_get_location_from_map">Get location from map</string>
+
     <!--EditTriggerActivity-->
     <string name="title_activity_edit_trigger">Edit Trigger</string>
     <string name="edit_trigger_details_title">Trigger Details</string>
@@ -84,7 +93,7 @@
     <string name="question_logo">Question logo</string>
     <string name="title">Title</string>
     <string name="intro">Intro</string>
-    <string name="query">Query</string>
+    <string name="phrase">Phrase</string>
     <string name="response">Answer</string>
     <string name="image_url">Image url</string>
     <string name="next_question">NEXT</string>

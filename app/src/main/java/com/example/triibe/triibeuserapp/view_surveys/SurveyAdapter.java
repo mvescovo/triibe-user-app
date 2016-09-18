@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author michael.
@@ -18,13 +18,12 @@ import java.util.ArrayList;
 public class SurveyAdapter extends RecyclerView.Adapter {
 
     private static final String TAG = "SurveyAdapter";
-
     private ViewSurveysContract.UserActionsListener mUserActionsListener;
-    private ArrayList<SurveyDetails> mSurveys;
+    private List mSurveyDetails;
 
-    public SurveyAdapter(ViewSurveysContract.UserActionsListener userActionsListener, ArrayList<SurveyDetails> surveys) {
+    public SurveyAdapter(ViewSurveysContract.UserActionsListener userActionsListener, List surveyDetails) {
         mUserActionsListener = userActionsListener;
-        mSurveys = surveys;
+        mSurveyDetails = surveyDetails;
     }
 
     @Override
@@ -36,16 +35,18 @@ public class SurveyAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         TextView textView = (TextView) ((SurveyViewHolder)holder).getView().findViewById(R.id.survey_description);
-        textView.setText(mSurveys.get(position).getDescription());
+        textView.setText(((SurveyDetails)mSurveyDetails.get(position)).getDescription());
         textView = (TextView) ((SurveyViewHolder)holder).getView().findViewById(R.id.survey_points);
-        textView.setText("Points: " + mSurveys.get(position).getPoints());
+        String points = ((SurveyDetails)mSurveyDetails.get(position)).getPoints();
+        textView.setText("Points: " + points);
         textView = (TextView) ((SurveyViewHolder)holder).getView().findViewById(R.id.survey_expiry);
-        textView.setText("Expiry time: " + mSurveys.get(position).getDurationTillExpiry() + "hour.");
+        String expiry = ((SurveyDetails)mSurveyDetails.get(position)).getDurationTillExpiry();
+        textView.setText("Expiry time: " + expiry + "hour.");
     }
 
     @Override
     public int getItemCount() {
-        return mSurveys.size();
+        return mSurveyDetails.size();
     }
 
     /*
@@ -61,7 +62,8 @@ public class SurveyAdapter extends RecyclerView.Adapter {
             mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mUserActionsListener.openSurveyDetails(mSurveys.get(getAdapterPosition()).getId());
+                    mUserActionsListener.openSurveyDetails(((SurveyDetails)mSurveyDetails
+                            .get(getAdapterPosition())).getId());
                 }
             });
         }
@@ -71,8 +73,8 @@ public class SurveyAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public void replaceData(@NonNull ArrayList<SurveyDetails> surveys) {
-        mSurveys = surveys;
+    public void replaceData(@NonNull List surveyDetails) {
+        mSurveyDetails = surveyDetails;
         notifyDataSetChanged();
     }
 }

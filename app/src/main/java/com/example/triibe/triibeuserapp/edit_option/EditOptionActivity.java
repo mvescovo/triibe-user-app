@@ -19,6 +19,8 @@ import butterknife.ButterKnife;
 
 public class EditOptionActivity extends AppCompatActivity implements EditOptionContract.View {
 
+    public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
+    public final static String EXTRA_QUESTION_ID = "com.example.triibe.QUESTION_ID";
     EditOptionContract.UserActionsListener mUserActionsListener;
     private String mSurveyId;
     private String mQuestionId;
@@ -46,7 +48,6 @@ public class EditOptionActivity extends AppCompatActivity implements EditOptionC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_option);
         ButterKnife.bind(this);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -56,12 +57,12 @@ public class EditOptionActivity extends AppCompatActivity implements EditOptionC
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        if (getIntent().getStringExtra("surveyId") != null) {
-            mSurveyId = getIntent().getStringExtra("surveyId");
+        if (getIntent().getStringExtra(EXTRA_SURVEY_ID) != null) {
+            mSurveyId = getIntent().getStringExtra(EXTRA_SURVEY_ID);
         }
 
-        if (getIntent().getStringExtra("questionId") != null) {
-            mQuestionId = getIntent().getStringExtra("questionId");
+        if (getIntent().getStringExtra(EXTRA_QUESTION_ID) != null) {
+            mQuestionId = getIntent().getStringExtra(EXTRA_QUESTION_ID);
         }
     }
 
@@ -83,7 +84,7 @@ public class EditOptionActivity extends AppCompatActivity implements EditOptionC
     private boolean validate() {
 
         if (mOptionPhrase.getText().toString().trim().contentEquals("")) {
-            mOptionPhrase.setError("Phrase must not be empty");
+            mOptionPhrase.setError("Phrase must not be empty"); // TODO: 18/09/16 set in strings
             mOptionPhrase.requestFocus();
             return false;
         }
@@ -106,7 +107,7 @@ public class EditOptionActivity extends AppCompatActivity implements EditOptionC
                     mUserActionsListener.editOption(mSurveyId, mQuestionId,
                             mOptionId.getText().toString().trim(),
                             mOptionPhrase.getText().toString().trim(),
-                            "false", mExtraInputType.getText().toString().trim(),
+                            "false", mExtraInputType.getText().toString().trim(), // TODO: 18/09/16 set in strings
                             mOptionExtraInputHint.getText().toString().trim());
                 }
                 return true;

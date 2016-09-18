@@ -1,6 +1,7 @@
 package com.example.triibe.triibeuserapp.edit_trigger;
 
-import com.example.triibe.triibeuserapp.data.Location;
+import android.location.Location;
+
 import com.example.triibe.triibeuserapp.data.SurveyTrigger;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -22,11 +23,13 @@ public class EditTriggerPresenter implements EditTriggerContract.UserActionsList
     }
 
     @Override
-    public void editTrigger(String surveyId, String id, String lat, String lon, String level,
+    public void editTrigger(String surveyId, String id, Double lat, Double lon, String level,
                             String time) {
         mView.setProgressIndicator(true);
 
-        Location location = new Location("1", lat, lon, level);
+        Location location = new Location("");
+        location.setLatitude(lat);
+        location.setLongitude(lon);
         SurveyTrigger surveyTrigger = new SurveyTrigger(surveyId, id, location, time);
         Map<String, Object> surveyTriggerValues = surveyTrigger.toMap();
         Map<String, Object> childUpdates = new HashMap<>();

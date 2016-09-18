@@ -9,12 +9,14 @@ public interface EditTriggerContract {
 
         void setProgressIndicator(boolean active);
 
+        void setCurrentLocation(double lat, double lon);
+
         void showEditSurvey();
     }
 
     interface UserActionsListener {
 
-        void editTrigger(String surveyId, String triggerId, String lat, String lon, String level,
+        void editTrigger(String surveyId, String triggerId, Double lat, Double lon, String level,
                          String time);
     }
 }

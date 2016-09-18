@@ -9,7 +9,6 @@ import android.content.Intent;
 public class StopTrackingIntentService extends IntentService {
 
     private static final String TAG = "StopTrackingIntentService";
-
     public StopTrackingIntentService() {
         super(TAG);
     }

@@ -14,6 +14,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,7 +25,7 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
     private static final String TAG = "ViewSurveysPresenter";
     private ViewSurveysContract.View mView;
     private DatabaseReference mDatabase;
-    private ArrayList<SurveyDetails> mSurveyDetails;
+    private List<SurveyDetails> mSurveyDetails;
     private boolean hasLoadedSurveys = false;
 
     public ViewSurveysPresenter(ViewSurveysContract.View view) {
@@ -45,7 +46,7 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                     User user = dataSnapshot.getValue(User.class);
                     Globals.getInstance().setUser(user);
                     if (Globals.getInstance().getUser().getSurveyIds() == null) {
-                        HashMap<String, Object> surveyIds = new HashMap<>();
+                        Map<String, Boolean> surveyIds = new HashMap<>();
                         Globals.getInstance().getUser().setSurveyIds(surveyIds);
                     }
                     if (!hasLoadedSurveys) {
@@ -56,7 +57,7 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                     }
                 } else {
                     // Add new user.
-                    HashMap<String, Object> surveyIds = new HashMap<>();
+                    Map<String, Boolean> surveyIds = new HashMap<>();
                     surveyIds.put("enrollmentSurvey", true);
                     Globals.getInstance().getUser().setSurveyIds(surveyIds);
                     mDatabase.child("users")
@@ -80,10 +81,10 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
     @Override
     public void loadSurveys() {
         mSurveyDetails.clear();
-        HashMap<String, Object> surveyIds = Globals.getInstance().getUser().getSurveyIds();
+        Map<String, Boolean> surveyIds = Globals.getInstance().getUser().getSurveyIds();
         Log.d(TAG, "loadSurveys: NUM SURVEY IDs: " + surveyIds.size());
 
-        for (Map.Entry<String, Object> surveyId : surveyIds.entrySet()) {
+        for (final Map.Entry<String, Boolean> surveyId : surveyIds.entrySet()) {
             ValueEventListener surveyDetailsDataListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -103,6 +104,11 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                     .child("surveyDetails")
                     .addValueEventListener(surveyDetailsDataListener);
         }
+
+        if (surveyIds.size() == 0) {
+            mView.showNoSurveysMessage();
+        }
+
         mView.setProgressIndicator(false);
     }
 

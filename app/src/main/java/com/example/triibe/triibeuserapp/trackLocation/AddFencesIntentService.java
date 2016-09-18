@@ -40,7 +40,9 @@ public class AddFencesIntentService extends IntentService
         ResultCallback<Status> {
 
     private static final String TAG = "AddFences";
-
+    public final static String EXTRA_TRIIBE_FENCE_TYPE = "com.example.triibe.TRIIBE_FENCE_TYPE";
+    public final static String TRIIBE_MALL = "com.example.triibe.TRIIBE_MALL";
+    public final static String TRIIBE_LANDMARK = "com.example.triibe.TRIIBE_LANDMARK";
     private GoogleApiClient mGoogleApiClient;
     private PendingIntent mPendingIntent;
     private FenceUpdateRequest mMallFenceUpdateRequest;
@@ -67,13 +69,13 @@ public class AddFencesIntentService extends IntentService
     @Override
     protected void onHandleIntent(Intent intent) {
         String type = "";
-        if (intent.getStringExtra("type") != null) {
-            type = intent.getStringExtra("type");
+        if (intent.getStringExtra(EXTRA_TRIIBE_FENCE_TYPE) != null) {
+            type = intent.getStringExtra(EXTRA_TRIIBE_FENCE_TYPE);
         }
 
-        if (type.contentEquals("mall")) {
+        if (type.contentEquals(TRIIBE_MALL)) {
             createMallFences();
-        } else if (type.contentEquals("landmark")) {
+        } else if (type.contentEquals(TRIIBE_LANDMARK)) {
             createLandmarkFences();
         }
     }
@@ -100,7 +102,7 @@ public class AddFencesIntentService extends IntentService
             SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
             boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED, false);
             if (!mallGeofencesAdded && mMallFenceUpdateRequest != null) {
-                addFences("mall");
+                addFences(TRIIBE_MALL);
             }
         }
     }
@@ -124,7 +126,7 @@ public class AddFencesIntentService extends IntentService
         if (!mGoogleApiClient.isConnected()) {
             mGoogleApiClient.connect();
         } else {
-            addFences("landmark");
+            addFences(TRIIBE_LANDMARK);
         }
     }
 
@@ -134,7 +136,7 @@ public class AddFencesIntentService extends IntentService
             return;
         }
 
-        if (type.contentEquals("mall")) {
+        if (type.contentEquals(TRIIBE_MALL)) {
             try {
                 Awareness.FenceApi.updateFences(
                         mGoogleApiClient,
@@ -149,7 +151,7 @@ public class AddFencesIntentService extends IntentService
             SharedPreferences.Editor editor = preferences.edit();
             editor.putBoolean(Constants.MALL_FENCES_ADDED, true);
             editor.apply();
-        } else if (type.contentEquals("landmark")) {
+        } else if (type.contentEquals(TRIIBE_LANDMARK)) {
             try {
                 Awareness.FenceApi.updateFences(
                         mGoogleApiClient,
@@ -166,11 +168,11 @@ public class AddFencesIntentService extends IntentService
         SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
         boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED, false);
         if (!mallGeofencesAdded && mMallFenceUpdateRequest != null) {
-            addFences("mall");
+            addFences(TRIIBE_MALL);
         }
 
         if (mLandmarkFenceUpdateRequest != null) {
-            addFences("landmark");
+            addFences(TRIIBE_LANDMARK);
         }
     }
 
@@ -200,7 +202,7 @@ public class AddFencesIntentService extends IntentService
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
-        Toast.makeText(this, "add fences service done", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onDestroy: added fences service done");
     }
 
     public static class MallFenceReceiver extends BroadcastReceiver {
@@ -212,7 +214,7 @@ public class AddFencesIntentService extends IntentService
             // Start or stop the app service
             Intent AppServiceIntent = new Intent(context, RunAppWhenAtMallService.class);
 
-            if (TextUtils.equals(fenceState.getFenceKey(), "southland")) {
+            if (TextUtils.equals(fenceState.getFenceKey(), "southland")) { // TODO: 18/09/16 add southland and others to constants file
                 switch (fenceState.getCurrentState()) {
                     case FenceState.TRUE:
                         Log.d(TAG, "In southland");
@@ -278,7 +280,7 @@ public class AddFencesIntentService extends IntentService
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
                 Intent addMallFencesIntent = new Intent(context, AddFencesIntentService.class);
-                addMallFencesIntent.putExtra("type", "mall");
+                addMallFencesIntent.putExtra(EXTRA_TRIIBE_FENCE_TYPE, TRIIBE_MALL);
                 context.startService(addMallFencesIntent);
             }
         }

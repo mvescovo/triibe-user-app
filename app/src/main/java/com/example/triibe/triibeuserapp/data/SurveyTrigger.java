@@ -1,5 +1,7 @@
 package com.example.triibe.triibeuserapp.data;
 
+import android.location.Location;
+
 import com.google.firebase.database.Exclude;
 
 import java.util.HashMap;
@@ -83,12 +85,12 @@ public class SurveyTrigger {
     // For firebase map
     @Exclude
     public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         result.put("surveyId", mSurveyId);
         result.put("id", mId);
-        result.put("latitude", mLocation.getLat());
-        result.put("longitude", mLocation.getLon());
-        result.put("level", mLocation.getLevel());
+        result.put("latitude", mLocation.getLatitude());
+        result.put("longitude", mLocation.getLongitude());
+        result.put("level", mLocation.getAltitude());
         result.put("time", mTime);
         return result;
     }
