@@ -53,7 +53,7 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
 //    Intent mTrackRssiIntent;
 //    Intent mTestMapsServiceIntent;
 //    GoogleApiClient mGoogleApiClient;
-//    Location mLastLocation;
+//    SurveyLocation mLastLocation;
 //    private GoogleMap mMap;
 //    boolean mTrackLocation = false;
 
@@ -284,8 +284,8 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
 //        }
 //
 //        LatLng location = mMap.getCameraPosition().target;
-//        Log.d(TAG, "Location: " + location.latitude + ", " + location.longitude);
-//        mLongLatTextView.setText("Location: " + location.latitude + ", " + location.longitude);
+//        Log.d(TAG, "SurveyLocation: " + location.latitude + ", " + location.longitude);
+//        mLongLatTextView.setText("SurveyLocation: " + location.latitude + ", " + location.longitude);
 //
 //
 //        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);

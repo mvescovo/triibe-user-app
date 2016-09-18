@@ -95,7 +95,7 @@ public class Option {
     // For firebase map
     @Exclude
     public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         result.put("questionId", mQuestionId);
         result.put("id", mId);
         result.put("phrase", mPhrase);

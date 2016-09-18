@@ -7,22 +7,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Answer entity.
- * 
- * @author michael
+ * AnswerDetails entity.
+ *
+ * @author michael.
  */
 @IgnoreExtraProperties
-public class Answer {
+public class AnswerDetails {
 
-    private AnswerDetails mAnswerDetails;
-    private Map<String, Option> mSelectedOptions;
+    private String mQuestionId;
+    private String mType;
 
     // Empty constructor required for firebase
-    public Answer() {}
+    public AnswerDetails() {}
 
-    public Answer(AnswerDetails answerDetails, Map<String, Option> selectedOptions) {
-        mAnswerDetails = answerDetails;
-        mSelectedOptions = selectedOptions;
+    public AnswerDetails(String questionId, String type) {
+        mQuestionId = questionId;
+        mType = type;
     }
 
     /*
@@ -31,20 +31,28 @@ public class Answer {
     * Note: getters must be of the form "get<parameter name>".
     * Boolean values cannot use "hasExtraValue" for example.
     * */
-    public Map<String, Option> getSelectedOptions() {
-        return mSelectedOptions;
+    public String getQuestionId() {
+        return mQuestionId;
     }
 
-    public void setSelectedOptions(Map<String, Option> selectedOptions) {
-        mSelectedOptions = selectedOptions;
+    public void setQuestionId(String questionId) {
+        mQuestionId = questionId;
+    }
+
+    public String getType() {
+        return mType;
+    }
+
+    public void setType(String type) {
+        mType = type;
     }
 
     // For firebase map
     @Exclude
     public Map<String, Object> toMap() {
         Map<String, Object> result = new HashMap<>();
-        result.put("answerDetails", mAnswerDetails);
-        result.put("selectedOptions", mSelectedOptions);
+        result.put("questionId", mQuestionId);
+        result.put("type", mType);
         return result;
     }
 }

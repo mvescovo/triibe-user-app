@@ -14,26 +14,14 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Question {
 
-    private String mSurveyId;
-    private String mId;
-    private String mImageUrl;
-    private String mTitle;
-    private String mIntro;
-    private Query mQuery;
-    private String mIntroLinkKey;
-    private String mIntroLinkUrl;
-    private String mAction;
+    QuestionDetails mQuestionDetails;
+    private Map<String, Option> mOptions;
 
     // Empty constructor required for firebase
     public Question() {}
 
-    public Question(String surveyId, String id, String imageUrl, String title, String intro, Query query) {
-        mSurveyId = surveyId;
-        mId = id;
-        mImageUrl = imageUrl;
-        mTitle = title;
-        mIntro = intro;
-        mQuery = query;
+    public Question(QuestionDetails questionDetails) {
+        mQuestionDetails = questionDetails;
     }
 
     /*
@@ -42,83 +30,28 @@ public class Question {
     * Note: getters must be of the form "get<parameter name>".
     * Boolean values cannot use "hasExtraValue" for example.
     * */
-    public String getSurveyId() {
-        return mSurveyId;
+    public QuestionDetails getQuestionDetails() {
+        return mQuestionDetails;
     }
 
-    public void setSurveyId(String surveyId) {
-        mSurveyId = surveyId;
+    public void setQuestionDetails(QuestionDetails questionDetails) {
+        mQuestionDetails = questionDetails;
     }
 
-    public String getId() {
-        return mId;
+    public Map<String, Option> getOptions() {
+        return mOptions;
     }
 
-    public void setId(String id) {
-        mId = id;
-    }
-
-    public String getImageUrl() {
-        return mImageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        mImageUrl = imageUrl;
-    }
-
-    public String getTitle() {
-        return mTitle;
-    }
-
-    public void setTitle(String title) {
-        mTitle = title;
-    }
-
-    public String getIntro() {
-        return mIntro;
-    }
-
-    public void setIntro(String intro) {
-        mIntro = intro;
-    }
-
-    public Query getQuery() {
-        return mQuery;
-    }
-
-    public void setQuery(Query query) {
-        mQuery = query;
-    }
-
-    public String getIntroLinkKey() {
-        return mIntroLinkKey;
-    }
-
-    public void setIntroLinkKey(String introLinkKey) {
-        mIntroLinkKey = introLinkKey;
-    }
-
-    public String getIntroLinkUrl() {
-        return mIntroLinkUrl;
-    }
-
-    public void setIntroLinkUrl(String introLinkUrl) {
-        mIntroLinkUrl = introLinkUrl;
+    public void setOptions(Map<String, Option> options) {
+        mOptions = options;
     }
 
     // For firebase map
     @Exclude
     public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("surveyId", mSurveyId);
-        result.put("id", mId);
-        result.put("imageUrl", mImageUrl);
-        result.put("title", mTitle);
-        result.put("intro", mIntro);
-        result.put("introLinkKey", mIntroLinkKey);
-        result.put("introLinkUrl", mIntroLinkUrl);
-        result.put("action", mAction);
-
+        Map<String, Object> result = new HashMap<>();
+        result.put("questionDetails", mQuestionDetails);
+        result.put("options", mOptions);
         return result;
     }
 }

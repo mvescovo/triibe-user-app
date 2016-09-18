@@ -24,7 +24,6 @@ import android.widget.TextView;
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.Answer;
 import com.example.triibe.triibeuserapp.data.Option;
-import com.example.triibe.triibeuserapp.data.Query;
 import com.example.triibe.triibeuserapp.data.Question;
 import com.example.triibe.triibeuserapp.util.Constants;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,7 +37,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,10 +47,10 @@ import butterknife.ButterKnife;
 public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher {
 
     private static final String TAG = "TakeSurveyActivity";
-
+    public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
     private DatabaseReference mDatabase;
-    private ArrayList<Question> mQuestions;
-    private ArrayList<Answer> mAnswers;
+    private Map<String, Question> mQuestions;
+    private Map<String, Answer> mAnswers;
     private boolean mDownloadedAnswers;
     private int mCurrentQuestionNum;
     private String mUserId;
@@ -69,8 +68,8 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     @BindView(R.id.intro)
     TextView mIntro;
 
-    @BindView(R.id.query)
-    TextView mQuery;
+    @BindView(R.id.phrase)
+    TextView mPhrase;
 
     @BindView(R.id.radio_group)
     RadioGroup mRadioGroup;
@@ -99,9 +98,8 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         setContentView(R.layout.activity_take_survey);
         ButterKnife.bind(this);
 
-
-        if (getIntent().getStringExtra("surveyId") != null) {
-            mSurveyId = getIntent().getStringExtra("surveyId");
+        if (getIntent().getStringExtra(EXTRA_SURVEY_ID) != null) {
+            mSurveyId = getIntent().getStringExtra(EXTRA_SURVEY_ID);
         } else {
             mSurveyId = "-1";
         }
@@ -115,10 +113,8 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
             mUserId = user.getUid();
         } else {
             // User is signed out
-            mUserId = "invalidUser";
+            mUserId = "invalidUser"; // TODO: 18/09/16 set in strings
         }
-
-//        mUserId = "testUser5";
 
         mDownloadedAnswers = false;
 
@@ -144,8 +140,8 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         ValueEventListener questionListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<List<Question>> t = new GenericTypeIndicator<List<Question>>() {};
-                mQuestions = (ArrayList<Question>) dataSnapshot.getValue(t);
+                GenericTypeIndicator<Map<String, Question>> t =  new GenericTypeIndicator<Map<String, Question>>() {};
+                mQuestions = dataSnapshot.getValue(t);
 
                 if (mQuestions != null) {
                     displayCurrentQuestion();
@@ -167,37 +163,37 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * Sync the answers from firebase.
     * */
     private void getAnswers() {
-        ValueEventListener answerListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<List<Answer>> t = new GenericTypeIndicator<List<Answer>>() {
-                };
-                mAnswers = (ArrayList<Answer>) dataSnapshot.getValue(t);
-                mLoadSurveyProgressBar.setVisibility(View.GONE);
-
-                if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum && !mDownloadedAnswers) {
-                    displayCurrentAnswer();
-                } else {
-                    Log.d(TAG, "onDataChange: No answers in survey");
-                }
-
-                mDownloadedAnswers = true;
-
-                // Prevent users from changing their responses to qualifying questions
-                if (mAnswers != null && mAnswers.size() > Constants.NUM_QUALIFYING_QUESTIONS &&
-                        mCurrentQuestionNum <= Constants.NUM_QUALIFYING_QUESTIONS) {
-                    mCurrentQuestionNum = Constants.NUM_QUALIFYING_QUESTIONS + 1;
-                    displayCurrentQuestion();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting answers failed, log a message
-                Log.w(TAG, "loadAnswers:onCancelled", databaseError.toException());
-            }
-        };
-        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).addValueEventListener(answerListener);
+//        ValueEventListener answerListener = new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                GenericTypeIndicator<List<Answer>> t = new GenericTypeIndicator<List<Answer>>() {
+//                };
+//                mAnswers = (ArrayList<Answer>) dataSnapshot.getValue(t);
+//                mLoadSurveyProgressBar.setVisibility(View.GONE);
+//
+//                if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum && !mDownloadedAnswers) {
+//                    displayCurrentAnswer();
+//                } else {
+//                    Log.d(TAG, "onDataChange: No answers in survey");
+//                }
+//
+//                mDownloadedAnswers = true;
+//
+//                // Prevent users from changing their responses to qualifying questions
+//                if (mAnswers != null && mAnswers.size() > Constants.NUM_QUALIFYING_QUESTIONS &&
+//                        mCurrentQuestionNum <= Constants.NUM_QUALIFYING_QUESTIONS) {
+//                    mCurrentQuestionNum = Constants.NUM_QUALIFYING_QUESTIONS + 1;
+//                    displayCurrentQuestion();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                // Getting answers failed, log a message
+//                Log.w(TAG, "loadAnswers:onCancelled", databaseError.toException());
+//            }
+//        };
+//        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).addValueEventListener(answerListener);
     }
 
     /*
@@ -212,32 +208,33 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         float progress = (float) mCurrentQuestionNum / mQuestions.size() * 100;
         mProgressBar.setProgress((int) progress);
 
-        final Question question = mQuestions.get(mCurrentQuestionNum - 1);
+        final Question question = (Question) mQuestions.get(Integer.toString(mCurrentQuestionNum - 1));
 
-        if (!question.getImageUrl().contentEquals("")) {
+        if (!question.getQuestionDetails().getImageUrl().contentEquals("")) {
             mImage.setVisibility(View.VISIBLE);
-            Picasso.with(this).load(question.getImageUrl()).into(mImage);
+            Picasso.with(this).load(question.getQuestionDetails().getImageUrl()).into(mImage);
         } else {
             mImage.setVisibility(View.GONE);
         }
-        if (!question.getTitle().contentEquals("")) {
+        if (!question.getQuestionDetails().getTitle().contentEquals("")) {
             mTitle.setVisibility(View.VISIBLE);
-            mTitle.setText(question.getTitle());
+            mTitle.setText(question.getQuestionDetails().getTitle());
         } else {
             mTitle.setVisibility(View.GONE);
         }
-        if (!question.getIntro().contentEquals("")) {
+        if (!question.getQuestionDetails().getIntro().contentEquals("")) {
             mIntro.setVisibility(View.VISIBLE);
-            mIntro.setText(question.getIntro());
+            mIntro.setText(question.getQuestionDetails().getIntro());
 
-            if (question.getIntroLinkKey() != null && question.getIntroLinkUrl() != null) {
+            if (question.getQuestionDetails().getIntroLinkKey() != null
+                    && question.getQuestionDetails().getIntroLinkUrl() != null) {
                 Linkify.TransformFilter mentionFilter = new Linkify.TransformFilter() {
                     public final String transformUrl(final Matcher match, String url) {
-                        return question.getIntroLinkUrl();
+                        return question.getQuestionDetails().getIntroLinkUrl();
                     }
                 };
 
-                Pattern pattern = Pattern.compile(question.getIntroLinkKey());
+                Pattern pattern = Pattern.compile(question.getQuestionDetails().getIntroLinkKey());
                 String scheme = "";
                 Linkify.addLinks(mIntro, pattern, scheme, null, mentionFilter);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -247,21 +244,21 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
         } else {
             mIntro.setVisibility(View.GONE);
         }
-        if (!question.getQuery().getPhrase().contentEquals("")) {
-            mQuery.setVisibility(View.VISIBLE);
-            mQuery.setText(question.getQuery().getPhrase());
+        if (!question.getQuestionDetails().getPhrase().contentEquals("")) {
+            mPhrase.setVisibility(View.VISIBLE);
+            mPhrase.setText(question.getQuestionDetails().getPhrase());
         } else {
-            mQuery.setVisibility(View.GONE);
+            mPhrase.setVisibility(View.GONE);
         }
 
-        switch (question.getQuery().getType()) {
+        switch (question.getQuestionDetails().getType()) {
             case "radio":
                 mRadioGroup.removeAllViews();
                 mRadioGroup.setVisibility(View.VISIBLE);
 
-                for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+                for (int i = 0; i < question.getOptions().size(); i++) {
                     RadioButton radioButton = new RadioButton(this);
-                    radioButton.setText(question.getQuery().getOptions().get(i).getPhrase());
+                    radioButton.setText(((Option)question.getOptions().get(Integer.toString(i))).getPhrase());
                     radioButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -275,9 +272,9 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                 mCheckboxGroup.removeAllViews();
                 mCheckboxGroup.setVisibility(View.VISIBLE);
 
-                for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+                for (int i = 0; i < question.getOptions().size(); i++) {
                     CheckBox checkBox = new CheckBox(this);
-                    checkBox.setText(question.getQuery().getOptions().get(i).getPhrase());
+                    checkBox.setText(((Option)question.getOptions().get(Integer.toString(i))).getPhrase());
                     checkBox.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -291,15 +288,15 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
                 mEditTextGroup.removeAllViews();
                 mEditTextGroup.setVisibility(View.VISIBLE);
 
-                for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+                for (int i = 0; i < question.getOptions().size(); i++) {
                     final TextInputEditText textInputEditText = new TextInputEditText(this);
-                    textInputEditText.setHint(question.getQuery().getOptions().get(i).getPhrase());
+                    textInputEditText.setHint(((Option)question.getOptions().get(Integer.toString(i))).getPhrase());
                     mEditTextGroup.addView(textInputEditText, i);
-                    if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_PHONE")) {
+                    if (((Option)question.getOptions().get(Integer.toString(i))).getExtraInputType() != null &&
+                            ((Option)question.getOptions().get(Integer.toString(i))).getExtraInputType().contentEquals("InputType.TYPE_CLASS_PHONE")) {
                         ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_PHONE);
-                    } else if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("TYPE_TEXT_VARIATION_EMAIL_ADDRESS")) {
+                    } else if (((Option)question.getOptions().get(Integer.toString(i))).getExtraInputType() != null &&
+                            ((Option)question.getOptions().get(Integer.toString(i))).getExtraInputType().contentEquals("TYPE_TEXT_VARIATION_EMAIL_ADDRESS")) {
                         ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
                     } else {
                         ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
@@ -319,432 +316,431 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * Unmarshal the current answer and display to the user.
     * */
     private void displayCurrentAnswer() {
-        mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
-        Question question = mQuestions.get(mCurrentQuestionNum - 1);
-
-        if (mAnswers.size() < mCurrentQuestionNum) {
-            if (question.getQuery().getType().contentEquals("text")) {
-                for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
-                    final int viewNumber = i;
-
-                    if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_PHONE")) {
-                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_PHONE);
-                    } else if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("TYPE_TEXT_VARIATION_EMAIL_ADDRESS")) {
-                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-                    } else {
-                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
-                    }
-                    ((TextInputEditText) mEditTextGroup.getChildAt(i)).addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                            onTextInputEditTextChanged(viewNumber);
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable editable) {
-
-                        }
-                    });
-                }
-            }
-        } else {
-            Answer answer = mAnswers.get(mCurrentQuestionNum - 1);
-
-            switch (answer.getType()) {
-                case "radio":
-                    if (answer.getSelectedOptions() != null) {
-                        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
-                            if (((RadioButton) mRadioGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(0).getPhrase())) {
-                                ((RadioButton) mRadioGroup.getChildAt(i)).toggle();
-                                if (question.getQuery().getOptions().get(i).getHasExtraInput()) {
-                                    mTextInputLayout.setVisibility(View.VISIBLE);
-                                    mTextInputEditText.setVisibility(View.VISIBLE);
-                                    mTextInputEditText.setText("");
-                                    if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-                                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
-                                        mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                                    }
-                                    mTextInputEditText.requestFocus();
-                                    if (answer.getSelectedOptions().get(0).getExtraInput() != null) {
-                                        mTextInputEditText.append(answer.getSelectedOptions().get(0).getExtraInput());
-                                    }
-                                    mTextInputEditText.setHint(answer.getSelectedOptions().get(0).getExtraInputHint());
-                                    mTextInputEditText.addTextChangedListener(this);
-                                } else {
-                                    mTextInputEditText.setText("");
-                                    mTextInputEditText.setVisibility(View.GONE);
-                                    mTextInputEditText.removeTextChangedListener(this);
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case "checkbox":
-                    if (answer.getSelectedOptions() != null) {
-                        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
-                            for (int j = 0; j < answer.getSelectedOptions().size(); j++) {
-                                if (((CheckBox) mCheckboxGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(j).getPhrase())) {
-                                    ((CheckBox) mCheckboxGroup.getChildAt(i)).toggle();
-                                    if (question.getQuery().getOptions().get(i).getHasExtraInput()) {
-                                        mTextInputLayout.setVisibility(View.VISIBLE);
-                                        mTextInputEditText.setVisibility(View.VISIBLE);
-                                        mTextInputEditText.setText("");
-                                        if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-                                                question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
-                                            mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                                        }
-                                        mTextInputEditText.requestFocus();
-
-                                        for (int k = 0; k < mQuestions.get(mCurrentQuestionNum - 1).getQuery().getOptions().size(); k++) {
-                                            if (mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions().get(k).getExtraInput() != null) {
-                                                mTextInputEditText.append(answer.getSelectedOptions().get(k).getExtraInput());
-                                            }
-                                        }
-
-                                        mTextInputEditText.setHint(answer.getSelectedOptions().get(i).getExtraInputHint());
-                                        mTextInputEditText.addTextChangedListener(this);
-                                    } else {
-                                        mTextInputEditText.setText("");
-                                        mTextInputEditText.setVisibility(View.GONE);
-                                        mTextInputEditText.removeTextChangedListener(this);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case "text":
-                    for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
-                        final int viewNumber = i;
-
-                        if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-                                question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_PHONE")) {
-                            ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_PHONE);
-                        } else if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-                                question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("TYPE_TEXT_VARIATION_EMAIL_ADDRESS")) {
-                            ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-                        } else {
-                            ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
-                        }
-                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).addTextChangedListener(new TextWatcher() {
-                            @Override
-                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                            }
-
-                            @Override
-                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                                onTextInputEditTextChanged(viewNumber);
-                            }
-
-                            @Override
-                            public void afterTextChanged(Editable editable) {
-
-                            }
-                        });
-
-                        if (answer.getSelectedOptions() != null) {
-                            for (int j = 0; j < answer.getSelectedOptions().size(); j++) {
-                                if (((TextInputEditText) mEditTextGroup.getChildAt(i)).getHint().equals(answer.getSelectedOptions().get(j).getPhrase())) {
-                                    ((TextInputEditText) mEditTextGroup.getChildAt(i)).setText(answer.getSelectedOptions().get(j).getExtraInput());
-                                }
-                            }
-                        }
-                    }
-                    break;
-            }
-        }
+//        mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+//        Question question = mQuestions.get(mCurrentQuestionNum - 1);
+//
+//        if (mAnswers.size() < mCurrentQuestionNum) {
+//            if (question.getQuery().getType().contentEquals("text")) {
+//                for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+//                    final int viewNumber = i;
+//
+//                    if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+//                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_PHONE")) {
+//                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_PHONE);
+//                    } else if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+//                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("TYPE_TEXT_VARIATION_EMAIL_ADDRESS")) {
+//                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+//                    } else {
+//                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
+//                    }
+//                    ((TextInputEditText) mEditTextGroup.getChildAt(i)).addTextChangedListener(new TextWatcher() {
+//                        @Override
+//                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//                            onTextInputEditTextChanged(viewNumber);
+//                        }
+//
+//                        @Override
+//                        public void afterTextChanged(Editable editable) {
+//
+//                        }
+//                    });
+//                }
+//            }
+//        } else {
+//            Answer answer = mAnswers.get(mCurrentQuestionNum - 1);
+//
+//            switch (answer.getType()) {
+//                case "radio":
+//                    if (answer.getSelectedOptions() != null) {
+//                        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+//                            if (((RadioButton) mRadioGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(0).getPhrase())) {
+//                                ((RadioButton) mRadioGroup.getChildAt(i)).toggle();
+//                                if (question.getQuery().getOptions().get(i).getHasExtraInput()) {
+//                                    mTextInputLayout.setVisibility(View.VISIBLE);
+//                                    mTextInputEditText.setVisibility(View.VISIBLE);
+//                                    mTextInputEditText.setText("");
+//                                    if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+//                                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
+//                                        mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+//                                    }
+//                                    mTextInputEditText.requestFocus();
+//                                    if (answer.getSelectedOptions().get(0).getExtraInput() != null) {
+//                                        mTextInputEditText.append(answer.getSelectedOptions().get(0).getExtraInput());
+//                                    }
+//                                    mTextInputEditText.setHint(answer.getSelectedOptions().get(0).getExtraInputHint());
+//                                    mTextInputEditText.addTextChangedListener(this);
+//                                } else {
+//                                    mTextInputEditText.setText("");
+//                                    mTextInputEditText.setVisibility(View.GONE);
+//                                    mTextInputEditText.removeTextChangedListener(this);
+//                                }
+//                            }
+//                        }
+//                    }
+//                    break;
+//                case "checkbox":
+//                    if (answer.getSelectedOptions() != null) {
+//                        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+//                            for (int j = 0; j < answer.getSelectedOptions().size(); j++) {
+//                                if (((CheckBox) mCheckboxGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(j).getPhrase())) {
+//                                    ((CheckBox) mCheckboxGroup.getChildAt(i)).toggle();
+//                                    if (question.getQuery().getOptions().get(i).getHasExtraInput()) {
+//                                        mTextInputLayout.setVisibility(View.VISIBLE);
+//                                        mTextInputEditText.setVisibility(View.VISIBLE);
+//                                        mTextInputEditText.setText("");
+//                                        if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+//                                                question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
+//                                            mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+//                                        }
+//                                        mTextInputEditText.requestFocus();
+//
+//                                        for (int k = 0; k < mQuestions.get(mCurrentQuestionNum - 1).getQuery().getOptions().size(); k++) {
+//                                            if (mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions().get(k).getExtraInput() != null) {
+//                                                mTextInputEditText.append(answer.getSelectedOptions().get(k).getExtraInput());
+//                                            }
+//                                        }
+//
+//                                        mTextInputEditText.setHint(answer.getSelectedOptions().get(i).getExtraInputHint());
+//                                        mTextInputEditText.addTextChangedListener(this);
+//                                    } else {
+//                                        mTextInputEditText.setText("");
+//                                        mTextInputEditText.setVisibility(View.GONE);
+//                                        mTextInputEditText.removeTextChangedListener(this);
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                    break;
+//                case "text":
+//                    for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
+//                        final int viewNumber = i;
+//
+//                        if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+//                                question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_PHONE")) {
+//                            ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_PHONE);
+//                        } else if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
+//                                question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("TYPE_TEXT_VARIATION_EMAIL_ADDRESS")) {
+//                            ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+//                        } else {
+//                            ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
+//                        }
+//                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).addTextChangedListener(new TextWatcher() {
+//                            @Override
+//                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//                                onTextInputEditTextChanged(viewNumber);
+//                            }
+//
+//                            @Override
+//                            public void afterTextChanged(Editable editable) {
+//
+//                            }
+//                        });
+//
+//                        if (answer.getSelectedOptions() != null) {
+//                            for (int j = 0; j < answer.getSelectedOptions().size(); j++) {
+//                                if (((TextInputEditText) mEditTextGroup.getChildAt(i)).getHint().equals(answer.getSelectedOptions().get(j).getPhrase())) {
+//                                    ((TextInputEditText) mEditTextGroup.getChildAt(i)).setText(answer.getSelectedOptions().get(j).getExtraInput());
+//                                }
+//                            }
+//                        }
+//                    }
+//                    break;
+//            }
+//        }
     }
 
     /*
     * Update the answer on firebase when the user changes the "extra text".
     * Does not include answers with all text fields, just the ones with a "other" option.
     * */
-    public void onExtraTextChanged(CharSequence charSequence) {
-        switch (mQuestions.get(mCurrentQuestionNum - 1).getQuery().getType()) {
-            case "radio":
-                mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions().get(0).setExtraInput(charSequence.toString());
-                break;
-            case "checkbox":
-                for (int i = 0; i < mQuestions.get(mCurrentQuestionNum - 1).getQuery().getOptions().size(); i++) {
-                    if (mQuestions.get(mCurrentQuestionNum - 1).getQuery().getOptions().get(i).getHasExtraInput()) {
-                        mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions().get(i).setExtraInput(charSequence.toString());
-                    }
-                }
-                break;
-        }
-
-        // Add the answer to firebase
-        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).setValue(mAnswers);
+    private void onExtraTextChanged(CharSequence charSequence) {
+//        switch (mQuestions.get(mCurrentQuestionNum - 1).getQuestionDetails().getType()) {
+//            case "radio":
+//                mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions().get(0).setExtraInput(charSequence.toString());
+//                break;
+//            case "checkbox":
+//                for (int i = 0; i < mQuestions.get(mCurrentQuestionNum - 1).getOptions().size(); i++) {
+//                    if (mQuestions.get(mCurrentQuestionNum - 1).getOptions().get(i).getHasExtraInput()) {
+//                        mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions().get(i).setExtraInput(charSequence.toString());
+//                    }
+//                }
+//                break;
+//        }
+//
+//        // Add the answer to firebase
+//        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).setValue(mAnswers);
     }
 
     /*
     * Update the answer on firebase when the user selects a radio option.
     * */
-    public void onRadioButtonClicked(View view) {
-//        Toast.makeText(TakeSurveyActivity.this, "Radio button clicked.", Toast.LENGTH_SHORT).show();
-        mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
-        Question question = mQuestions.get(mCurrentQuestionNum - 1);
-
-        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
-//            Toast.makeText(TakeSurveyActivity.this, "Inside for loop", Toast.LENGTH_SHORT).show();
-            if (question.getQuery().getOptions().get(i).getPhrase().contentEquals(((RadioButton) view).getText())) {
-//                Toast.makeText(TakeSurveyActivity.this, "Inside first if", Toast.LENGTH_SHORT).show();
-//                Toast.makeText(TakeSurveyActivity.this, "Has extra input: " + question.getQuery().getOptions().get(i).HasExtraInput() + ", extra input hint: " +
-//                        question.getQuery().getOptions().get(i).getExtraInputHint(), Toast.LENGTH_SHORT).show();
-                if (question.getQuery().getOptions().get(i).getHasExtraInput()) {
-//                    Toast.makeText(TakeSurveyActivity.this, "Has extra input but can't show it for some reason.", Toast.LENGTH_SHORT).show();
-                    mTextInputLayout.setVisibility(View.VISIBLE);
-                    mTextInputEditText.setVisibility(View.VISIBLE);
-                    mTextInputEditText.addTextChangedListener(this);
-                    mTextInputEditText.setHint(question.getQuery().getOptions().get(i).getExtraInputHint());
-                    if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
-                        mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                    }
-                    mTextInputEditText.requestFocus();
-
-                } else {
-                    mTextInputEditText.setText("");
-                    mTextInputEditText.setHint("");
-                    mTextInputEditText.setVisibility(View.GONE);
-                    mTextInputEditText.removeTextChangedListener(this);
-                }
-            }
-        }
-
-        ArrayList<Option> selectedOptions = new ArrayList<>();
-
-        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
-            Option option = question.getQuery().getOptions().get(i);
-            if (option.getPhrase().contentEquals(((RadioButton) view).getText())) {
-                selectedOptions.add(option);
-            }
-        }
-
-        Answer answer = new Answer(Integer.toString(mCurrentQuestionNum), "radio", selectedOptions);
-        if (mAnswers == null) {
-            mAnswers = new ArrayList<>();
-        }
-        if (mAnswers.size() > mCurrentQuestionNum - 1) {
-            mAnswers.remove(mCurrentQuestionNum - 1);
-        }
-        if (mAnswers.size() > 0) {
-            mAnswers.add(mCurrentQuestionNum - 1, answer);
-        } else {
-            mAnswers.add(answer);
-        }
-
-        // Add the answer to firebase
-        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).setValue(mAnswers);
+    private void onRadioButtonClicked(View view) {
+////        Toast.makeText(TakeSurveyActivity.this, "Radio button clicked.", Toast.LENGTH_SHORT).show();
+//        mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+//        Question question = mQuestions.get(mCurrentQuestionNum - 1);
+//
+//        for (int i = 0; i < question.getOptions().size(); i++) {
+////            Toast.makeText(TakeSurveyActivity.this, "Inside for loop", Toast.LENGTH_SHORT).show();
+//            if (question.getOptions().get(i).getPhrase().contentEquals(((RadioButton) view).getText())) {
+////                Toast.makeText(TakeSurveyActivity.this, "Inside first if", Toast.LENGTH_SHORT).show();
+////                Toast.makeText(TakeSurveyActivity.this, "Has extra input: " + question.getQuery().getOptions().get(i).HasExtraInput() + ", extra input hint: " +
+////                        question.getQuery().getOptions().get(i).getExtraInputHint(), Toast.LENGTH_SHORT).show();
+//                if (question.getOptions().get(i).getHasExtraInput()) {
+////                    Toast.makeText(TakeSurveyActivity.this, "Has extra input but can't show it for some reason.", Toast.LENGTH_SHORT).show();
+//                    mTextInputLayout.setVisibility(View.VISIBLE);
+//                    mTextInputEditText.setVisibility(View.VISIBLE);
+//                    mTextInputEditText.addTextChangedListener(this);
+//                    mTextInputEditText.setHint(question.getOptions().get(i).getExtraInputHint());
+//                    if (question.getOptions().get(i).getExtraInputType() != null &&
+//                            question.getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
+//                        mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+//                    }
+//                    mTextInputEditText.requestFocus();
+//
+//                } else {
+//                    mTextInputEditText.setText("");
+//                    mTextInputEditText.setHint("");
+//                    mTextInputEditText.setVisibility(View.GONE);
+//                    mTextInputEditText.removeTextChangedListener(this);
+//                }
+//            }
+//        }
+//
+//        ArrayList<Option> selectedOptions = new ArrayList<>();
+//
+//        for (int i = 0; i < question.getOptions().size(); i++) {
+//            Option option = question.getOptions().get(i);
+//            if (option.getPhrase().contentEquals(((RadioButton) view).getText())) {
+//                selectedOptions.add(option);
+//            }
+//        }
+//
+//        Answer answer = new Answer(Integer.toString(mCurrentQuestionNum), "radio", selectedOptions);
+//        if (mAnswers == null) {
+//            mAnswers = new ArrayList<>();
+//        }
+//        if (mAnswers.size() > mCurrentQuestionNum - 1) {
+//            mAnswers.remove(mCurrentQuestionNum - 1);
+//        }
+//        if (mAnswers.size() > 0) {
+//            mAnswers.add(mCurrentQuestionNum - 1, answer);
+//        } else {
+//            mAnswers.add(answer);
+//        }
+//
+//        // Add the answer to firebase
+//        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).setValue(mAnswers);
     }
 
     /*
     * Update the answer on firebase when the user selects a checkbox option.
     * */
-    public void onCheckboxClicked(View view) {
-        mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
-        // Is the view now checked?
-        boolean checked = ((CheckBox) view).isChecked();
-
-        Question question = mQuestions.get(mCurrentQuestionNum - 1);
-        Option dummyOption = new Option("", false);
-
-        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
-            if (question.getQuery().getOptions().get(i).getPhrase().contentEquals(((CheckBox) view).getText())) {
-                if (question.getQuery().getOptions().get(i).getHasExtraInput() && checked) {
-                    mTextInputLayout.setVisibility(View.VISIBLE);
-                    mTextInputEditText.setVisibility(View.VISIBLE);
-                    mTextInputEditText.addTextChangedListener(this);
-                    mTextInputEditText.setHint(question.getQuery().getOptions().get(i).getExtraInputHint());
-                    if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
-                        mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                    }
-                    mTextInputEditText.requestFocus();
-
-                } else if (question.getQuery().getOptions().get(i).getHasExtraInput() && !checked) {
-                    mTextInputEditText.setText("");
-                    mTextInputEditText.setHint("");
-                    mTextInputEditText.setVisibility(View.GONE);
-                    mTextInputEditText.removeTextChangedListener(this);
-                }
-            }
-        }
-
-        ArrayList<Option> selectedOptions;
-        if (mAnswers.size() < mCurrentQuestionNum) {
-            selectedOptions = new ArrayList<>();
-        } else {
-            selectedOptions = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
-            if (selectedOptions == null) {
-                selectedOptions = new ArrayList<>();
-            }
-        }
-
-        if (selectedOptions.size() < question.getQuery().getOptions().size()) {
-            int optionsSize = question.getQuery().getOptions().size() - selectedOptions.size();
-            for (int i = 0; i < optionsSize; i++) {
-                selectedOptions.add(i, dummyOption);
-            }
-        }
-
-        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
-            Option option = question.getQuery().getOptions().get(i);
-            if (option.getPhrase().contentEquals(((CheckBox) view).getText())) {
-                if (checked) {
-                    selectedOptions.remove(i);
-                    selectedOptions.add(i, option);
-                } else {
-                    selectedOptions.remove(i);
-                    selectedOptions.add(i, dummyOption);
-                }
-            }
-        }
-
-        Answer answer = new Answer(Integer.toString(mCurrentQuestionNum), "checkbox", selectedOptions);
-        if (mAnswers == null) {
-            mAnswers = new ArrayList<>();
-        }
-        if (mAnswers.size() > mCurrentQuestionNum - 1) {
-            mAnswers.remove(mCurrentQuestionNum - 1);
-        }
-        if (mAnswers.size() > 0) {
-            mAnswers.add(mCurrentQuestionNum - 1, answer);
-        } else {
-            mAnswers.add(answer);
-        }
-
-        // Add the answer to firebase
-        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).setValue(mAnswers);
+    private void onCheckboxClicked(View view) {
+//        mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+//        // Is the view now checked?
+//        boolean checked = ((CheckBox) view).isChecked();
+//
+//        Question question = mQuestions.get(mCurrentQuestionNum - 1);
+//        Option dummyOption = new Option("", false);
+//
+//        for (int i = 0; i < question.getOptions().size(); i++) {
+//            if (question.getOptions().get(i).getPhrase().contentEquals(((CheckBox) view).getText())) {
+//                if (question.getOptions().get(i).getHasExtraInput() && checked) {
+//                    mTextInputLayout.setVisibility(View.VISIBLE);
+//                    mTextInputEditText.setVisibility(View.VISIBLE);
+//                    mTextInputEditText.addTextChangedListener(this);
+//                    mTextInputEditText.setHint(question.getOptions().get(i).getExtraInputHint());
+//                    if (question.getOptions().get(i).getExtraInputType() != null &&
+//                            question.getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
+//                        mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+//                    }
+//                    mTextInputEditText.requestFocus();
+//
+//                } else if (question.getOptions().get(i).getHasExtraInput() && !checked) {
+//                    mTextInputEditText.setText("");
+//                    mTextInputEditText.setHint("");
+//                    mTextInputEditText.setVisibility(View.GONE);
+//                    mTextInputEditText.removeTextChangedListener(this);
+//                }
+//            }
+//        }
+//
+//        ArrayList<Option> selectedOptions;
+//        if (mAnswers.size() < mCurrentQuestionNum) {
+//            selectedOptions = new ArrayList<>();
+//        } else {
+//            selectedOptions = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
+//            if (selectedOptions == null) {
+//                selectedOptions = new ArrayList<>();
+//            }
+//        }
+//
+//        if (selectedOptions.size() < question.getOptions().size()) {
+//            int optionsSize = question.getOptions().size() - selectedOptions.size();
+//            for (int i = 0; i < optionsSize; i++) {
+//                selectedOptions.add(i, dummyOption);
+//            }
+//        }
+//
+//        for (int i = 0; i < question.getOptions().size(); i++) {
+//            Option option = question.getOptions().get(i);
+//            if (option.getPhrase().contentEquals(((CheckBox) view).getText())) {
+//                if (checked) {
+//                    selectedOptions.remove(i);
+//                    selectedOptions.add(i, option);
+//                } else {
+//                    selectedOptions.remove(i);
+//                    selectedOptions.add(i, dummyOption);
+//                }
+//            }
+//        }
+//
+//        Answer answer = new Answer(Integer.toString(mCurrentQuestionNum), "checkbox", selectedOptions);
+//        if (mAnswers == null) {
+//            mAnswers = new ArrayList<>();
+//        }
+//        if (mAnswers.size() > mCurrentQuestionNum - 1) {
+//            mAnswers.remove(mCurrentQuestionNum - 1);
+//        }
+//        if (mAnswers.size() > 0) {
+//            mAnswers.add(mCurrentQuestionNum - 1, answer);
+//        } else {
+//            mAnswers.add(answer);
+//        }
+//
+//        // Add the answer to firebase
+//        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).setValue(mAnswers);
     }
 
     /*
     * Update the answer on firebase when the user changes input text fields.
     * */
-    public void onTextInputEditTextChanged(int viewNumber) {
-        Question question = mQuestions.get(mCurrentQuestionNum - 1);
-        Option dummyOption = new Option("", true);
-
-        ArrayList<Option> selectedOptions;
-        if (mAnswers.size() < mCurrentQuestionNum) {
-            selectedOptions = new ArrayList<>();
-        } else {
-            selectedOptions = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
-            if (selectedOptions == null) {
-                selectedOptions = new ArrayList<>();
-            }
-        }
-
-        if (selectedOptions.size() < question.getQuery().getOptions().size()) {
-            int optionsSize = question.getQuery().getOptions().size() - selectedOptions.size();
-            for (int i = 0; i < optionsSize; i++) {
-                selectedOptions.add(i, dummyOption);
-            }
-        }
-
-        for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
-            Option option = question.getQuery().getOptions().get(i);
-            if (option.getPhrase().contentEquals(((TextInputEditText) mEditTextGroup.getChildAt(viewNumber)).getHint())) {
-                option.setExtraInput(((TextInputEditText) mEditTextGroup.getChildAt(viewNumber)).getText().toString());
-                selectedOptions.remove(i);
-                selectedOptions.add(i, option);
-            }
-        }
-
-        Answer answer = new Answer(Integer.toString(mCurrentQuestionNum), "text", selectedOptions);
-        if (mAnswers == null) {
-            mAnswers = new ArrayList<>();
-        }
-        if (mAnswers.size() > mCurrentQuestionNum - 1) {
-            mAnswers.remove(mCurrentQuestionNum - 1);
-        }
-        if (mAnswers.size() > 0) {
-            mAnswers.add(mCurrentQuestionNum - 1, answer);
-        } else {
-            mAnswers.add(answer);
-        }
-
-        // Add the answer to firebase
-        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).setValue(mAnswers);
+    private void onTextInputEditTextChanged(int viewNumber) {
+//        Question question = mQuestions.get(mCurrentQuestionNum - 1);
+//        Option dummyOption = new Option("", true);
+//
+//        ArrayList<Option> selectedOptions;
+//        if (mAnswers.size() < mCurrentQuestionNum) {
+//            selectedOptions = new ArrayList<>();
+//        } else {
+//            selectedOptions = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
+//            if (selectedOptions == null) {
+//                selectedOptions = new ArrayList<>();
+//            }
+//        }
+//
+//        if (selectedOptions.size() < question.getOptions().size()) {
+//            int optionsSize = question.getOptions().size() - selectedOptions.size();
+//            for (int i = 0; i < optionsSize; i++) {
+//                selectedOptions.add(i, dummyOption);
+//            }
+//        }
+//
+//        for (int i = 0; i < question.getOptions().size(); i++) {
+//            Option option = question.getOptions().get(i);
+//            if (option.getPhrase().contentEquals(((TextInputEditText) mEditTextGroup.getChildAt(viewNumber)).getHint())) {
+//                option.setExtraInput(((TextInputEditText) mEditTextGroup.getChildAt(viewNumber)).getText().toString());
+//                selectedOptions.remove(i);
+//                selectedOptions.add(i, option);
+//            }
+//        }
+//
+//        Answer answer = new Answer(Integer.toString(mCurrentQuestionNum), "text", selectedOptions);
+//        if (mAnswers == null) {
+//            mAnswers = new ArrayList<>();
+//        }
+//        if (mAnswers.size() > mCurrentQuestionNum - 1) {
+//            mAnswers.remove(mCurrentQuestionNum - 1);
+//        }
+//        if (mAnswers.size() > 0) {
+//            mAnswers.add(mCurrentQuestionNum - 1, answer);
+//        } else {
+//            mAnswers.add(answer);
+//        }
+//
+//        // Add the answer to firebase
+//        mDatabase.child("surveys").child(mSurveyId).child("answers").child(mUserId).setValue(mAnswers);
     }
 
     /*
     * Go to the next question.
     * */
-    public void nextQuestion(View view) {
-        Question question = mQuestions.get(mCurrentQuestionNum - 1);
-
-        if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum) {
-            boolean answerOk = false;
-            if (question.getQuery().getRequiredPhrase() != null) {
-                String requiredPhrase = mQuestions.get(mCurrentQuestionNum - 1).getQuery().getRequiredPhrase();
-                ArrayList<Option> options = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
-                for (int i = 0; i < options.size(); i++) {
-                    if (options.get(i).getPhrase().contentEquals(requiredPhrase)) {
-                        answerOk = true;
-                    }
-                }
-            } else {
-                ArrayList<Option> options = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
-                if (question.getQuery().getType().contentEquals("text")) {
-                    answerOk = true;
-                    for (int i = 0; i < options.size(); i++) {
-                        if (options.get(i).getExtraInput() == null || options.get(i).getExtraInput().contentEquals("")) {
-                            answerOk = false;
-                        }
-                    }
-                } else {
-                    for (int i = 0; i < options.size(); i++) {
-                        if (!options.get(i).getPhrase().contentEquals("")) {
-                            answerOk = !options.get(i).getHasExtraInput() || options.get(i).getExtraInput() != null && !options.get(i).getExtraInput().contentEquals("");
-                        }
-                    }
-                }
-            }
-
-            if (answerOk) {
-                if (mNextButton.getText().toString().contentEquals(getString(R.string.finish_survey))) {
-                    finish();
-                } else {
-                    mCurrentQuestionNum++;
-                    mTextInputEditText.removeTextChangedListener(this);
-                    displayCurrentQuestion();
-                    if (mCurrentQuestionNum == mQuestions.size()) {
-                        mNextButton.setText(R.string.finish_survey);
-                    }
-                }
-            } else {
-                if (question.getQuery().getIncorrectAnswerPhrase() != null) {
-                    Snackbar snackbar = Snackbar.make(view, question.getQuery().getIncorrectAnswerPhrase(), Snackbar.LENGTH_SHORT);
-                    snackbar.show();
-                } else {
-                    Snackbar snackbar = Snackbar.make(view, R.string.question_incomplete, Snackbar.LENGTH_SHORT);
-                    snackbar.show();
-                }
-            }
-
-        } else if (question.getQuery().getRequiredPhrase() != null) {
-            Snackbar snackbar = Snackbar.make(view, question.getQuery().getIncorrectAnswerPhrase(), Snackbar.LENGTH_SHORT);
-            snackbar.show();
-        } else {
-            Snackbar snackbar = Snackbar.make(view, R.string.question_incomplete, Snackbar.LENGTH_SHORT);
-            snackbar.show();
-        }
-
+    private void nextQuestion(View view) {
+//        Question question = mQuestions.get(mCurrentQuestionNum - 1);
+//
+//        if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum) {
+//            boolean answerOk = false;
+//            if (question.getQuestionDetails().getRequiredPhrase() != null) {
+//                String requiredPhrase = mQuestions.get(mCurrentQuestionNum - 1).getQuestionDetails().getRequiredPhrase();
+//                ArrayList<Option> options = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
+//                for (int i = 0; i < options.size(); i++) {
+//                    if (options.get(i).getPhrase().contentEquals(requiredPhrase)) {
+//                        answerOk = true;
+//                    }
+//                }
+//            } else {
+//                ArrayList<Option> options = mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions();
+//                if (question.getQuestionDetails().getType().contentEquals("text")) {
+//                    answerOk = true;
+//                    for (int i = 0; i < options.size(); i++) {
+//                        if (options.get(i).getExtraInput() == null || options.get(i).getExtraInput().contentEquals("")) {
+//                            answerOk = false;
+//                        }
+//                    }
+//                } else {
+//                    for (int i = 0; i < options.size(); i++) {
+//                        if (!options.get(i).getPhrase().contentEquals("")) {
+//                            answerOk = !options.get(i).getHasExtraInput() || options.get(i).getExtraInput() != null && !options.get(i).getExtraInput().contentEquals("");
+//                        }
+//                    }
+//                }
+//            }
+//
+//            if (answerOk) {
+//                if (mNextButton.getText().toString().contentEquals(getString(R.string.finish_survey))) {
+//                    finish();
+//                } else {
+//                    mCurrentQuestionNum++;
+//                    mTextInputEditText.removeTextChangedListener(this);
+//                    displayCurrentQuestion();
+//                    if (mCurrentQuestionNum == mQuestions.size()) {
+//                        mNextButton.setText(R.string.finish_survey);
+//                    }
+//                }
+//            } else {
+//                if (question.getQuestionDetails().getIncorrectAnswerPhrase() != null) {
+//                    Snackbar snackbar = Snackbar.make(view, question.getQuestionDetails().getIncorrectAnswerPhrase(), Snackbar.LENGTH_SHORT);
+//                    snackbar.show();
+//                } else {
+//                    Snackbar snackbar = Snackbar.make(view, R.string.question_incomplete, Snackbar.LENGTH_SHORT);
+//                    snackbar.show();
+//                }
+//            }
+//
+//        } else if (question.getQuestionDetails().getRequiredPhrase() != null) {
+//            Snackbar snackbar = Snackbar.make(view, question.getQuestionDetails().getIncorrectAnswerPhrase(), Snackbar.LENGTH_SHORT);
+//            snackbar.show();
+//        } else {
+//            Snackbar snackbar = Snackbar.make(view, R.string.question_incomplete, Snackbar.LENGTH_SHORT);
+//            snackbar.show();
+//        }
     }
 
     /*
     * Go to the previous question.
     * */
-    public void previousQuestion(View view) {
+    private void previousQuestion(View view) {
         // Prevent users from changing their responses to qualifying questions
         if (mCurrentQuestionNum != Constants.NUM_QUALIFYING_QUESTIONS + 1) {
             mNextButton.setText(R.string.next_question);
@@ -767,7 +763,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
     * Set visible/gone the "Add question" button in "activity_take_survey.xml" to enable.
     * Fill out the appropriate fields before attempting to add a question.
     * */
-    public void addNewQuestion(View view) {
+    private void addNewQuestion(View view) {
         // Enter the options
         ArrayList<Option> options = new ArrayList<>();
         Option option1 = new Option("$0 - $18,200", false);
@@ -783,7 +779,7 @@ public class TakeSurveyActivity extends AppCompatActivity implements TextWatcher
 
         // Enter the answer type. E.g. "checkbox" or "radio" or "text"
         // Enter two extra string paramaters to indicate a required answer. The second one is for the "incorectAnswerPhrase"
-        Query query = new Query("radio", "What is your average annual FAMILY income (in Australian dollars, before tax)?", options);
+//        Query query = new Query("radio", "What is your average annual FAMILY income (in Australian dollars, before tax)?", options);
 
         // Enter the question details
 //        Question question = new Question("5", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/The_Westfield_Group_logo.svg/500px-The_Westfield_Group_logo.svg.png", "About You", "", query);

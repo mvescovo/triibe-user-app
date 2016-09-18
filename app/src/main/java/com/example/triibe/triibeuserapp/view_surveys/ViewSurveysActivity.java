@@ -14,16 +14,19 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.triibe.triibeuserapp.R;
-import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity;
-import com.example.triibe.triibeuserapp.takeSurvey.TakeSurveyActivity;
 import com.example.triibe.triibeuserapp.trackLocation.AddFencesIntentService;
 import com.example.triibe.triibeuserapp.util.Constants;
+import com.example.triibe.triibeuserapp.util.RunAppWhenAtMallService;
+import com.example.triibe.triibeuserapp.view_survey_details.ViewSurveyDetailsActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,17 +39,11 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
         EasyPermissions.PermissionCallbacks {
 
     private static final String TAG = "ViewSurveysActivity";
-
     private static final int REQUEST_EDIT_SURVEY = 1;
-    private static final int REQUEST_EDIT_TRIGGER = 3;
-    private static final int REQUEST_LINK_TRIGGER = 4;
-    private Intent mServiceIntent;
-    String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
     private static final int FINE_LOCAITON = 123;
+    private String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
     private ViewSurveysContract.UserActionsListener mUserActionsListener;
     private SurveyAdapter mSurveyAdapter;
-//    private ArrayList<String> mSurveys;
-//    private User mUser;
 
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
@@ -62,9 +59,6 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
 
     @BindView(R.id.modify_survey_fab)
     FloatingActionButton mModifySurveyFab;
-
-    @BindView(R.id.track_location_fab)
-    FloatingActionButton mTrackLocationFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,54 +76,20 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
             }
         });
 
-//        mTrackLocationFab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(getApplicationContext(), TrackLocationActivity.class);
-//                startActivity(intent);
-//            }
-//        });
-
         mUserActionsListener = new ViewSurveysPresenter(this);
 
-        /*
-        * Create test user and add a couple of survey ids.
-        * */
-//        mUser = new User();
-//        ArrayList<String> surveyIds = new ArrayList<>();
-//        surveyIds.add("1");
-//        surveyIds.add("2");
-//        mUser.setSurveyIds(surveyIds);
-
-//        mSurveys = mUser.getSurveyIds();
-
-
-        /*
-        * RecyclerView
-        * */
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mSurveyAdapter = new SurveyAdapter(mUserActionsListener, new ArrayList<SurveyDetails>(0));
+        mSurveyAdapter = new SurveyAdapter(mUserActionsListener, new ArrayList());
         mRecyclerView.setAdapter(mSurveyAdapter);
 
-//        if (adapter.getItemCount() == 0) {
-//            mSurveysTextView.setVisibility(View.VISIBLE);
-//        }
-
-        // Add test user data
-//        addSurveyIdToUser();
-
-        // Start up location tracking service
-//        mServiceIntent = new Intent(this, TrackLocationService.class);
-//        startService(mServiceIntent);
-
-        // Add mall geofences if not already added (will also be added automatically on boot)
+        // Add mall fences if not already added (will also be added automatically on boot)
         SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
-        boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED, false);
-        if (!mallGeofencesAdded) {
+        boolean mallfencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED, false);
+        if (!mallfencesAdded) {
             if (EasyPermissions.hasPermissions(this, perms)) {
                 // Have permission
-                startAddGeofencesService();
+                startAddfencesService();
             } else {
                 // Do not have permissions, request them now
                 EasyPermissions.requestPermissions(this, "Need location access to monitor location",
@@ -139,8 +99,8 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     }
 
     @Override
-    protected void onPostResume() {
-        super.onPostResume();
+    protected void onResume() {
+        super.onResume();
         mUserActionsListener.loadUser();
     }
 
@@ -154,10 +114,13 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     }
 
     @Override
-    public void showSurveys(@NonNull ArrayList<SurveyDetails> surveys) {
-        mSurveyAdapter.replaceData(surveys);
+    public void showSurveys(@NonNull List surveyDetails) {
+        mSurveyAdapter.replaceData(surveyDetails);
+    }
 
-        if (surveys.size() == 0) {
+    @Override
+    public void showNoSurveysMessage() {
+        if (mSurveyAdapter.getItemCount() == 0) {
             mSurveysTextView.setVisibility(View.VISIBLE);
         } else {
             mSurveysTextView.setVisibility(View.GONE);
@@ -166,10 +129,8 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
 
     @Override
     public void showSurveyDetails(String surveyId) {
-        stopService(mServiceIntent);
-
-        Intent intent = new Intent(this, TakeSurveyActivity.class);
-        intent.putExtra("surveyId", surveyId);
+        Intent intent = new Intent(this, ViewSurveyDetailsActivity.class);
+        intent.putExtra(ViewSurveyDetailsActivity.EXTRA_SURVEY_ID, surveyId);
         startActivity(intent);
     }
 
@@ -186,13 +147,10 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
         }
     }
 
-    /*
-    * Location permission stuff
-    * */
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
         Log.d(TAG, "onPermissionsGranted: GRANTED");
-        startAddGeofencesService();
+        startAddfencesService();
     }
 
     @Override
@@ -207,13 +165,37 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
-    private void startAddGeofencesService() {
+    private void startAddfencesService() {
         Intent addMallFencesIntent = new Intent(this, AddFencesIntentService.class);
-        addMallFencesIntent.putExtra("type", "mall");
+        addMallFencesIntent.putExtra(AddFencesIntentService.EXTRA_TRIIBE_FENCE_TYPE,
+                AddFencesIntentService.TRIIBE_MALL);
         startService(addMallFencesIntent);
 
-        Intent addLandmarkFencesIntent = new Intent(this, AddFencesIntentService.class);
-        addLandmarkFencesIntent.putExtra("type", "landmark");
-        startService(addLandmarkFencesIntent);
+
+        // This was just for testing. Real landmark fences are added when the app service starts
+        // after it listens for available fences to add, then ideally filters on them before adding
+
+//        Intent addLandmarkFencesIntent = new Intent(this, AddFencesIntentService.class);
+//        addLandmarkFencesIntent.putExtra("type", "landmark");
+//        startService(addLandmarkFencesIntent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_view_surveys, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.start_data_tracking:
+                Intent intent = new Intent(this, RunAppWhenAtMallService.class);
+                startService(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
