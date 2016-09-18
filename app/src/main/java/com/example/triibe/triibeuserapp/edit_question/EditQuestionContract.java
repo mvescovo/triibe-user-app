@@ -1,6 +1,6 @@
 package com.example.triibe.triibeuserapp.edit_question;
 
-import com.example.triibe.triibeuserapp.data.Query;
+import com.example.triibe.triibeuserapp.data.QuestionDetails;
 
 /**
  * @author michael.
@@ -18,6 +18,6 @@ public interface EditQuestionContract {
 
     interface UserActionsListener {
 
-        void editQuestion(String surveyId, String questionid, String imageUrl, String title, String intro, Query query, boolean editOption);
+        void editQuestion(QuestionDetails questionDetails, boolean editOption);
     }
 }

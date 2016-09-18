@@ -1,12 +1,10 @@
 package com.example.triibe.triibeuserapp.data;
 
+import android.location.Location;
 import android.support.annotation.NonNull;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,9 +20,9 @@ public class User {
     private String mPhone;
     private String mEmail;
     private DemographicProfile mDemographicProfile;
-    private HashMap<String, Object> mSurveyIds;
-    private Map<Integer, Date> mLocations;
-    private List<Answer> mResponses;
+    private Map<String, Boolean> mSurveyIds;
+    private Map<String, Location> mLocations;
+    private Map<String, Answer> mResponses;
     private boolean mEnrolled;
     private boolean mAdmin;
 
@@ -81,27 +79,27 @@ public class User {
         mDemographicProfile = demographicProfile;
     }
 
-    public HashMap<String, Object> getSurveyIds() {
+    public Map<String, Boolean> getSurveyIds() {
         return mSurveyIds;
     }
 
-    public void setSurveyIds(@NonNull HashMap<String, Object> surveyIds) {
+    public void setSurveyIds(@NonNull Map<String, Boolean> surveyIds) {
         mSurveyIds = surveyIds;
     }
 
-    public Map<Integer, Date> getLocations() {
+    public Map<String, Location> getLocations() {
         return mLocations;
     }
 
-    public void setLocations(Map<Integer, Date> locations) {
+    public void setLocations(Map<String, Location> locations) {
         mLocations = locations;
     }
 
-    public List<Answer> getResponses() {
+    public Map<String, Answer> getResponses() {
         return mResponses;
     }
 
-    public void setResponses(List<Answer> responses) {
+    public void setResponses(Map<String, Answer> responses) {
         mResponses = responses;
     }
 

@@ -11,7 +11,9 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions"/>
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions"/>
 
     <application
         android:allowBackup="true"
@@ -20,13 +22,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--Meta data-->
+        <!-- Meta data -->
         <meta-data
             android:name="com.google.android.awareness.API_KEY"
             android:value="@string/google_api_key"/>
         <meta-data
             android:name="com.google.android.nearby.messages.API_KEY"
-            android:value="@string/google_api_key" />
+            android:value="@string/google_api_key"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_api_key"/>
@@ -34,7 +36,7 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
 
-        <!--Activities-->
+        <!-- Activities -->
         <activity android:name=".util.AuthUiActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -59,7 +61,12 @@
             android:label="@string/title_activity_view_surveys"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".view_survey_details.ViewSurveyDetailsActivity">
+        <activity android:name=".view_survey_details.ViewSurveyDetailsActivity"
+                  android:label="@string/title_activity_take_survey"
+                  android:parentActivityName=".view_surveys.ViewSurveysActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
         </activity>
         <activity
             android:name=".edit_survey.EditSurveyActivity"
@@ -98,17 +105,10 @@
                 android:value="com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity"/>
         </activity>
 
-        <!--Services-->
+        <!-- Services -->
         <service
             android:name=".util.RunAppWhenAtMallService"
             android:exported="false">
-        </service>
-        <service
-            android:name=".util.FirebaseMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
         </service>
         <service
             android:name=".trackLocation.AddFencesIntentService"
@@ -118,47 +118,46 @@
             android:name=".util.StopTrackingIntentService"
             android:exported="false">
         </service>
+        <service
+            android:name=".trackLocation.GetCurrentLocationIntentService"
+            android:exported="false">
+        </service>
 
-        <!--Receivers-->
-        <receiver
-            android:name=".trackLocation.AddFencesIntentService$BootDetectionBroadcastReceiver">
+        <!-- Receivers -->
+        <receiver android:name=".trackLocation.AddFencesIntentService$BootDetectionBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-        <receiver
-            android:name=".trackLocation.AddFencesIntentService$MallFenceReceiver">
+        <receiver android:name=".trackLocation.AddFencesIntentService$MallFenceReceiver">
         </receiver>
 
 
 
-
-
-
-
-
-
-
-
-
         <!--<service-->
-        <!--android:name=".trackLocation.AddMallGeofencesIntentService"-->
+        <!--android:name=".util.FirebaseMessagingService"-->
         <!--android:exported="false">-->
-        <!--</service>-->
-        <!--<service-->
-        <!--android:name=".trackLocation.AddLandmarkGeofencesIntentService"-->
-        <!--android:exported="false">-->
-        <!--</service>-->
-        <!--<service-->
-        <!--android:name=".trackLocation.MallGeofenceTransitionIntentService"-->
-        <!--android:exported="false">-->
-        <!--</service>-->
-        <!--<service-->
-        <!--android:name=".trackLocation.LandmarkGeofenceTransitionIntentService"-->
-        <!--android:exported="false">-->
+        <!--<intent-filter>-->
+        <!--<action android:name="com.google.firebase.MESSAGING_EVENT"/>-->
+        <!--</intent-filter>-->
         <!--</service>-->
 
-
+        <!-- <service -->
+        <!-- android:name=".trackLocation.AddMallGeofencesIntentService" -->
+        <!-- android:exported="false"> -->
+        <!-- </service> -->
+        <!-- <service -->
+        <!-- android:name=".trackLocation.AddLandmarkGeofencesIntentService" -->
+        <!-- android:exported="false"> -->
+        <!-- </service> -->
+        <!-- <service -->
+        <!-- android:name=".trackLocation.MallGeofenceTransitionIntentService" -->
+        <!-- android:exported="false"> -->
+        <!-- </service> -->
+        <!-- <service -->
+        <!-- android:name=".trackLocation.LandmarkGeofenceTransitionIntentService" -->
+        <!-- android:exported="false"> -->
+        <!-- </service> -->
 
 
         <!-- <activity -->
@@ -167,6 +166,7 @@
         <!-- </activity> -->
         <!-- <activity android:name=".trackLocation.TrackLocationActivity"> -->
         <!-- </activity> -->
+
 
         <!-- <service -->
         <!-- android:name=".trackLocation.TrackLocationService" -->
@@ -178,6 +178,7 @@
         <!-- android:exported="false"> -->
         <!-- </service> -->
         <!-- <service android:name=".trackLocation.AddGeofencesIntentServiceOLD"/> -->
+
 
         <!-- <service -->
         <!-- android:name=".trackWIFI.TrackRssiIntentService" -->
@@ -203,6 +204,20 @@
         -->
 
 
+        <!--<activity-->
+        <!--android:name=".edit_location.EditLocationActivity"-->
+        <!--android:label="@string/title_activity_edit_location"-->
+        <!--android:parentActivityName=".view_surveys.ViewSurveysActivity"-->
+        <!--android:theme="@style/AppTheme.NoActionBar">-->
+        <!--<meta-data-->
+        <!--android:name="android.support.PARENT_ACTIVITY"-->
+        <!--android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>-->
+        <!--</activity>-->
+
+
+
+
+
         <!-- <activity -->
         <!-- android:name=".trackWIFI.IndoorMapActivity" -->
         <!-- android:label="@string/title_activity_maps"> -->
@@ -222,8 +237,6 @@
         <!-- <category android:name="android.intent.category.LAUNCHER"/> -->
         <!-- </intent-filter> -->
         <!-- </activity> -->
-
-
     </application>
 
 </manifest>

@@ -28,7 +28,7 @@ import butterknife.ButterKnife;
 public class EditSurveyActivity extends AppCompatActivity implements EditSurveyContract.View {
 
     private static final String TAG = "EditSurveyActivity";
-
+    public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
     private static final int REQUEST_EDIT_QUESTION = 1;
     private static final int REQUEST_EDIT_TRIGGER = 2;
     EditSurveyContract.UserActionsListener mUserActionsListener;
@@ -83,9 +83,11 @@ public class EditSurveyActivity extends AppCompatActivity implements EditSurveyC
             public void onClick(View v) {
                 mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 if (validateForQuestion()) {
-                    mUserActionsListener.editSurvey(mSurveyId.getText().toString(),
-                            mDescription.getText().toString(), mVersion.getText().toString(),
-                            mPoints.getText().toString(), mTimeTillExpiry.getText().toString(),
+                    mUserActionsListener.editSurvey(mSurveyId.getText().toString().trim(),
+                            mDescription.getText().toString().trim(),
+                            mVersion.getText().toString().trim(),
+                            mPoints.getText().toString().trim(),
+                            mTimeTillExpiry.getText().toString().trim(),
                             true);
                 }
             }
@@ -100,7 +102,6 @@ public class EditSurveyActivity extends AppCompatActivity implements EditSurveyC
                 }
             }
         });
-
 
         // The View with the BottomSheetBehavior
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
@@ -135,20 +136,20 @@ public class EditSurveyActivity extends AppCompatActivity implements EditSurveyC
     @Override
     public void showEditQuestion() {
         Intent intent = new Intent(this, EditQuestionActivity.class);
-        intent.putExtra("surveyId", mSurveyId.getText().toString().trim());
+        intent.putExtra(EXTRA_SURVEY_ID, mSurveyId.getText().toString().trim());
         startActivityForResult(intent, REQUEST_EDIT_QUESTION);
     }
 
     @Override
     public void showEditTrigger() {
         Intent intent = new Intent(this, EditTriggerActivity.class);
-        intent.putExtra("surveyId", mSurveyId.getText().toString().trim());
+        intent.putExtra(EXTRA_SURVEY_ID, mSurveyId.getText().toString().trim());
         startActivityForResult(intent, REQUEST_EDIT_TRIGGER);
     }
 
     private boolean validateForQuestion() {
         if (mSurveyId.getText().toString().trim().contentEquals("")) {
-            mSurveyId.setError("Name must not be empty");
+            mSurveyId.setError("Name must not be empty"); // TODO: 18/09/16 set in strings
             mSurveyId.requestFocus();
             return false;
         } else if (mDescription.getText().toString().trim().contentEquals("")) {
@@ -173,7 +174,7 @@ public class EditSurveyActivity extends AppCompatActivity implements EditSurveyC
 
     private boolean validateForTrigger() {
         if (mSurveyId.getText().toString().trim().contentEquals("")) {
-            mSurveyId.setError("Name must not be empty");
+            mSurveyId.setError("Name must not be empty"); // TODO: 18/09/16 set in strings
             mSurveyId.requestFocus();
             return false;
         }
@@ -202,10 +203,6 @@ public class EditSurveyActivity extends AppCompatActivity implements EditSurveyC
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.more_options:
-                // Hide keyboard (currently not working as desired so leaving commented)
-//                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                imm.hideSoftInputFromWindow(mRootView.getWindowToken(), 0);
-                // Show bottomsheet
                 mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 return true;
             case R.id.done:

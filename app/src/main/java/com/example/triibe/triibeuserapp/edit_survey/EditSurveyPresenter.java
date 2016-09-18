@@ -19,10 +19,9 @@ import java.util.Map;
 public class EditSurveyPresenter implements EditSurveyContract.UserActionsListener {
 
     private static final String TAG = "EditSurveyPresenter";
-
     EditSurveyContract.View mView;
     private DatabaseReference mDatabase;
-    private HashMap<String, Object> mSurveyIds;
+    private Map<String, Boolean> mSurveyIds;
 
     public EditSurveyPresenter(EditSurveyContract.View view) {
         mView = view;
@@ -34,11 +33,10 @@ public class EditSurveyPresenter implements EditSurveyContract.UserActionsListen
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
-                            GenericTypeIndicator<HashMap<String, Object>> t
-                                    = new GenericTypeIndicator<HashMap<String, Object>>() {
-                            };
+                            GenericTypeIndicator<Map<String, Boolean>> t
+                                    = new GenericTypeIndicator<Map<String, Boolean>>() {};
                             mSurveyIds = dataSnapshot.getValue(t);
-                            for (Map.Entry<String, Object> id : mSurveyIds.entrySet()) {
+                            for (Map.Entry<String, Boolean> id : mSurveyIds.entrySet()) {
                                 Log.d(TAG, "onDataChange: ID: " + id.getKey());
                             }
                         } else {
@@ -58,8 +56,8 @@ public class EditSurveyPresenter implements EditSurveyContract.UserActionsListen
                            String timeTillExpiry, boolean editQuestion) {
         mView.setProgressIndicator(true);
 
-        SurveyDetails surveyDetails = new SurveyDetails(surveyId, version, description, timeTillExpiry,
-                points);
+        SurveyDetails surveyDetails = new SurveyDetails(surveyId, version, description,
+                timeTillExpiry, points);
         Map<String, Object> surveyDetailsValues = surveyDetails.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/surveys/" + surveyId + "/surveyDetails", surveyDetailsValues);

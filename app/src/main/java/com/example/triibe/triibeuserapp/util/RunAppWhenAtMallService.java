@@ -59,7 +59,7 @@ public class RunAppWhenAtMallService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "app service starting", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onStartCommand: app service starting");
 
         // For each start request, send a message to start a job and deliver the
         // start ID so we know which request we're stopping when we finish the job
@@ -91,7 +91,7 @@ public class RunAppWhenAtMallService extends Service {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.westfieldicon_transparent)
-                        .setContentTitle("At mall")
+                        .setContentTitle("At mall") // TODO: 18/09/16 set in strings
                         .setContentText("Tracking data")
                         .addAction(R.drawable.ic_stop_black_24dp, "Stop", mStopTrackingPendingIntent);
         Intent resultIntent = new Intent(this, AuthUiActivity.class);
@@ -115,6 +115,7 @@ public class RunAppWhenAtMallService extends Service {
         stopService(new Intent(getBaseContext(), IpService.class));
         wakeLock.release();
         Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onDestroy: service done");
     }
 
     // Handler that receives messages from the thread

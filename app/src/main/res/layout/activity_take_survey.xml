@@ -105,12 +105,12 @@
                 android:visibility="gone"/>
 
             <TextView
-                android:id="@+id/query"
+                android:id="@+id/phrase"
                 style="@style/Base.TextAppearance.AppCompat.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/query"
+                android:text="@string/phrase"
                 android:visibility="gone"/>
 
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"

@@ -77,7 +77,7 @@ public class SurveyDetails {
     // For firebase map
     @Exclude
     public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         result.put("id", mId);
         result.put("version", mVersion);
         result.put("description", mDescription);

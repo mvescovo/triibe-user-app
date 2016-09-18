@@ -121,13 +121,13 @@
 //    }
 //
 //    private void populateGeofenceList() {
-//        for (Map.Entry<String, LatLng> entry : Constants.TEST_LANDMARKS.entrySet()) {
+//        for (Map.Entry<String, LatLng> entry : Constants.WESTFIELD_LANDMARKS.entrySet()) {
 //            mGeofences.add(new Geofence.Builder()
 //                    .setRequestId(entry.getKey())
 //                    .setCircularRegion(
 //                            entry.getValue().latitude,
 //                            entry.getValue().longitude,
-//                            Constants.GEOFENCE_RADIUS_IN_METERS
+//                            Constants.FENCE_LANDMARK_RADIUS_IN_METERS
 //                    )
 //                    .setExpirationDuration(Constants.FENCE_EXPIRATION_IN_MILLISECONDS)
 //                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |

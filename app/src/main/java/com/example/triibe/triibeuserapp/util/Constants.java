@@ -33,6 +33,5 @@ public final class Constants {
     static {
         WESTFIELD_LANDMARKS.put("eastSide", new LatLng(-37.958201, 145.056192));
         WESTFIELD_LANDMARKS.put("westSide", new LatLng(-37.958876, 145.049591));
-        WESTFIELD_LANDMARKS.put("furtherSouth", new LatLng(-37.982068, 145.07188));
     }
 }
