@@ -31,7 +31,7 @@ import java.util.TimerTask;
 public class IpService extends Service {
 
     //change the CHECK_INTERVAL to manage how often you check for active connections .
-    public static final long CHECK_INTERVAL = 1000;
+    public static final long CHECK_INTERVAL = 1500;
     // run on another Thread to avoid crash
     private Handler mHandler = new Handler();
     // timer handling

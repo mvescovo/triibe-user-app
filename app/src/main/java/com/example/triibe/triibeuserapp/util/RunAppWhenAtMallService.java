@@ -43,7 +43,7 @@ public class RunAppWhenAtMallService extends Service {
                 Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
 
-        //power managment.
+        //power manegment.
         mgr = (PowerManager)this.getSystemService(Context.POWER_SERVICE);
         wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
         wakeLock.acquire();
