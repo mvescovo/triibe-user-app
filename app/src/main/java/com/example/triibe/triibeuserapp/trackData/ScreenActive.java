@@ -1,10 +1,16 @@
 package com.example.triibe.triibeuserapp.trackData;
 
-import java.util.Date;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Matthew on 4/09/2016.
  */
+@IgnoreExtraProperties
 public class ScreenActive {
 
     private String startTime;
@@ -33,4 +39,15 @@ public class ScreenActive {
     public void setStopTime(String stopTime) {
         this.stopTime = stopTime;
     }
+
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("Screen On Time", startTime);
+        result.put("Screen Off Time", stopTime);
+
+        return result;
+    }
+
 }
