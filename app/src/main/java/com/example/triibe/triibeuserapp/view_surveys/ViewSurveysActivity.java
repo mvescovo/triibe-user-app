@@ -22,8 +22,7 @@ import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity;
 import com.example.triibe.triibeuserapp.takeSurvey.TakeSurveyActivity;
-import com.example.triibe.triibeuserapp.trackLocation.AddLandmarkGeofencesIntentService;
-import com.example.triibe.triibeuserapp.trackLocation.AddMallGeofencesIntentService;
+import com.example.triibe.triibeuserapp.trackLocation.AddFencesIntentService;
 import com.example.triibe.triibeuserapp.util.Constants;
 
 import java.util.ArrayList;
@@ -125,8 +124,8 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
 //        startService(mServiceIntent);
 
         // Add mall geofences if not already added (will also be added automatically on boot)
-        SharedPreferences preferences = getSharedPreferences(Constants.MALL_GEOFENCES, 0);
-        boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_GEOFENCES_ADDED, false);
+        SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
+        boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED, false);
         if (!mallGeofencesAdded) {
             if (EasyPermissions.hasPermissions(this, perms)) {
                 // Have permission
@@ -209,10 +208,12 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     }
 
     private void startAddGeofencesService() {
-        Intent addGeofencesIntent = new Intent(this, AddMallGeofencesIntentService.class);
-        startService(addGeofencesIntent);
+        Intent addMallFencesIntent = new Intent(this, AddFencesIntentService.class);
+        addMallFencesIntent.putExtra("type", "mall");
+        startService(addMallFencesIntent);
 
-        Intent addGeofencesIntentLandmark = new Intent(this, AddLandmarkGeofencesIntentService.class);
-        startService(addGeofencesIntentLandmark);
+        Intent addLandmarkFencesIntent = new Intent(this, AddFencesIntentService.class);
+        addLandmarkFencesIntent.putExtra("type", "landmark");
+        startService(addLandmarkFencesIntent);
     }
 }

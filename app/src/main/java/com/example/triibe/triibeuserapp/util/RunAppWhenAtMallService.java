@@ -1,6 +1,5 @@
 package com.example.triibe.triibeuserapp.util;
 
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -29,21 +28,10 @@ public class RunAppWhenAtMallService extends Service {
     PowerManager.WakeLock wakeLock;
 
     private static final String TAG = "RunAppWhenAtMallService";
-
+    private static final int STOP_SERVICE_REQUEST = 9999;
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
-
-    // Handler that receives messages from the thread
-    private final class ServiceHandler extends Handler {
-        public ServiceHandler(Looper looper) {
-            super(looper);
-        }
-        @Override
-        public void handleMessage(Message msg) {
-            // TODO: Matt to handle messages here
-            Log.d(TAG, "handleMessage: test data tracking task (print to console)");
-        }
-    }
+    private PendingIntent mStopTrackingPendingIntent;
 
     @Override
     public void onCreate() {
@@ -64,6 +52,9 @@ public class RunAppWhenAtMallService extends Service {
         // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
+
+        Intent stopAppServiceIntent = new Intent(this, StopTrackingIntentService.class);
+        mStopTrackingPendingIntent = PendingIntent.getService(this, STOP_SERVICE_REQUEST, stopAppServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     @Override
@@ -96,45 +87,26 @@ public class RunAppWhenAtMallService extends Service {
         // Method to start the service
         startService(new Intent(getBaseContext(), IpService.class));
 
-
-
-
         // Start the service in the foreground
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.the_westfield_group_logo)
-                        .setContentTitle("TRIIBE")
-                        .setContentText("Tracking data");
-        // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(this, ViewSurveysActivity.class);
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
+                        .setSmallIcon(R.drawable.westfieldicon_transparent)
+                        .setContentTitle("At mall")
+                        .setContentText("Tracking data")
+                        .addAction(R.drawable.ic_stop_black_24dp, "Stop", mStopTrackingPendingIntent);
+        Intent resultIntent = new Intent(this, AuthUiActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        // Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(ViewSurveysActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        // mId allows you to update the notification later on.
         startForeground(Constants.APP_SERVICE_RUNNING_ID, mBuilder.build());
-
-        // If we get killed, after returning from here, restart
         return START_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        // We don't provide binding, so return null
         return null;
     }
 
@@ -145,4 +117,16 @@ public class RunAppWhenAtMallService extends Service {
         Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
     }
 
+    // Handler that receives messages from the thread
+    private final class ServiceHandler extends Handler {
+        public ServiceHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            // TODO: Matt to handle messages here
+            Log.d(TAG, "handleMessage: test data tracking task (print to console)");
+        }
+    }
 }
