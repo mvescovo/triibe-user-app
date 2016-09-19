@@ -11,6 +11,8 @@ import android.widget.Toast;
 import com.example.triibe.triibeuserapp.trackData.Connection;
 import com.example.triibe.triibeuserapp.trackData.ScreenActive;
 import com.example.triibe.triibeuserapp.trackData.ScreenReceiver;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -40,9 +42,12 @@ public class IpService extends Service {
 
     /*********FIREBASE*********/
     private DatabaseReference mDatabase;
+    private FirebaseUser user;
     /**************************/
 
-    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+    DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    DateFormat date = new SimpleDateFormat("dd-MM-yyyy");
+    String currentDate;
     String dateInput;
 
     private Map<String, Object> totalConMap = new HashMap<>();
@@ -75,9 +80,11 @@ public class IpService extends Service {
         }
         // schedule task
         mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(), 0, CHECK_INTERVAL);
+        currentDate = date.format(new Date());
 
         /*********FIREBASE*********/
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         /**************************/
 
         //screen checking
@@ -190,9 +197,9 @@ public class IpService extends Service {
                 dateInput = df.format(date);
                 previousConMap.get(entry.getValue().getIpAddrURL()).setEndConnection(dateInput);
                 /*********FIREBASE*********/
-                String dataKey = mDatabase.child("data").child("Total Connections").push().getKey();
+                String dataKey = mDatabase.child("data").child("Total Connections").child(user.getUid()).child(currentDate).push().getKey();
                 connectionValues = previousConMap.get(entry.getValue().getIpAddrURL()).toMap();
-                totalConMap.put("/data/Total Connections/"+dataKey,connectionValues);
+                totalConMap.put("/data/Total Connections/"+user.getUid()+"/"+currentDate+"/"+dataKey,connectionValues);
                 mDatabase.updateChildren(totalConMap);
                 /**************************/
                 it.remove();
@@ -207,7 +214,7 @@ public class IpService extends Service {
         if (!screenOn) {
             System.out.println("SCREEN ON");
             /*********FIREBASE*********/
-            timeKey = mDatabase.child("data").child("Screen Time").push().getKey();
+            timeKey = mDatabase.child("data").child("Screen Time").child(user.getUid()).child(currentDate).push().getKey();
             /**************************/
             Date sDate = new Date();
             dateInput = df.format(sDate);
@@ -221,7 +228,7 @@ public class IpService extends Service {
                 System.out.println(Active.getStopTime());
                 /*********FIREBASE*********/
                 timeVaules = Active.toMap();
-                timeMap.put("/data/Screen Time/"+ timeKey,timeVaules);
+                timeMap.put("/data/Screen Time/"+user.getUid()+"/"+currentDate+"/"+timeKey,timeVaules);
                 mDatabase.updateChildren(timeMap);
                 /**************************/
         }
@@ -239,9 +246,9 @@ public class IpService extends Service {
                 dateInput = df.format(date);
                 previousConMap.get(entry.getValue().getIpAddrURL()).setEndConnection(dateInput);
                 /*********FIREBASE*********/
-                String dataKey = mDatabase.child("data").child("Total Connections").push().getKey();
+                String dataKey = mDatabase.child("data").child("Total Connections").child(user.getUid()).child(currentDate).push().getKey();
                 connectionValues = previousConMap.get(entry.getValue().getIpAddrURL()).toMap();
-                totalConMap.put("/data/Total Connections/"+dataKey,connectionValues);
+                totalConMap.put("/data/Total Connections/"+user.getUid()+"/"+currentDate+"/"+dataKey,connectionValues);
                 mDatabase.updateChildren(totalConMap);
                 /**************************/
                 it.remove();
