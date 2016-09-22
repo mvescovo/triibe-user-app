@@ -1,4 +1,4 @@
-package com.example.triibe.triibeuserapp.view_survey_details;
+package com.example.triibe.triibeuserapp.view_question;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.triibe.triibeuserapp.R;
+import com.example.triibe.triibeuserapp.util.Globals;
 import com.squareup.picasso.Picasso;
 
 import java.util.regex.Matcher;
@@ -31,12 +32,12 @@ import java.util.regex.Pattern;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ViewSurveyDetailsActivity extends AppCompatActivity
-        implements ViewSurveyDetailsContract.View, TextWatcher {
+public class ViewQuestionActivity extends AppCompatActivity
+        implements ViewQuestionContract.View, TextWatcher {
 
     private static final String TAG = "SurveyDetailsActivity";
     public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
-    ViewSurveyDetailsContract.UserActionsListener mUserActionsListener;
+    ViewQuestionContract.UserActionsListener mUserActionsListener;
     private String mSurveyId;
 
     @BindView(R.id.view_root)
@@ -93,7 +94,12 @@ public class ViewSurveyDetailsActivity extends AppCompatActivity
             mSurveyId = "-1";
         }
 
-        mUserActionsListener = new ViewSurveyDetailsPresenter(this, mSurveyId);
+        mUserActionsListener = new ViewQuestionPresenter(
+                Globals.getInstance().getTriibeRepository(),
+                this,
+                mSurveyId,
+                Globals.getInstance().getUser().getId()
+        );
 
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,7 +119,7 @@ public class ViewSurveyDetailsActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        mUserActionsListener.loadQuestions(false);
+        mUserActionsListener.loadCurrentQuestion();
     }
 
     @Override
@@ -193,42 +199,53 @@ public class ViewSurveyDetailsActivity extends AppCompatActivity
     public void showRadioButtonGroup() {
         mCheckboxGroup.setVisibility(View.GONE);
         mEditTextGroup.setVisibility(View.GONE);
+        mTextInputEditText.setVisibility(View.GONE);
         mRadioGroup.removeAllViews();
         mRadioGroup.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void showRadioButtonItem(String phrase, @Nullable String extraInputHint,
+    public void showRadioButtonItem(final String phrase, @Nullable String extraInputHint,
                                     @Nullable String extraInputType) {
         RadioButton radioButton = new RadioButton(this);
         radioButton.setText(phrase);
         radioButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mUserActionsListener.saveQuestion(((RadioButton)view).getText().toString(),
-                        "radio", true);
+                mUserActionsListener
+                        .saveAnswer(((RadioButton)view).getText().toString(), "radio", true);
             }
         });
         mRadioGroup.addView(radioButton);
     }
 
     @Override
-    public void selectRadioButtonItem(String phrase, int size) {
+    public void selectRadioButtonItem(String phrase, boolean hasExtraInput,
+                                      @Nullable String extraInputHint,
+                                      @Nullable String extraInputType,
+                                      @Nullable String extraInput,
+                                      int size) {
         for (int i = 0; i < size; i++) {
             RadioButton item = (RadioButton) mRadioGroup.getChildAt(i);
             if (item.getText().toString().contentEquals(phrase)) {
                 item.toggle();
+                if (hasExtraInput) {
+                    showExtraInputTextboxItem(extraInputHint, extraInputType, extraInput);
+                }
                 return;
             }
         }
     }
 
     @Override
-    public void showExtraInputTextboxItem(String hint, String type) {
+    public void showExtraInputTextboxItem(String hint, String type, @Nullable String text) {
         mTextInputLayout.setVisibility(View.VISIBLE);
         mTextInputEditText.setVisibility(View.VISIBLE);
         mTextInputEditText.addTextChangedListener(this);
         mTextInputEditText.setHint(hint);
+        if (text != null) {
+            mTextInputEditText.setText(text);
+        }
         switch (type) {
             case "text": // TODO: 18/09/16 set in constants or something
                 mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -242,37 +259,39 @@ public class ViewSurveyDetailsActivity extends AppCompatActivity
 
     @Override
     public void hideExtraInputTextboxItem() {
+        mTextInputEditText.removeTextChangedListener(this);
         mTextInputEditText.setText("");
         mTextInputEditText.setHint("");
         mTextInputEditText.setVisibility(View.GONE);
-        mTextInputEditText.removeTextChangedListener(this);
     }
 
     @Override
     public void showCheckboxGroup() {
         mRadioGroup.setVisibility(View.GONE);
         mEditTextGroup.setVisibility(View.GONE);
+        mTextInputEditText.setVisibility(View.GONE);
         mCheckboxGroup.removeAllViews();
         mCheckboxGroup.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void showCheckboxItem(String phrase, @Nullable String extraInputHint,
-                                 @Nullable String extraInputType) {
+    public void showCheckboxItem(final String phrase, @Nullable String extraInputHint,
+                                 @Nullable String extraInputType, final int size) {
         CheckBox checkBox = new CheckBox(this);
         checkBox.setText(phrase);
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mUserActionsListener.saveQuestion(((CheckBox)view).getText().toString(),
-                        "checkbox", ((CheckBox) view).isChecked());
+                mUserActionsListener
+                        .saveAnswer(((CheckBox)view).getText().toString(), "checkbox",
+                                ((CheckBox)view).isChecked());
             }
         });
         mCheckboxGroup.addView(checkBox);
     }
 
     @Override
-    public void selectCheckboxItem(String phrase, int size) {
+    public void selectCheckboxItem(String phrase, boolean checked, int size) {
         for (int i = 0; i < size; i++) {
             CheckBox item = (CheckBox) mCheckboxGroup.getChildAt(i);
             if (item.getText().toString().contentEquals(phrase)) {
@@ -292,7 +311,16 @@ public class ViewSurveyDetailsActivity extends AppCompatActivity
 
     @Override
     public void showTextboxItem(String hint, String type) {
-
+        TextInputEditText textInputEditText = new TextInputEditText(this);
+        textInputEditText.setHint(hint);
+        textInputEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mUserActionsListener
+                        .saveAnswer(((TextInputEditText)view).getText().toString(), "text", true);
+            }
+        });
+        mEditTextGroup.addView(textInputEditText);
     }
 
     @Override
@@ -323,7 +351,7 @@ public class ViewSurveyDetailsActivity extends AppCompatActivity
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        mUserActionsListener.saveQuestion(charSequence.toString(), "extraText", true);
+        mUserActionsListener.saveAnswer(charSequence.toString(), "extraText", true);
     }
 
     @Override

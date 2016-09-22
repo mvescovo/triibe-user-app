@@ -11,6 +11,7 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
         release {
@@ -20,6 +21,12 @@ android {
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+    }
+    // So that logging doesn't stop tests from running (as Log is not mocked).
+    // https://sites.google.com/a/android.com/tools/tech-docs/unit-testing-support.
+    // May be able to remove this with later releases or by using another method.
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }
 
@@ -57,6 +64,26 @@ dependencies {
 
     // Make permissions in Android 23+ easy
     compile 'pub.devrel:easypermissions:0.1.9'
+
+    // Google core libraries for Java. E.g. allows immutable maps
+    compile 'com.google.guava:guava:19.0'
+
+    // Testing - unit tests
+    testCompile "org.mockito:mockito-all:$rootProject.ext.mockitoVersion"
+    testCompile "org.hamcrest:hamcrest-all:$rootProject.ext.hamcrestVersion"
+    testCompile "org.powermock:powermock-module-junit4:$rootProject.ext.powerMockito"
+    testCompile "org.powermock:powermock-api-mockito:$rootProject.ext.powerMockito"
+
+    // Testing - screen tests
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestCompile 'com.android.support.test.espresso:espresso-contrib:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'design'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+    }
 
     // Floating action button menu
 //    compile 'com.github.clans:fab:1.6.4'

@@ -61,7 +61,7 @@
             android:label="@string/title_activity_view_surveys"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".view_survey_details.ViewSurveyDetailsActivity"
+        <activity android:name=".view_question.ViewQuestionActivity"
                   android:label="@string/title_activity_take_survey"
                   android:parentActivityName=".view_surveys.ViewSurveysActivity">
             <meta-data
@@ -211,7 +211,7 @@
         <!--android:theme="@style/AppTheme.NoActionBar">-->
         <!--<meta-data-->
         <!--android:name="android.support.PARENT_ACTIVITY"-->
-        <!--android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>-->
+        <!--android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivityvity"/>-->
         <!--</activity>-->
 
 

@@ -5,7 +5,7 @@
     android:id="@+id/view_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view_survey_details.ViewSurveyDetailsActivity">
+    tools:context=".view_question.ViewQuestionActivity">
 
     <ProgressBar
         android:id="@+id/load_survey_progress_bar"

@@ -20,10 +20,10 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.triibe.triibeuserapp.R;
-import com.example.triibe.triibeuserapp.takeSurvey.TakeSurveyActivity;
 import com.example.triibe.triibeuserapp.util.AuthUiActivity;
 import com.example.triibe.triibeuserapp.util.Constants;
 import com.example.triibe.triibeuserapp.util.Globals;
+import com.example.triibe.triibeuserapp.view_question.ViewQuestionActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -154,7 +154,7 @@ public class TrackDataActivity extends AppCompatActivity implements GoogleApiCli
     }
 
     public void takeSurvey(View view) {
-        startActivity(new Intent(this, TakeSurveyActivity.class));
+        startActivity(new Intent(this, ViewQuestionActivity.class));
     }
 
     public void startDataTracking(final View view) {

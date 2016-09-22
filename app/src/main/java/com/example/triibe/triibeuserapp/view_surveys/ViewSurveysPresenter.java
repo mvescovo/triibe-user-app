@@ -1,20 +1,11 @@
 package com.example.triibe.triibeuserapp.view_surveys;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
-import com.example.triibe.triibeuserapp.data.User;
-import com.example.triibe.triibeuserapp.util.Globals;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.example.triibe.triibeuserapp.data.TriibeRepository;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,97 +14,52 @@ import java.util.Map;
 public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsListener {
 
     private static final String TAG = "ViewSurveysPresenter";
+    private TriibeRepository mTriibeRepository;
     private ViewSurveysContract.View mView;
-    private DatabaseReference mDatabase;
-    private List<SurveyDetails> mSurveyDetails;
-    private boolean hasLoadedSurveys = false;
 
-    public ViewSurveysPresenter(ViewSurveysContract.View view) {
+    public ViewSurveysPresenter(TriibeRepository triibeRepository, ViewSurveysContract.View view) {
+        mTriibeRepository = triibeRepository;
         mView = view;
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mSurveyDetails = new ArrayList<>();
-    }
-
-    @Override
-    public void loadUser() {
-        mView.setProgressIndicator(true);
-
-        ValueEventListener userDataListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onDataChange: USER DATA CHANGED");
-                if (dataSnapshot.exists()) {
-                    User user = dataSnapshot.getValue(User.class);
-                    Globals.getInstance().setUser(user);
-                    if (Globals.getInstance().getUser().getSurveyIds() == null) {
-                        Map<String, Boolean> surveyIds = new HashMap<>();
-                        Globals.getInstance().getUser().setSurveyIds(surveyIds);
-                    }
-                    if (!hasLoadedSurveys) {
-                        hasLoadedSurveys = true;
-                        loadSurveys();
-                    } else {
-                        mView.setProgressIndicator(false);
-                    }
-                } else {
-                    // Add new user.
-                    Map<String, Boolean> surveyIds = new HashMap<>();
-                    surveyIds.put("enrollmentSurvey", true);
-                    Globals.getInstance().getUser().setSurveyIds(surveyIds);
-                    mDatabase.child("users")
-                            .child(Globals.getInstance().getUser().getId())
-                            .setValue(Globals.getInstance().getUser());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting user data failed, log a message
-                Log.w(TAG, "loadUserData:onCancelled", databaseError.toException());
-                mView.setProgressIndicator(false);
-            }
-        };
-        mDatabase.child("users")
-                .child(Globals.getInstance().getUser().getId())
-                .addValueEventListener(userDataListener);
     }
 
     @Override
     public void loadSurveys() {
-        mSurveyDetails.clear();
-        Map<String, Boolean> surveyIds = Globals.getInstance().getUser().getSurveyIds();
-        Log.d(TAG, "loadSurveys: NUM SURVEY IDs: " + surveyIds.size());
+        mView.setProgressIndicator(true);
 
-        for (final Map.Entry<String, Boolean> surveyId : surveyIds.entrySet()) {
-            ValueEventListener surveyDetailsDataListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    SurveyDetails surveyDetails = dataSnapshot.getValue(SurveyDetails.class);
-                    mSurveyDetails.add(surveyDetails);
-                    mView.showSurveys(mSurveyDetails);
-                }
+        final Map<String, SurveyDetails> surveys = new HashMap<>();
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    // Getting survey details data failed, log a message
-                    Log.w(TAG, "loadSurveyDetailsData:onCancelled", databaseError.toException());
-                }
-            };
-            mDatabase.child("surveys")
-                    .child(surveyId.getKey())
-                    .child("surveyDetails")
-                    .addValueEventListener(surveyDetailsDataListener);
-        }
-
-        if (surveyIds.size() == 0) {
-            mView.showNoSurveysMessage();
-        }
-
-        mView.setProgressIndicator(false);
+        mTriibeRepository.getUserSurveyIds(new TriibeRepository.GetUserSurveyIdsCallback() {
+                    @Override
+                    public void onUserSurveyIdsLoaded(final Map<String, Boolean> userSurveyIds) {
+                        Object[] surveyIds = userSurveyIds.keySet().toArray();
+                        surveys.clear();
+                        for (int i = 0; i < userSurveyIds.size(); i++) {
+                            final int position = i;
+                            mTriibeRepository.getSurvey(surveyIds[i].toString(),
+                                    new TriibeRepository.GetSurveyCallback() {
+                                @Override
+                                public void onSurveyLoaded(SurveyDetails survey) {
+                                    surveys.put("" + position, survey);
+                                    if (surveys.size() == 0) {
+                                        mView.showNoSurveysMessage();
+                                    } else {
+                                        // Only show survey and hide the progress bar when all
+                                        // values are received.
+                                        if (position == userSurveyIds.size() - 1) {
+                                            mView.showSurveys(surveys);
+                                            mView.setProgressIndicator(false);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
     }
 
     @Override
-    public void openSurveyDetails(@NonNull String surveyId) {
-        mView.showSurveyDetails(surveyId);
+    public void openSurveyQuestions(@NonNull String surveyId) {
+        // Show the first question in the survey // TODO: 20/09/16 make it so it shows the question the user is up to
+        mView.showQuestionUi(surveyId, "q1");
     }
 }

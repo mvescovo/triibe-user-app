@@ -1,11 +1,11 @@
-package com.example.triibe.triibeuserapp.view_survey_details;
+package com.example.triibe.triibeuserapp.view_question;
 
 import android.support.annotation.Nullable;
 
 /**
  * @author michael.
  */
-public interface ViewSurveyDetailsContract {
+public interface ViewQuestionContract {
 
     interface View {
 
@@ -31,19 +31,26 @@ public interface ViewSurveyDetailsContract {
 
         void showRadioButtonGroup();
 
-        void showRadioButtonItem(String phrase, @Nullable String extraInputHint, @Nullable String extraInputType);
+        void showRadioButtonItem(String phrase, @Nullable String extraInputHint,
+                                 @Nullable String extraInputType);
 
-        void selectRadioButtonItem(String phrase, int size);
+        void selectRadioButtonItem(String phrase, boolean hasExtraInput,
+                                   @Nullable String extraInput,
+                                   @Nullable String extraInputHint,
+                                   @Nullable String extraInputType,
+                                   int size);
 
-        void showExtraInputTextboxItem(String hint, String type);
+        void showExtraInputTextboxItem(String hint, String type, @Nullable String text);
 
         void hideExtraInputTextboxItem();
 
         void showCheckboxGroup();
 
-        void showCheckboxItem(String phrase, @Nullable String extraInputHint, @Nullable String extraInputType);
+        void showCheckboxItem(String phrase, @Nullable String extraInputHint,
+                              @Nullable String extraInputType,
+                              int size);
 
-        void selectCheckboxItem(String phrase, int size);
+        void selectCheckboxItem(String phrase, boolean checked, int size);
 
         void showTextboxGroup();
 
@@ -60,9 +67,9 @@ public interface ViewSurveyDetailsContract {
 
     interface UserActionsListener {
 
-        void loadQuestions(boolean forceUpdate);
+        void loadCurrentQuestion();
 
-        void saveQuestion(String selectedPhrase, String type, boolean checked);
+        void saveAnswer(String phrase, String type, boolean checked);
 
         void goToNextQuestion();
 

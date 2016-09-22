@@ -2,7 +2,9 @@ package com.example.triibe.triibeuserapp.view_surveys;
 
 import android.support.annotation.NonNull;
 
-import java.util.List;
+import com.example.triibe.triibeuserapp.data.SurveyDetails;
+
+import java.util.Map;
 
 /**
  * @author michael.
@@ -13,19 +15,17 @@ public interface ViewSurveysContract {
 
         void setProgressIndicator(boolean active);
 
-        void showSurveys(@NonNull List surveyDetails);
+        void showSurveys(@NonNull Map<String, SurveyDetails> surveyDetails);
 
         void showNoSurveysMessage();
 
-        void showSurveyDetails(String surveyId);
+        void showQuestionUi(String surveyId, String questionId);
     }
 
     interface UserActionsListener {
 
-        void loadUser();
-
         void loadSurveys();
 
-        void openSurveyDetails(@NonNull String surveyId);
+        void openSurveyQuestions(@NonNull String surveyId);
     }
 }

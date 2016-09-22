@@ -22,14 +22,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.triibe.triibeuserapp.R;
+import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity;
 import com.example.triibe.triibeuserapp.trackLocation.AddFencesIntentService;
 import com.example.triibe.triibeuserapp.util.Constants;
+import com.example.triibe.triibeuserapp.util.Globals;
 import com.example.triibe.triibeuserapp.util.RunAppWhenAtMallService;
-import com.example.triibe.triibeuserapp.view_survey_details.ViewSurveyDetailsActivity;
+import com.example.triibe.triibeuserapp.view_question.ViewQuestionActivity;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -76,11 +79,12 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
             }
         });
 
-        mUserActionsListener = new ViewSurveysPresenter(this);
+        mUserActionsListener = new ViewSurveysPresenter(
+                Globals.getInstance().getTriibeRepository(), this);
 
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mSurveyAdapter = new SurveyAdapter(mUserActionsListener, new ArrayList());
+        mSurveyAdapter = new SurveyAdapter(mUserActionsListener, new HashMap<String, SurveyDetails>());
         mRecyclerView.setAdapter(mSurveyAdapter);
 
         // Add mall fences if not already added (will also be added automatically on boot)
@@ -101,7 +105,7 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     @Override
     protected void onResume() {
         super.onResume();
-        mUserActionsListener.loadUser();
+        mUserActionsListener.loadSurveys();
     }
 
     @Override
@@ -114,7 +118,7 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     }
 
     @Override
-    public void showSurveys(@NonNull List surveyDetails) {
+    public void showSurveys(@NonNull Map<String, SurveyDetails> surveyDetails) {
         mSurveyAdapter.replaceData(surveyDetails);
     }
 
@@ -128,9 +132,9 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     }
 
     @Override
-    public void showSurveyDetails(String surveyId) {
-        Intent intent = new Intent(this, ViewSurveyDetailsActivity.class);
-        intent.putExtra(ViewSurveyDetailsActivity.EXTRA_SURVEY_ID, surveyId);
+    public void showQuestionUi(String surveyId, String questionId) {
+        Intent intent = new Intent(this, ViewQuestionActivity.class);
+        intent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, surveyId);
         startActivity(intent);
     }
 
