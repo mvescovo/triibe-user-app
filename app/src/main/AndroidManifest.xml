@@ -61,9 +61,10 @@
             android:label="@string/title_activity_view_surveys"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".view_survey_details.ViewSurveyDetailsActivity"
-                  android:label="@string/title_activity_take_survey"
-                  android:parentActivityName=".view_surveys.ViewSurveysActivity">
+        <activity
+            android:name=".view_question.ViewQuestionActivity"
+            android:label="@string/title_activity_take_survey"
+            android:parentActivityName=".view_surveys.ViewSurveysActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
@@ -111,7 +112,7 @@
             android:exported="false">
         </service>
         <service
-            android:name=".trackLocation.AddFencesIntentService"
+            android:name=".track_location.AddFencesIntentService"
             android:exported="false">
         </service>
         <service
@@ -119,7 +120,7 @@
             android:exported="false">
         </service>
         <service
-            android:name=".trackLocation.GetCurrentLocationIntentService"
+            android:name=".track_location.GetCurrentLocationIntentService"
             android:exported="false">
         </service>
 
@@ -127,23 +128,22 @@
         </service>
 
         <!-- Receivers -->
-        <receiver android:name=".trackLocation.AddFencesIntentService$BootDetectionBroadcastReceiver">
+        <receiver android:name=".track_location.AddFencesIntentService$BootDetectionBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".trackLocation.AddFencesIntentService$MallFenceReceiver">
+        <receiver android:name=".track_location.AddFencesIntentService$MallFenceReceiver">
         </receiver>
 
+        <!-- <service -->
+        <!-- android:name=".util.FirebaseMessagingService" -->
+        <!-- android:exported="false"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="com.google.firebase.MESSAGING_EVENT"/> -->
+        <!-- </intent-filter> -->
+        <!-- </service> -->
 
-
-        <!--<service-->
-        <!--android:name=".util.FirebaseMessagingService"-->
-        <!--android:exported="false">-->
-        <!--<intent-filter>-->
-        <!--<action android:name="com.google.firebase.MESSAGING_EVENT"/>-->
-        <!--</intent-filter>-->
-        <!--</service>-->
 
         <!-- <service -->
         <!-- android:name=".trackLocation.AddMallGeofencesIntentService" -->
@@ -207,18 +207,15 @@
         -->
 
 
-        <!--<activity-->
-        <!--android:name=".edit_location.EditLocationActivity"-->
-        <!--android:label="@string/title_activity_edit_location"-->
-        <!--android:parentActivityName=".view_surveys.ViewSurveysActivity"-->
-        <!--android:theme="@style/AppTheme.NoActionBar">-->
-        <!--<meta-data-->
-        <!--android:name="android.support.PARENT_ACTIVITY"-->
-        <!--android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>-->
-        <!--</activity>-->
-
-
-
+        <!-- <activity -->
+        <!-- android:name=".edit_location.EditLocationActivity" -->
+        <!-- android:label="@string/title_activity_edit_location" -->
+        <!-- android:parentActivityName=".view_surveys.ViewSurveysActivity" -->
+        <!-- android:theme="@style/AppTheme.NoActionBar"> -->
+        <!-- <meta-data -->
+        <!-- android:name="android.support.PARENT_ACTIVITY" -->
+        <!-- android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivityvity"/> -->
+        <!-- </activity> -->
 
 
         <!-- <activity -->
@@ -240,6 +237,8 @@
         <!-- <category android:name="android.intent.category.LAUNCHER"/> -->
         <!-- </intent-filter> -->
         <!-- </activity> -->
+        <activity android:name=".edit_survey.TestActivity">
+        </activity>
     </application>
 
 </manifest>

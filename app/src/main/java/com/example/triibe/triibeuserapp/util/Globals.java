@@ -1,5 +1,8 @@
 package com.example.triibe.triibeuserapp.util;
 
+import com.example.triibe.triibeuserapp.data.TriibeRepository;
+import com.example.triibe.triibeuserapp.data.TriibeRepositoryImpl;
+import com.example.triibe.triibeuserapp.data.TriibeServiceApiImpl;
 import com.example.triibe.triibeuserapp.data.User;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -10,38 +13,46 @@ import com.google.firebase.database.FirebaseDatabase;
  */
 public class Globals {
 
-    private volatile static Globals uniqueInstance;
-    private boolean firebasePersistenceSet;
-    private volatile User mUser;
+    private volatile static Globals sUniqueInstance;
+    private static TriibeRepository sTriibeRepository;
+    private static boolean sFirebasePersistenceSet;
+    private static volatile User sUser;
 //    public static GoogleMap mMap;
 
     private Globals() {}
 
     public static Globals getInstance() {
-        if (uniqueInstance == null) {
+        if (sUniqueInstance == null) {
             synchronized (Globals.class) {
-                if (uniqueInstance == null) {
-                    uniqueInstance = new Globals();
+                if (sUniqueInstance == null) {
+                    sUniqueInstance = new Globals();
                 }
             }
         }
-        return uniqueInstance;
+        return sUniqueInstance;
+    }
+
+    public synchronized TriibeRepository getTriibeRepository() {
+        if (sTriibeRepository == null) {
+            sTriibeRepository = new TriibeRepositoryImpl(new TriibeServiceApiImpl());
+        }
+        return sTriibeRepository;
     }
 
     public boolean isFirebasePersistenceSet() {
-        return firebasePersistenceSet;
+        return sFirebasePersistenceSet;
     }
 
     public void setFirebasePersistenceEnabled() {
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        this.firebasePersistenceSet = true;
+        this.sFirebasePersistenceSet = true;
     }
 
     public User getUser() {
-        return mUser;
+        return sUser;
     }
 
     public void setUser(User user) {
-        mUser = user;
+        sUser = user;
     }
 }

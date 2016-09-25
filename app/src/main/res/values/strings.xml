@@ -24,6 +24,7 @@
     <string name="edit_points_hint">Points</string>
     <string name="edit_version_hint">Version</string>
     <string name="successfully_saved_survey">Survey saved</string>
+    <string name="successfully_deleted_survey">Survey deleted</string>
     <string name="successfully_saved_question">Question saved</string>
     <string name="successfully_saved_trigger">Trigger saved</string>
     <string name="delete_survey">Delete survey</string>

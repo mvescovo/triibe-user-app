@@ -1,4 +1,4 @@
-package com.example.triibe.triibeuserapp.trackLocation;
+package com.example.triibe.triibeuserapp.track_location;
 
 import android.Manifest;
 import android.app.IntentService;
