@@ -2,13 +2,14 @@ package com.example.triibe.triibeuserapp.data;
 
 import com.google.firebase.database.Exclude;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author michael.
  */
-public class SurveyDetails {
+public class SurveyDetails implements Serializable {
 
     private String mId;
     private String mVersion;

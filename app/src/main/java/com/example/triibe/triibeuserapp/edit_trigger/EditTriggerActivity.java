@@ -18,7 +18,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.example.triibe.triibeuserapp.R;
-import com.example.triibe.triibeuserapp.trackLocation.GetCurrentLocationIntentService;
+import com.example.triibe.triibeuserapp.track_location.GetCurrentLocationIntentService;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

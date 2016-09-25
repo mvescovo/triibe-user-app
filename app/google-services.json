@@ -15,6 +15,30 @@
       },
       "oauth_client": [
         {
+          "client_id": "139425671337-jbijn0aq3h82h2egl8brf30tkgi9lp22.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.triibe.triibeuserapp",
+            "certificate_hash": "BA40401CEB380ADF4E87A8FC2339AE2184344735"
+          }
+        },
+        {
+          "client_id": "139425671337-isprug7pc8071fo9meg79ik5inat4d7c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.triibe.triibeuserapp",
+            "certificate_hash": "EA54C0214BA8A7CF0D700F45884BF47EFF0B8570"
+          }
+        },
+        {
+          "client_id": "139425671337-ilfigom7pm7v9v3if653nfm5mq6915g6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.triibe.triibeuserapp",
+            "certificate_hash": "8C887DC68790921DF105A3C631D8DED6938D6DBE"
+          }
+        },
+        {
           "client_id": "139425671337-92ivv2bnqi6s0mabvvt03g4nkrra86sk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

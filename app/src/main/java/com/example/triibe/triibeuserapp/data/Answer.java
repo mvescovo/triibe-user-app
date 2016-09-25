@@ -31,6 +31,14 @@ public class Answer {
     * Note: getters must be of the form "get<parameter name>".
     * Boolean values cannot use "hasExtraValue" for example.
     * */
+    public AnswerDetails getAnswerDetails() {
+        return mAnswerDetails;
+    }
+
+    public void setAnswerDetails(AnswerDetails answerDetails) {
+        mAnswerDetails = answerDetails;
+    }
+
     public Map<String, Option> getSelectedOptions() {
         return mSelectedOptions;
     }

@@ -1,20 +1,13 @@
 package com.example.triibe.triibeuserapp.view_surveys;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.support.annotation.Nullable;
 
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
-import com.example.triibe.triibeuserapp.data.User;
-import com.example.triibe.triibeuserapp.util.Globals;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.example.triibe.triibeuserapp.data.TriibeRepository;
+import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,97 +16,67 @@ import java.util.Map;
 public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsListener {
 
     private static final String TAG = "ViewSurveysPresenter";
+    private TriibeRepository mTriibeRepository;
     private ViewSurveysContract.View mView;
-    private DatabaseReference mDatabase;
-    private List<SurveyDetails> mSurveyDetails;
-    private boolean hasLoadedSurveys = false;
 
-    public ViewSurveysPresenter(ViewSurveysContract.View view) {
+    public ViewSurveysPresenter(TriibeRepository triibeRepository, ViewSurveysContract.View view) {
+        mTriibeRepository = triibeRepository;
         mView = view;
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mSurveyDetails = new ArrayList<>();
     }
 
     @Override
-    public void loadUser() {
+    public void loadSurveys(@NonNull String userId, @NonNull Boolean forceUpdate) {
         mView.setProgressIndicator(true);
 
-        ValueEventListener userDataListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onDataChange: USER DATA CHANGED");
-                if (dataSnapshot.exists()) {
-                    User user = dataSnapshot.getValue(User.class);
-                    Globals.getInstance().setUser(user);
-                    if (Globals.getInstance().getUser().getSurveyIds() == null) {
-                        Map<String, Boolean> surveyIds = new HashMap<>();
-                        Globals.getInstance().getUser().setSurveyIds(surveyIds);
-                    }
-                    if (!hasLoadedSurveys) {
-                        hasLoadedSurveys = true;
-                        loadSurveys();
-                    } else {
-                        mView.setProgressIndicator(false);
-                    }
-                } else {
-                    // Add new user.
-                    Map<String, Boolean> surveyIds = new HashMap<>();
-                    surveyIds.put("enrollmentSurvey", true);
-                    Globals.getInstance().getUser().setSurveyIds(surveyIds);
-                    mDatabase.child("users")
-                            .child(Globals.getInstance().getUser().getId())
-                            .setValue(Globals.getInstance().getUser());
-                }
-            }
+        final Map<String, SurveyDetails> surveys = new HashMap<>();
+        final String path = "users/" + userId + "/surveyIds";
+        if (forceUpdate) {
+            mTriibeRepository.refreshSurveyIds();
+        }
+        EspressoIdlingResource.increment();
+        mTriibeRepository.getSurveyIds(path, new TriibeRepository.GetSurveyIdsCallback() {
+                    @Override
+                    public void onSurveyIdsLoaded(@Nullable final Map<String, Boolean> userSurveyIds) {
+                        EspressoIdlingResource.decrement();
+                        if (userSurveyIds != null) {
+                            Object[] surveyIds = userSurveyIds.keySet().toArray();
+                            surveys.clear();
+                            for (int i = 0; i < userSurveyIds.size(); i++) {
+                                final int position = i;
+                                EspressoIdlingResource.increment();
+                                mTriibeRepository.getSurvey(surveyIds[i].toString(),
+                                        new TriibeRepository.GetSurveyCallback() {
+                                            @Override
+                                            public void onSurveyLoaded(SurveyDetails survey) {
+                                                EspressoIdlingResource.decrement();
+                                                surveys.put("" + position, survey);
+                                                if (surveys.size() == 0) {
+                                                    mView.showNoSurveysMessage();
+                                                } else {
+                                                    // Only show survey and hide the progress bar
+                                                    // when all values are received.
+                                                    if (position == userSurveyIds.size() - 1) {
+                                                        mView.showSurveys(surveys);
+                                                        mView.setProgressIndicator(false);
+                                                    }
+                                                }
+                                            }
+                                        });
+                            }
+                        } else {
+                            // Add new user survey id's.
+                            Map<String, Boolean> newUserSurveyIds = new HashMap<>();
+                            newUserSurveyIds.put("enrollmentSurvey", true);
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting user data failed, log a message
-                Log.w(TAG, "loadUserData:onCancelled", databaseError.toException());
-                mView.setProgressIndicator(false);
-            }
-        };
-        mDatabase.child("users")
-                .child(Globals.getInstance().getUser().getId())
-                .addValueEventListener(userDataListener);
+                            // Set new ID's in firebase
+                            mTriibeRepository.saveSurveyIds(path, newUserSurveyIds);
+                        }
+                    }
+                });
     }
 
     @Override
-    public void loadSurveys() {
-        mSurveyDetails.clear();
-        Map<String, Boolean> surveyIds = Globals.getInstance().getUser().getSurveyIds();
-        Log.d(TAG, "loadSurveys: NUM SURVEY IDs: " + surveyIds.size());
-
-        for (final Map.Entry<String, Boolean> surveyId : surveyIds.entrySet()) {
-            ValueEventListener surveyDetailsDataListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    SurveyDetails surveyDetails = dataSnapshot.getValue(SurveyDetails.class);
-                    mSurveyDetails.add(surveyDetails);
-                    mView.showSurveys(mSurveyDetails);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    // Getting survey details data failed, log a message
-                    Log.w(TAG, "loadSurveyDetailsData:onCancelled", databaseError.toException());
-                }
-            };
-            mDatabase.child("surveys")
-                    .child(surveyId.getKey())
-                    .child("surveyDetails")
-                    .addValueEventListener(surveyDetailsDataListener);
-        }
-
-        if (surveyIds.size() == 0) {
-            mView.showNoSurveysMessage();
-        }
-
-        mView.setProgressIndicator(false);
-    }
-
-    @Override
-    public void openSurveyDetails(@NonNull String surveyId) {
-        mView.showSurveyDetails(surveyId);
+    public void openSurveyQuestions(@NonNull String surveyId) {
+        mView.showQuestionUi(surveyId, "q1");
     }
 }

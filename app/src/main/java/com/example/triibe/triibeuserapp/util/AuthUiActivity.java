@@ -37,7 +37,9 @@ public class AuthUiActivity extends AppCompatActivity {
 
     @BindView(android.R.id.content)
     View mRootView;
-    FirebaseAuth mAuth;
+
+    private FirebaseAuth mAuth;
+    private String mUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +49,9 @@ public class AuthUiActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {
             setUser();
-            startActivity(new Intent(this, ViewSurveysActivity.class));
+            Intent intent = new Intent(this, ViewSurveysActivity.class);
+            intent.putExtra(ViewSurveysActivity.EXTRA_USER_ID, mUserId);
+            startActivity(intent);
             finish();
         } else {
             startActivityForResult(
@@ -86,7 +90,9 @@ public class AuthUiActivity extends AppCompatActivity {
     private void handleSignInResponse(int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             setUser();
-            startActivity(new Intent(this, ViewSurveysActivity.class));
+            Intent intent = new Intent(this, ViewSurveysActivity.class);
+            intent.putExtra(ViewSurveysActivity.EXTRA_USER_ID, mUserId);
+            startActivity(intent);
             finish();
             return;
         }
@@ -107,6 +113,7 @@ public class AuthUiActivity extends AppCompatActivity {
     private void setUser() {
         if (mAuth.getCurrentUser() != null) {
             User user = new User(mAuth.getCurrentUser().getUid());
+            mUserId = user.getId();
             Globals.getInstance().setUser(user);
         }
     }

@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author michael.
@@ -19,9 +19,9 @@ public class SurveyAdapter extends RecyclerView.Adapter {
 
     private static final String TAG = "SurveyAdapter";
     private ViewSurveysContract.UserActionsListener mUserActionsListener;
-    private List mSurveyDetails;
+    private Map<String, SurveyDetails> mSurveyDetails;
 
-    public SurveyAdapter(ViewSurveysContract.UserActionsListener userActionsListener, List surveyDetails) {
+    public SurveyAdapter(ViewSurveysContract.UserActionsListener userActionsListener, Map<String, SurveyDetails> surveyDetails) {
         mUserActionsListener = userActionsListener;
         mSurveyDetails = surveyDetails;
     }
@@ -35,12 +35,12 @@ public class SurveyAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         TextView textView = (TextView) ((SurveyViewHolder)holder).getView().findViewById(R.id.survey_description);
-        textView.setText(((SurveyDetails)mSurveyDetails.get(position)).getDescription());
+        textView.setText((mSurveyDetails.get("" + position)).getDescription());
         textView = (TextView) ((SurveyViewHolder)holder).getView().findViewById(R.id.survey_points);
-        String points = ((SurveyDetails)mSurveyDetails.get(position)).getPoints();
-        textView.setText("Points: " + points);
+        String points = (mSurveyDetails.get("" + position)).getPoints();
+        textView.setText("Points: " + points); // TODO: 20/09/16 use string resource
         textView = (TextView) ((SurveyViewHolder)holder).getView().findViewById(R.id.survey_expiry);
-        String expiry = ((SurveyDetails)mSurveyDetails.get(position)).getDurationTillExpiry();
+        String expiry = (mSurveyDetails.get("" + position)).getDurationTillExpiry();
         textView.setText("Expiry time: " + expiry + "hour.");
     }
 
@@ -62,8 +62,8 @@ public class SurveyAdapter extends RecyclerView.Adapter {
             mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mUserActionsListener.openSurveyDetails(((SurveyDetails)mSurveyDetails
-                            .get(getAdapterPosition())).getId());
+                    mUserActionsListener.openSurveyQuestions((mSurveyDetails
+                            .get("" + getAdapterPosition())).getId());
                 }
             });
         }
@@ -73,7 +73,7 @@ public class SurveyAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public void replaceData(@NonNull List surveyDetails) {
+    public void replaceData(@NonNull Map<String, SurveyDetails> surveyDetails) {
         mSurveyDetails = surveyDetails;
         notifyDataSetChanged();
     }

@@ -15,13 +15,15 @@ import java.util.Map;
 public class AnswerDetails {
 
     private String mQuestionId;
+    private String mId;
     private String mType;
 
     // Empty constructor required for firebase
     public AnswerDetails() {}
 
-    public AnswerDetails(String questionId, String type) {
+    public AnswerDetails(String questionId, String id, String type) {
         mQuestionId = questionId;
+        mId = id;
         mType = type;
     }
 
@@ -37,6 +39,14 @@ public class AnswerDetails {
 
     public void setQuestionId(String questionId) {
         mQuestionId = questionId;
+    }
+
+    public String getId() {
+        return mId;
+    }
+
+    public void setId(String id) {
+        mId = id;
     }
 
     public String getType() {

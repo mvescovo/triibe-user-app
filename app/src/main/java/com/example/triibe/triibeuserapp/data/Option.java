@@ -17,6 +17,7 @@ public class Option {
     private String mQuestionId;
     private String mId;
     private String mPhrase;
+    private boolean mChecked;
     private boolean mHasExtraInput;
     private String mExtraInput;
     private String mExtraInputType;
@@ -28,6 +29,13 @@ public class Option {
     public Option(String phrase, boolean hasExtraInput) {
         mPhrase = phrase;
         mHasExtraInput = hasExtraInput;
+    }
+
+
+    public Option(String phrase, boolean hasExtraInput, boolean checked) {
+        mPhrase = phrase;
+        mHasExtraInput = hasExtraInput;
+        mChecked = checked;
     }
 
     /*
@@ -58,6 +66,14 @@ public class Option {
 
     public void setPhrase(String phrase) {
         mPhrase = phrase;
+    }
+
+    public boolean isChecked() {
+        return mChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        mChecked = checked;
     }
 
     public boolean getHasExtraInput() {

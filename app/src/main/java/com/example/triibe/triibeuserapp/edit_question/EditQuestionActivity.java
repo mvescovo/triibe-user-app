@@ -4,36 +4,50 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.QuestionDetails;
 import com.example.triibe.triibeuserapp.edit_option.EditOptionActivity;
+import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
+import com.example.triibe.triibeuserapp.util.Globals;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class EditQuestionActivity extends AppCompatActivity implements EditQuestionContract.View {
+public class EditQuestionActivity extends AppCompatActivity
+        implements EditQuestionContract.View, TextWatcher {
 
     private static final String TAG = "EditQuestionActivity";
+//    public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
     public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
-    public final static String EXTRA_QUESTION_ID = "com.example.triibe.QUESTION_ID";
     private static final int REQUEST_EDIT_OPTION = 1;
     EditQuestionContract.UserActionsListener mUserActionsListener;
     private String mSurveyId;
     BottomSheetBehavior mBottomSheetBehavior;
+    private List<String> mQuestionIds;
 
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
@@ -44,8 +58,11 @@ public class EditQuestionActivity extends AppCompatActivity implements EditQuest
     @BindView(R.id.edit_option_button_layout)
     LinearLayout mEditOptionButtonLayout;
 
+    @BindView(R.id.TEST_BUTTON)
+    Button mTestButton;
+
     @BindView(R.id.question_id)
-    TextInputEditText mQuestionId;
+    AppCompatAutoCompleteTextView mQuestionId;
 
     @BindView(R.id.question_title)
     TextInputEditText mTitle;
@@ -65,7 +82,10 @@ public class EditQuestionActivity extends AppCompatActivity implements EditQuest
         setContentView(R.layout.activity_edit_question);
         ButterKnife.bind(this);
 
-        mUserActionsListener = new EditQuestionPresenter(this);
+        mUserActionsListener = new EditQuestionPresenter(
+                Globals.getInstance().getTriibeRepository(),
+                this
+        );
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -79,25 +99,20 @@ public class EditQuestionActivity extends AppCompatActivity implements EditQuest
             Log.d(TAG, "onCreate: NO SURVEY ID");
         }
 
+        mTestButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mUserActionsListener.editOption();
+            }
+        });
+
         mEditOptionButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 if (validate()) {
-                    QuestionDetails questionDetails = new QuestionDetails(
-                            mSurveyId,
-                            mQuestionId.getText().toString().trim(),
-                            "",
-                            "http://i.imgur.com/DvpvklR.png", // TODO: 18/09/16 FIX THIS WITH REAL VALUES
-                            mTitle.getText().toString().trim(),
-                            mIntro.getText().toString().trim(),
-                            "",
-                            "",
-                            "",
-                            "",
-                            ""
-                    );
-                    mUserActionsListener.editQuestion(questionDetails, true);
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    mUserActionsListener.editOption();
                 }
             }
         });
@@ -115,6 +130,15 @@ public class EditQuestionActivity extends AppCompatActivity implements EditQuest
             }
 
         });
+
+        mQuestionIds = new ArrayList<>();
+        mQuestionId.addTextChangedListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mUserActionsListener.getQuestionIds(mSurveyId, true);
     }
 
     @Override
@@ -127,16 +151,36 @@ public class EditQuestionActivity extends AppCompatActivity implements EditQuest
     }
 
     @Override
-    public void showEditSurvey() {
-        setResult(Activity.RESULT_OK);
+    public void addQuestionIdsToAutoComplete(List<String> questionIds) {
+        mQuestionIds = questionIds;
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                mQuestionIds
+        );
+
+        mQuestionId.setAdapter(adapter);
+    }
+
+    @Override
+    public void showQuestionDetails(QuestionDetails questionDetails) {
+        mTitle.setText(questionDetails.getTitle());
+        mIntro.setText(questionDetails.getIntro());
+        mImageUrl.setText(questionDetails.getImageUrl());
+    }
+
+    @Override
+    public void showEditSurvey(@NonNull Integer resultCode) {
+        setResult(resultCode);
         finish();
     }
 
     @Override
     public void showEditOption() {
         Intent intent = new Intent(this, EditOptionActivity.class);
-        intent.putExtra(EXTRA_SURVEY_ID, mSurveyId);
-        intent.putExtra(EXTRA_QUESTION_ID, mQuestionId.getText().toString().trim());
+        intent.putExtra(EditOptionActivity.EXTRA_SURVEY_ID, mSurveyId);
+        intent.putExtra(EditOptionActivity.EXTRA_QUESTION_ID, mQuestionId.getText().toString().trim());
         startActivityForResult(intent, REQUEST_EDIT_OPTION);
     }
 
@@ -159,6 +203,21 @@ public class EditQuestionActivity extends AppCompatActivity implements EditQuest
             mImageUrl.requestFocus();
             return false;
         }
+
+        QuestionDetails questionDetails = new QuestionDetails(
+                mSurveyId,
+                mQuestionId.getText().toString().trim(),
+                "",
+                mImageUrl.getText().toString().trim(), // TODO: 18/09/16 FIX THIS WITH REAL VALUES
+                mTitle.getText().toString().trim(),
+                mIntro.getText().toString().trim(),
+                "",
+                "",
+                "",
+                "",
+                ""
+        );
+        mUserActionsListener.saveQuestion(questionDetails);
 
         return true;
     }
@@ -186,24 +245,35 @@ public class EditQuestionActivity extends AppCompatActivity implements EditQuest
                 return true;
             case R.id.done:
                 if (validate()) {
-                    QuestionDetails questionDetails = new QuestionDetails(
-                            mSurveyId,
-                            mQuestionId.getText().toString().trim(),
-                            "",
-                            "http://i.imgur.com/DvpvklR.png", // TODO: 18/09/16 fix with real values
-                            mTitle.getText().toString().trim(),
-                            mIntro.getText().toString().trim(),
-                            "",
-                            "",
-                            "",
-                            "",
-                            ""
-                    );
-                    mUserActionsListener.editQuestion(questionDetails, false);
+                    showEditSurvey(Activity.RESULT_OK);
                 }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        for (int i = 0; i < mQuestionIds.size(); i++) {
+            if (s.toString().contentEquals(mQuestionIds.get(i))) {
+                mUserActionsListener.getQuestion(mQuestionIds.get(i));
+            }
+        }
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+    }
+
+    @VisibleForTesting
+    public IdlingResource getCountingIdlingResource() {
+        return EspressoIdlingResource.getIdlingResource();
     }
 }
