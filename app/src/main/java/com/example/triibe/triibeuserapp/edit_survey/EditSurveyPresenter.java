@@ -1,16 +1,15 @@
 package com.example.triibe.triibeuserapp.edit_survey;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
+import com.example.triibe.triibeuserapp.data.TriibeRepository;
+import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,62 +18,84 @@ import java.util.Map;
 public class EditSurveyPresenter implements EditSurveyContract.UserActionsListener {
 
     private static final String TAG = "EditSurveyPresenter";
-    EditSurveyContract.View mView;
-    private DatabaseReference mDatabase;
-    private Map<String, Boolean> mSurveyIds;
+    private TriibeRepository mTriibeRepository;
+    private EditSurveyContract.View mView;
 
-    public EditSurveyPresenter(EditSurveyContract.View view) {
+    public EditSurveyPresenter(TriibeRepository triibeRepository, EditSurveyContract.View view) {
+        mTriibeRepository = triibeRepository;
         mView = view;
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        // Get surveyIds to allow the user to select them in the UI
-        mDatabase.child("surveyIds")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            GenericTypeIndicator<Map<String, Boolean>> t
-                                    = new GenericTypeIndicator<Map<String, Boolean>>() {};
-                            mSurveyIds = dataSnapshot.getValue(t);
-                            for (Map.Entry<String, Boolean> id : mSurveyIds.entrySet()) {
-                                Log.d(TAG, "onDataChange: ID: " + id.getKey());
-                            }
-                        } else {
-                            Log.d(TAG, "onDataChange: DATA SNAPSHOT DOES NOT EXIST");
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
     }
 
     @Override
-    public void editSurvey(String surveyId, String description, String version, String points,
-                           String timeTillExpiry, boolean editQuestion) {
+    public void loadSurveyIds(@NonNull Boolean forceUpdate) {
+        mView.setProgressIndicator(true);
+
+        final String path = "surveyIds";
+        if (forceUpdate) {
+            mTriibeRepository.refreshSurveyIds();
+        }
+        EspressoIdlingResource.increment();
+        mTriibeRepository.getSurveyIds(path, new TriibeRepository.GetSurveyIdsCallback() {
+            @Override
+            public void onSurveyIdsLoaded(@Nullable Map<String, Boolean> surveyIds) {
+                EspressoIdlingResource.decrement();
+                List<String> surveyIdsArray;
+                if (surveyIds != null) {
+                    surveyIdsArray = new ArrayList<>(surveyIds.keySet());
+                } else {
+                    surveyIdsArray = new ArrayList<>();
+                }
+                mView.addSurveyIdsToAutoComplete(surveyIdsArray);
+            }
+        });
+
+        mView.setProgressIndicator(false);
+    }
+
+    @Override
+    public void getSurvey(@NonNull String surveyId) {
+        mView.setProgressIndicator(true);
+
+        EspressoIdlingResource.increment();
+        mTriibeRepository.getSurvey(surveyId, new TriibeRepository.GetSurveyCallback() {
+            @Override
+            public void onSurveyLoaded(@Nullable SurveyDetails survey) {
+                EspressoIdlingResource.decrement();
+                if (survey != null) {
+                    mView.showSurveyDetails(survey);
+                    mView.setProgressIndicator(false);
+                } else {
+                    Log.d(TAG, "onSurveyLoaded: SURVEY NULL");
+                }
+            }
+        });
+    }
+
+    @Override
+    public void saveSurvey(String surveyId, String description, String version, String points,
+                           String timeTillExpiry) {
         mView.setProgressIndicator(true);
 
         SurveyDetails surveyDetails = new SurveyDetails(surveyId, version, description,
                 timeTillExpiry, points);
-        Map<String, Object> surveyDetailsValues = surveyDetails.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/surveys/" + surveyId + "/surveyDetails", surveyDetailsValues);
-        childUpdates.put("/surveyIds/" + surveyId, true);
-        mDatabase.updateChildren(childUpdates);
+
+        mTriibeRepository.saveSurvey(surveyId, surveyDetails);
 
         mView.setProgressIndicator(false);
-
-        if (editQuestion) {
-            mView.showEditQuestion();
-        } else {
-            mView.showSurveys();
-        }
     }
 
     @Override
-    public void editTrigger(String surveyId) {
+    public void deleteSurvey(@NonNull String surveyId) {
+        mTriibeRepository.deleteSurvey(surveyId);
+    }
+
+    @Override
+    public void editQuestion() {
+        mView.showEditQuestion();
+    }
+
+    @Override
+    public void editTrigger() {
         mView.showEditTrigger();
     }
 }

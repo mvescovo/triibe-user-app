@@ -11,6 +11,7 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -28,13 +29,20 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+
+    // Always show the result of every unit test, even if it passes.
+    testOptions.unitTests.all {
+        testLogging {
+            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        }
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
 
     // Android support libraries
+    compile 'com.android.support:support-annotations:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
@@ -69,12 +77,17 @@ dependencies {
     compile 'com.google.guava:guava:19.0'
 
     // Testing - unit tests
-    testCompile "org.mockito:mockito-all:$rootProject.ext.mockitoVersion"
-    testCompile "org.hamcrest:hamcrest-all:$rootProject.ext.hamcrestVersion"
-    testCompile "org.powermock:powermock-module-junit4:$rootProject.ext.powerMockito"
-    testCompile "org.powermock:powermock-api-mockito:$rootProject.ext.powerMockito"
+    testCompile 'junit:junit:4.12'
+    testCompile "org.mockito:mockito-all:1.10.19"
+    testCompile "org.hamcrest:hamcrest-all:1.3"
+    testCompile "org.powermock:powermock-module-junit4:1.6.2"
+    testCompile "org.powermock:powermock-api-mockito:1.6.2"
 
-    // Testing - screen tests
+    // Android Testing Support Library's runner and rules
+    androidTestCompile "com.android.support.test:runner:0.5"
+    androidTestCompile "com.android.support.test:rules:0.5"
+
+    // Testing - Espresso UI Testing dependencies
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
@@ -84,6 +97,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'design'
         exclude group: 'com.android.support', module: 'recyclerview-v7'
     }
+    androidTestCompile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
+    androidTestCompile "com.android.support.test.espresso:espresso-intents:2.2.2"
+    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
 
     // Floating action button menu
 //    compile 'com.github.clans:fab:1.6.4'
@@ -97,6 +113,15 @@ dependencies {
 //    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.3.5'
 //    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore
 //    compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.5'
+    compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
+}
+
+/*
+Resolves dependency versions across test and production APKs, specifically, transitive
+dependencies. This is required since Espresso internally has a dependency on support-annotations.
+*/
+configurations.all {
+    resolutionStrategy.force "com.android.support:support-annotations:24.2.1"
 }
 
 // To load the google-services.json file needed for firebase

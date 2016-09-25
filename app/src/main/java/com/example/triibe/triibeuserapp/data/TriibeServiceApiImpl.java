@@ -3,7 +3,6 @@ package com.example.triibe.triibeuserapp.data;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.example.triibe.triibeuserapp.util.Globals;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,29 +25,19 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
         mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
+    
+    /*
+    * Surveys
+    * */
     @Override
-    public void getUserSurveyIds(@NonNull final GetUserSurveyIdsCallback callback) {
+    public void getSurveyIds(@NonNull String path, @NonNull final GetSurveyIdsCallback callback) {
         final ValueEventListener userDataListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 GenericTypeIndicator<Map<String, Boolean>> t =
-                        new GenericTypeIndicator<Map<String, Boolean>>() {
-                        };
-                Map<String, Boolean> userSurveyIds = dataSnapshot.getValue(t);
-                if (userSurveyIds != null) {
-                    callback.onUserSurveyIdsLoaded(userSurveyIds);
-                } else {
-                    // Add new user survey id's.
-                    Map<String, Boolean> newUserSurveyIds = new HashMap<>();
-                    newUserSurveyIds.put("enrollmentSurvey", true);
-
-                    // Set new ID's in firebase
-                    mDatabase.child("users").child(Globals.getInstance().getUser().getId())
-                            .child("surveyIds")
-                            .setValue(newUserSurveyIds);
-
-                    callback.onUserSurveyIdsLoaded(newUserSurveyIds);
-                }
+                        new GenericTypeIndicator<Map<String, Boolean>>() {};
+                Map<String, Boolean> allSurveyIds = dataSnapshot.getValue(t);
+                callback.onSurveyIdsLoaded(allSurveyIds);
             }
 
             @Override
@@ -57,8 +46,12 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
                 Log.w(TAG, "loadUserData:onCancelled", databaseError.toException());
             }
         };
-        mDatabase.child("users").child(Globals.getInstance().getUser().getId()).child("surveyIds")
-                .addValueEventListener(userDataListener);
+        mDatabase.child(path).addListenerForSingleValueEvent(userDataListener);
+    }
+
+    @Override
+    public void saveSurveyIds(@NonNull String path, @NonNull Map<String, Boolean> surveyIds) {
+        mDatabase.child(path).setValue(surveyIds);
     }
 
     @Override
@@ -67,11 +60,7 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 SurveyDetails surveyDetails = dataSnapshot.getValue(SurveyDetails.class);
-                if (surveyDetails != null) {
-                    callback.onSurveyLoaded(dataSnapshot.getValue(SurveyDetails.class));
-                } else {
-                    callback.onSurveyLoaded(new SurveyDetails());
-                }
+                callback.onSurveyLoaded(surveyDetails);
             }
 
             @Override
@@ -83,7 +72,55 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
         mDatabase.child("surveys")
                 .child(surveyId)
                 .child("surveyDetails")
-                .addValueEventListener(surveyDetailsDataListener);
+                .addListenerForSingleValueEvent(surveyDetailsDataListener);
+    }
+
+    @Override
+    public void saveSurvey(@NonNull String surveyId, @NonNull SurveyDetails surveyDetails) {
+        Map<String, Object> surveyDetailsValues = surveyDetails.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/surveys/" + surveyId + "/surveyDetails", surveyDetailsValues);
+        childUpdates.put("/surveyIds/" + surveyId, true);
+        mDatabase.updateChildren(childUpdates);
+    }
+
+    @Override
+    public void deleteSurvey(@NonNull String surveyId) {
+        if (!surveyId.contentEquals("")) {
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/surveys/" + surveyId, null);
+            childUpdates.put("/surveyIds/" + surveyId, null);
+            mDatabase.updateChildren(childUpdates);
+        }
+    }
+
+    
+    /*
+    * Questions
+    * */
+    @Override
+    public void getQuestionIds(@NonNull String path, @NonNull final GetQuestionIdsCallback callback) {
+        final ValueEventListener userDataListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<Map<String, Boolean>> t =
+                        new GenericTypeIndicator<Map<String, Boolean>>() {};
+                Map<String, Boolean> allQuestionIds = dataSnapshot.getValue(t);
+                callback.onQuestionIdsLoaded(allQuestionIds);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting user data failed, log a message
+                Log.w(TAG, "loadUserData:onCancelled", databaseError.toException());
+            }
+        };
+        mDatabase.child(path).addListenerForSingleValueEvent(userDataListener);
+    }
+
+    @Override
+    public void saveQuestionIds(@NonNull String path, @NonNull Map<String, Boolean> questionIds) {
+        // TODO: 25/09/16  
     }
 
     @Override
@@ -94,11 +131,7 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
                 GenericTypeIndicator<Map<String, Question>> t =
                         new GenericTypeIndicator<Map<String, Question>>() {};
                 Map<String, Question> questions = dataSnapshot.getValue(t);
-                if (questions != null) {
-                    callback.onQuestionsLoaded(dataSnapshot.getValue(t));
-                } else {
-                    callback.onQuestionsLoaded(new HashMap<String, Question>());
-                }
+                callback.onQuestionsLoaded(questions);
             }
 
             @Override
@@ -108,14 +141,85 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
             }
         };
         mDatabase.child("surveys").child(surveyId).child("questions")
-                .addValueEventListener(questionListener);
+                .addListenerForSingleValueEvent(questionListener);
     }
 
     @Override
-    public void getQuestion(@NonNull String questionId, @NonNull GetQuestionCallback callback) {
+    public void getQuestion(@NonNull String surveyId, @NonNull String questionId, @NonNull final GetQuestionCallback callback) {
+        ValueEventListener surveyDetailsDataListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                QuestionDetails questionDetails = dataSnapshot.getValue(QuestionDetails.class);
+                callback.onQuestionLoaded(questionDetails);
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting survey details data failed, log a message
+                Log.w(TAG, "loadSurveyDetailsData:onCancelled", databaseError.toException());
+            }
+        };
+        mDatabase.child("surveys/" + surveyId + "/questions/" + questionId + "/questionDetails")
+                .addListenerForSingleValueEvent(surveyDetailsDataListener);
     }
 
+    @Override
+    public void saveQuestion(@NonNull String surveyId, @NonNull String questionId, @NonNull QuestionDetails questionDetails) {
+        Map<String, Object> questionDetailsValues = questionDetails.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/surveys/" + surveyId + "/questions/" + questionId + "/questionDetails", questionDetailsValues);
+        childUpdates.put("/surveys/" + surveyId + "/questionIds/" + questionId, true);
+        mDatabase.updateChildren(childUpdates);
+    }
+
+    @Override
+    public void deleteQuestion(@NonNull String surveyId, @NonNull String questionId) {
+        // TODO: 25/09/16  
+    }
+
+    
+    /*
+    * Options
+    * */
+    @Override
+    public void getOptionIds(@NonNull String path, @NonNull GetOptionIdsCallback callback) {
+        // TODO: 25/09/16  
+    }
+
+    @Override
+    public void saveOptionIds(@NonNull String path, @NonNull Map<String, Boolean> optionIds) {
+        // TODO: 25/09/16  
+    }
+
+    @Override
+    public void getOptions(@NonNull String surveyId, @NonNull String questionId, @NonNull GetOptionsCallback callback) {
+        // TODO: 25/09/16  
+    }
+
+    @Override
+    public void getOption(@NonNull String surveyId, @NonNull String questionId, @NonNull String optionId, @NonNull GetOptionCallback callback) {
+        // TODO: 25/09/16  
+    }
+
+    @Override
+    public void saveOption(@NonNull String surveyId, @NonNull String questionId, @NonNull String optionId, @NonNull Option option) {
+        // TODO: 25/09/16  
+    }
+
+    @Override
+    public void deleteOption(@NonNull String surveyId, @NonNull String questionId, @NonNull String optionId) {
+        // TODO: 25/09/16  
+    }
+
+    
+    /*
+    * Triggers
+    * */
+    
+    
+    /*
+    * Answers
+    * */
     @Override
     public void getAnswers(@NonNull String surveyId, @NonNull String userId, @NonNull final GetAnswersCallback callback) {
         ValueEventListener answerListener = new ValueEventListener() {
@@ -124,28 +228,7 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
                 GenericTypeIndicator<Map<String, Answer>> t =
                         new GenericTypeIndicator<Map<String, Answer>>() {};
                 Map<String, Answer> answers = dataSnapshot.getValue(t);
-                if (answers != null) {
-                    callback.onAnswersLoaded(answers);
-                } else {
-                    callback.onAnswersLoaded(new HashMap<String, Answer>());
-                }
-
-
-//                mLoadSurveyProgressBar.setVisibility(View.GONE);
-//                if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum
-//                        && !mDownloadedAnswers) {
-//                    displayCurrentAnswer();
-//                } else {
-//                    Log.d(TAG, "onDataChange: No answers in survey");
-//                }
-//                mDownloadedAnswers = true;
-
-                // Prevent users from changing their responses to qualifying questions
-//                if (mAnswers != null && mAnswers.size() > Constants.NUM_QUALIFYING_QUESTIONS &&
-//                        mCurrentQuestionNum <= Constants.NUM_QUALIFYING_QUESTIONS) {
-//                    mCurrentQuestionNum = Constants.NUM_QUALIFYING_QUESTIONS + 1;
-//                    displayCurrentQuestion();
-//                }
+                callback.onAnswersLoaded(answers);
             }
 
             @Override
@@ -155,12 +238,12 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
             }
         };
         mDatabase.child("surveys").child(surveyId).child("answers").child(userId)
-                .addValueEventListener(answerListener);
+                .addListenerForSingleValueEvent(answerListener);
     }
 
     @Override
-    public void getAnswer(@NonNull String questionId, @NonNull GetAnswerCallback callback) {
-
+    public void getAnswer(@NonNull String surveyId, @NonNull String questionId, @NonNull GetAnswerCallback callback) {
+        // TODO: 25/09/16  
     }
 
     @Override
@@ -169,4 +252,6 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
         mDatabase.child("surveys").child(surveyId).child("answers").child(userId).child(questionId)
                 .setValue(answer);
     }
+
+    // TODO: 25/09/16 maybe put a method to detach listeners when the activity is destroyed? Not sure if it's necessary.
 }

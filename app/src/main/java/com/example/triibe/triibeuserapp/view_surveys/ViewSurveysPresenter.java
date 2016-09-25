@@ -1,9 +1,11 @@
 package com.example.triibe.triibeuserapp.view_surveys;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
+import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,35 +25,51 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
     }
 
     @Override
-    public void loadSurveys() {
+    public void loadSurveys(@NonNull String userId, @NonNull Boolean forceUpdate) {
         mView.setProgressIndicator(true);
 
         final Map<String, SurveyDetails> surveys = new HashMap<>();
-
-        mTriibeRepository.getUserSurveyIds(new TriibeRepository.GetUserSurveyIdsCallback() {
+        final String path = "users/" + userId + "/surveyIds";
+        if (forceUpdate) {
+            mTriibeRepository.refreshSurveyIds();
+        }
+        EspressoIdlingResource.increment();
+        mTriibeRepository.getSurveyIds(path, new TriibeRepository.GetSurveyIdsCallback() {
                     @Override
-                    public void onUserSurveyIdsLoaded(final Map<String, Boolean> userSurveyIds) {
-                        Object[] surveyIds = userSurveyIds.keySet().toArray();
-                        surveys.clear();
-                        for (int i = 0; i < userSurveyIds.size(); i++) {
-                            final int position = i;
-                            mTriibeRepository.getSurvey(surveyIds[i].toString(),
-                                    new TriibeRepository.GetSurveyCallback() {
-                                @Override
-                                public void onSurveyLoaded(SurveyDetails survey) {
-                                    surveys.put("" + position, survey);
-                                    if (surveys.size() == 0) {
-                                        mView.showNoSurveysMessage();
-                                    } else {
-                                        // Only show survey and hide the progress bar when all
-                                        // values are received.
-                                        if (position == userSurveyIds.size() - 1) {
-                                            mView.showSurveys(surveys);
-                                            mView.setProgressIndicator(false);
-                                        }
-                                    }
-                                }
-                            });
+                    public void onSurveyIdsLoaded(@Nullable final Map<String, Boolean> userSurveyIds) {
+                        EspressoIdlingResource.decrement();
+                        if (userSurveyIds != null) {
+                            Object[] surveyIds = userSurveyIds.keySet().toArray();
+                            surveys.clear();
+                            for (int i = 0; i < userSurveyIds.size(); i++) {
+                                final int position = i;
+                                EspressoIdlingResource.increment();
+                                mTriibeRepository.getSurvey(surveyIds[i].toString(),
+                                        new TriibeRepository.GetSurveyCallback() {
+                                            @Override
+                                            public void onSurveyLoaded(SurveyDetails survey) {
+                                                EspressoIdlingResource.decrement();
+                                                surveys.put("" + position, survey);
+                                                if (surveys.size() == 0) {
+                                                    mView.showNoSurveysMessage();
+                                                } else {
+                                                    // Only show survey and hide the progress bar
+                                                    // when all values are received.
+                                                    if (position == userSurveyIds.size() - 1) {
+                                                        mView.showSurveys(surveys);
+                                                        mView.setProgressIndicator(false);
+                                                    }
+                                                }
+                                            }
+                                        });
+                            }
+                        } else {
+                            // Add new user survey id's.
+                            Map<String, Boolean> newUserSurveyIds = new HashMap<>();
+                            newUserSurveyIds.put("enrollmentSurvey", true);
+
+                            // Set new ID's in firebase
+                            mTriibeRepository.saveSurveyIds(path, newUserSurveyIds);
                         }
                     }
                 });
@@ -59,7 +77,6 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
 
     @Override
     public void openSurveyQuestions(@NonNull String surveyId) {
-        // Show the first question in the survey // TODO: 20/09/16 make it so it shows the question the user is up to
         mView.showQuestionUi(surveyId, "q1");
     }
 }

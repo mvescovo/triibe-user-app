@@ -37,8 +37,10 @@ public class ViewQuestionActivity extends AppCompatActivity
 
     private static final String TAG = "SurveyDetailsActivity";
     public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
+    public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
     ViewQuestionContract.UserActionsListener mUserActionsListener;
     private String mSurveyId;
+    private String mUserId;
 
     @BindView(R.id.view_root)
     RelativeLayout mRootView;
@@ -85,7 +87,7 @@ public class ViewQuestionActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_survey_details);
+        setContentView(R.layout.activity_view_question);
         ButterKnife.bind(this);
 
         if (getIntent().getStringExtra(EXTRA_SURVEY_ID) != null) {
@@ -94,11 +96,17 @@ public class ViewQuestionActivity extends AppCompatActivity
             mSurveyId = "-1";
         }
 
+        if (getIntent().getStringExtra(EXTRA_USER_ID) != null) {
+            mUserId = getIntent().getStringExtra(EXTRA_USER_ID);
+        } else {
+            mUserId = "TestUserId";
+        }
+
         mUserActionsListener = new ViewQuestionPresenter(
                 Globals.getInstance().getTriibeRepository(),
                 this,
                 mSurveyId,
-                Globals.getInstance().getUser().getId()
+                mUserId
         );
 
         mNextButton.setOnClickListener(new View.OnClickListener() {

@@ -1,6 +1,7 @@
 package com.example.triibe.triibeuserapp.view_question;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 
@@ -12,6 +13,7 @@ import com.example.triibe.triibeuserapp.data.Question;
 import com.example.triibe.triibeuserapp.data.QuestionDetails;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.util.Constants;
+import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +24,7 @@ import java.util.Set;
  */
 public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener {
 
-    private static final String TAG = "SurveyDetailsPresenter";
+    private static final String TAG = "ViewQuestionPresenter";
     TriibeRepository mTriibeRepository;
     ViewQuestionContract.View mView;
     private String mSurveyId;
@@ -50,31 +52,51 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
             @Override
             public void onQuestionsLoaded(Map<String, Question> questions) {
                 mQuestions = questions;
+                if (mQuestions == null) {
+                    mQuestions = new HashMap<>();
+                }
+                Log.d(TAG, "onQuestionsLoaded: questions size: " + mQuestions.size());
                 loadAnswers(new LoadAnswersCallback() {
                     @Override
                     public void onAnswersLoaded(Map<String, Answer> answers) {
                         mAnswers = answers;
-                        mCurrentQuestionNum = mAnswers.size() + 1;
+                        if (mAnswers == null) {
+                            mAnswers = new HashMap<>();
+                        }
+                        if (mAnswers.size() >= Constants.NUM_QUALIFYING_QUESTIONS &&
+                                mCurrentQuestionNum <= Constants.NUM_QUALIFYING_QUESTIONS) {
+                            mCurrentQuestionNum = mAnswers.size() + 1;
+                        }
                         displayCurrentQuestion();
                     }
-                });
+                }, true);
             }
-        });
+        }, true);
     }
 
-    private void loadQuestions(final LoadQuestionsCallback callback) {
+    private void loadQuestions(@NonNull final LoadQuestionsCallback callback,  @NonNull Boolean forceUpdate) {
+        if (forceUpdate) {
+            mTriibeRepository.refreshQuestions();
+        }
+        EspressoIdlingResource.increment();
         mTriibeRepository.getQuestions(mSurveyId, new TriibeRepository.GetQuestionsCallback() {
             @Override
             public void onQuestionsLoaded(Map<String, Question> questions) {
+                EspressoIdlingResource.decrement();
                 callback.onQuestionsLoaded(questions);
             }
         });
     }
 
-    public void loadAnswers(final LoadAnswersCallback callback) {
+    public void loadAnswers(@NonNull final LoadAnswersCallback callback,  @NonNull Boolean forceUpdate) {
+        if (forceUpdate) {
+            mTriibeRepository.refreshAnswers();
+        }
+        EspressoIdlingResource.increment();
         mTriibeRepository.getAnswers(mSurveyId, mUserId, new TriibeRepository.GetAnswersCallback() {
             @Override
             public void onAnswersLoaded(Map<String, Answer> answers) {
+                EspressoIdlingResource.decrement();
                 callback.onAnswersLoaded(answers);
             }
         });
@@ -496,7 +518,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 mAnswers = answers;
                 checkAnswerToGoNext();
             }
-        });
+        }, false);
     }
 
     public void checkAnswerToGoNext() {
@@ -590,7 +612,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 mAnswers = answers;
                 checkAnswerToGoPrevious();
             }
-        });
+        }, false);
     }
 
     public void checkAnswerToGoPrevious() {

@@ -52,7 +52,7 @@ public class ViewSurveysPresenterTest {
     private ViewSurveysContract.View mView;
 
     @Captor
-    private ArgumentCaptor<TriibeRepository.GetUserSurveyIdsCallback> mSurveyIdsCallbackCaptor;
+    private ArgumentCaptor<TriibeRepository.GetSurveyIdsCallback> mSurveyIdsCallbackCaptor;
 
     @Captor
     private ArgumentCaptor<TriibeRepository.GetSurveyCallback> mSurveyCallbackCaptor;
@@ -69,11 +69,11 @@ public class ViewSurveysPresenterTest {
     public void loadSurveysFromRepositoryAndLoadIntoView() {
         HashMap<String, SurveyDetails> surveys = new HashMap<>();
 
-        mViewSurveysPresenter.loadSurveys();
+        mViewSurveysPresenter.loadSurveys(anyString(), true);
         verify(mView).setProgressIndicator(true);
 
-        verify(mTriibeRepository).getUserSurveyIds(mSurveyIdsCallbackCaptor.capture());
-        mSurveyIdsCallbackCaptor.getValue().onUserSurveyIdsLoaded(SURVEY_IDS_MAP);
+        verify(mTriibeRepository).getSurveyIds(anyString(), mSurveyIdsCallbackCaptor.capture());
+        mSurveyIdsCallbackCaptor.getValue().onSurveyIdsLoaded(SURVEY_IDS_MAP);
 
         // The presenter should call getSurvey for each surveyId returned in getUserSurveyIds
         verify(mTriibeRepository, times(SURVEY_IDS_MAP.size())).getSurvey(anyString(), mSurveyCallbackCaptor.capture());

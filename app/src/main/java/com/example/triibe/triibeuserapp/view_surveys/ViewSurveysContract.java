@@ -24,7 +24,7 @@ public interface ViewSurveysContract {
 
     interface UserActionsListener {
 
-        void loadSurveys();
+        void loadSurveys(@NonNull String userId, @NonNull Boolean forceUpdate);
 
         void openSurveyQuestions(@NonNull String surveyId);
     }
