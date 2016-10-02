@@ -165,7 +165,7 @@ public class IpService extends Service {
         }else {
             for (Map.Entry<String, Connection> entry : currentConMap.entrySet()) {
                 if (previousConMap.containsKey(entry.getValue().getIpAddrURL())){
-                    // System.out.println("The ip is already in the previous connection map");
+                    // The ip is already in the previous connection map so make no changes.
                     // System.out.println(entry.getValue().getIpAddrURL());
                 }else{
                     // The ip was not found in the previous connection map so we add it in.
