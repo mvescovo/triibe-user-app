@@ -11,12 +11,13 @@ import android.widget.Toast;
 import com.example.triibe.triibeuserapp.trackData.Connection;
 import com.example.triibe.triibeuserapp.trackData.ScreenActive;
 import com.example.triibe.triibeuserapp.trackData.ScreenReceiver;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,6 +29,7 @@ import java.util.TimerTask;
 
 /**
  * Created by Matthew on 2/09/2016.
+ * The Service to track Ip Information and the screen on ans off times.
  */
 public class IpService extends Service {
 
@@ -40,10 +42,14 @@ public class IpService extends Service {
 
     /*********FIREBASE*********/
     private DatabaseReference mDatabase;
+    private FirebaseUser user;
     /**************************/
 
-    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+    DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    DateFormat date = new SimpleDateFormat("dd-MM-yyyy");
+    String currentDate;
     String dateInput;
+
 
     private Map<String, Object> totalConMap = new HashMap<>();
     private Map<String, Connection> currentConMap = new HashMap<>();
@@ -75,9 +81,10 @@ public class IpService extends Service {
         }
         // schedule task
         mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(), 0, CHECK_INTERVAL);
-
+        currentDate = date.format(new Date());
         /*********FIREBASE*********/
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         /**************************/
 
         //screen checking
@@ -97,26 +104,14 @@ public class IpService extends Service {
                 public void run() {
                     netStatCall();
                     compareConnection();
-                    if(!totalConMap.isEmpty()){
-                      /*  System.out.println("----------total connections so far---------");
-                        for (Map.Entry<String, Object> entry : totalConMap.entrySet()) {
-                            System.out.println(entry.getValue().getIpAddrURL());
-                        }
-                        System.out.println("------------------------------------");*/
-                    }
-                    if(!timeMap.isEmpty()){
-                       /* System.out.println("----------total screentime ---------");
-                        for (Map.Entry<String, Object> entry : timeMap.entrySet()) {
-                            if(!(entry.getValue().getStopTime()==null)){
-                                System.out.println(entry.getValue().getStartTime()+" - "+entry.getValue().getStopTime());
-                            }
-                        }
-                        System.out.println("------------------------------------");*/}
                 }
             });
         }
     }
-    //NETSTAT AND CONNECTION TRACKING
+    /**NETSTAT AND CONNECTION TRACKING
+     * Calls the in built linux function Netstat using a command line call which returns network information,
+     * we filter for Established connections and then tokenise the data and save the connections in the hashmaps.
+     * */
     public void netStatCall(){
         Connection tempCon;
         String s;
@@ -130,12 +125,11 @@ public class IpService extends Service {
             BufferedReader br = new BufferedReader(
                     new InputStreamReader(p.getInputStream()));
             while ((s = br.readLine()) != null){
-                // the line contains ESTABLISHED - change this if you want to filter for somthing else.
+                // If the line contains the text "ESTABLISHED" - change this if you want to filter for something else.
                 if( s.contains("ESTABLISHED")){
                     // split the line into tokens
                     tokens = s.split(delims);
                     // print out the foreign address (token 4)
-                    //System.out.println("line: " + s);
                     strOutPut = strOutPut + tokens[0]+ " connection to " + tokens[4] + "\n";
                     Date date = new Date();
                     dateInput = df.format(date);
@@ -145,35 +139,36 @@ public class IpService extends Service {
                 }
             }
             p.waitFor();
-            //System.out.println ("exit: " + p.exitValue());
             p.destroy();
         } catch (Exception e) {
             System.out.println("ERROR");
         }
     }
 
-    //compare the current connection to the previous connections
+    /**
+     * Compare the current connections to the previous connections, removing the connections that are no
+     * longer in the previous connections and adding them to the total connections.
+     *  */
     public void compareConnection(){
-
+        //System.out.println("COMPARE CONNECTION CALLED");
         if (previousConMap.isEmpty()&&currentConMap.isEmpty()){
-           // System.out.println("both hashmaps are empty");
+            // if both th hashmaps are empty simply end the function
             return;
         }
         if (previousConMap.isEmpty()){
             for (Map.Entry<String, Connection> entry : currentConMap.entrySet()) {
                 previousConMap.put(entry.getValue().getIpAddrURL(),currentConMap.get(entry.getValue().getIpAddrURL()));
-              //  System.out.println("First Adding to previous");
-              //  System.out.println(entry.getValue().getIpAddrURL());
+                //  System.out.println("First Adding to previous");
+                //  System.out.println(entry.getValue().getIpAddrURL());
             }
         }else {
             for (Map.Entry<String, Connection> entry : currentConMap.entrySet()) {
                 if (previousConMap.containsKey(entry.getValue().getIpAddrURL())){
-                   // System.out.println("The ip is already in the previous connection map");
-                   // System.out.println(entry.getValue().getIpAddrURL());
+                    // System.out.println("The ip is already in the previous connection map");
+                    // System.out.println(entry.getValue().getIpAddrURL());
                 }else{
+                    // The ip was not found in the previous connection map so we add it in.
                     previousConMap.put(entry.getValue().getIpAddrURL(),currentConMap.get(entry.getValue().getIpAddrURL()));
-                   // System.out.print("Adding to previous: ");
-                   // System.out.println(entry.getValue().getIpAddrURL());
                 }
             }
         }
@@ -190,7 +185,7 @@ public class IpService extends Service {
                 /*********FIREBASE*********/
                 String dataKey = mDatabase.child("data").child("Total Connections").push().getKey();
                 connectionValues = previousConMap.get(entry.getValue().getIpAddrURL()).toMap();
-                totalConMap.put("/data/Total Connections/"+dataKey,connectionValues);
+                totalConMap.put("/data/Total Connections/"+user.getUid()+"/"+currentDate+"/"+dataKey,connectionValues);
                 mDatabase.updateChildren(totalConMap);
                 /**************************/
                 it.remove();
@@ -198,6 +193,11 @@ public class IpService extends Service {
         }
     }
 
+    /**
+     * Runs when the service first starts before the on create.  Here we set up the Broadcast
+     * Reciver to detect when the screen turns on and off as well ass the calls to add that data
+     * to the Server.
+     * */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Let it continue running until it is stopped.
@@ -213,37 +213,40 @@ public class IpService extends Service {
             System.out.println(Active.getStartTime());
         } else {
             System.out.println("SCREEN OFF");
-                Date eDate = new Date();
-                dateInput = df.format(eDate);
-                Active.setStopTime(dateInput);
-                System.out.println(Active.getStopTime());
-                /*********FIREBASE*********/
-                timeVaules = Active.toMap();
-                timeMap.put("/data/Screen Time/"+ timeKey,timeVaules);
-                mDatabase.updateChildren(timeMap);
-                /**************************/
+            Date eDate = new Date();
+            dateInput = df.format(eDate);
+            Active.setStopTime(dateInput);
+            System.out.println(Active.getStopTime());
+            /*********FIREBASE*********/
+            timeVaules = Active.toMap();
+            timeMap.put("/data/Screen Time/"+user.getUid()+"/"+currentDate+"/"+timeKey,timeVaules);
+            mDatabase.updateChildren(timeMap);
+            /**************************/
         }
         Toast.makeText(this, "Tracking Started", Toast.LENGTH_LONG).show();
+        //start sticky means that the service will not be shutdown so easily if there are more memory is being take up by other applications.
         return START_STICKY;
     }
+
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         //Add all Remain connections to the DataBase
         for(Iterator<Map.Entry<String, Connection>> it = previousConMap.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<String, Connection> entry = it.next();
-                //System.out.println("the value: "+ entry.getValue().getIpAddrURL()+"no longer in current removing adding to total");
-                Date date = new Date();
-                dateInput = df.format(date);
-                previousConMap.get(entry.getValue().getIpAddrURL()).setEndConnection(dateInput);
-                /*********FIREBASE*********/
-                String dataKey = mDatabase.child("data").child("Total Connections").push().getKey();
-                connectionValues = previousConMap.get(entry.getValue().getIpAddrURL()).toMap();
-                totalConMap.put("/data/Total Connections/"+dataKey,connectionValues);
-                mDatabase.updateChildren(totalConMap);
-                /**************************/
-                it.remove();
-            }
+            //System.out.println("the value: "+ entry.getValue().getIpAddrURL()+"no longer in current removing adding to total");
+            Date date = new Date();
+            dateInput = df.format(date);
+            previousConMap.get(entry.getValue().getIpAddrURL()).setEndConnection(dateInput);
+            /*********FIREBASE*********/
+            String dataKey = mDatabase.child("data").child("Total Connections").child(user.getUid()).child(currentDate).push().getKey();
+            connectionValues = previousConMap.get(entry.getValue().getIpAddrURL()).toMap();
+            totalConMap.put("/data/Total Connections/"+user.getUid()+"/"+currentDate+"/"+dataKey,connectionValues);
+            // mDatabase.updateChildren(totalConMap);
+            /**************************/
+            //   it.remove();
+        }
 
         unregisterReceiver(mReceiver);
         //stop the timer so that it dosent continue to run even after you kill the service.
