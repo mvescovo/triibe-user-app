@@ -205,7 +205,7 @@ public class IpService extends Service {
         if (!screenOn) {
             System.out.println("SCREEN ON");
             /*********FIREBASE*********/
-            timeKey = mDatabase.child("data").child("Screen Time").push().getKey();
+            timeKey = mDatabase.child("data").child("Screen Time").child(user.getUid()).child(currentDate).push().getKey();
             /**************************/
             Date sDate = new Date();
             dateInput = df.format(sDate);
@@ -243,9 +243,9 @@ public class IpService extends Service {
             String dataKey = mDatabase.child("data").child("Total Connections").child(user.getUid()).child(currentDate).push().getKey();
             connectionValues = previousConMap.get(entry.getValue().getIpAddrURL()).toMap();
             totalConMap.put("/data/Total Connections/"+user.getUid()+"/"+currentDate+"/"+dataKey,connectionValues);
-            // mDatabase.updateChildren(totalConMap);
+             mDatabase.updateChildren(totalConMap);
             /**************************/
-            //   it.remove();
+            it.remove();
         }
 
         unregisterReceiver(mReceiver);
