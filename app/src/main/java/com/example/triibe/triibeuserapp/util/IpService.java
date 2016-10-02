@@ -155,7 +155,6 @@ public class IpService extends Service {
     //compare the current connection to the previous connections
     public void compareConnection(){
 
-        //System.out.println("----------------Compare connection called-------------");
         if (previousConMap.isEmpty()&&currentConMap.isEmpty()){
            // System.out.println("both hashmaps are empty");
             return;
@@ -181,8 +180,7 @@ public class IpService extends Service {
         for(Iterator<Map.Entry<String, Connection>> it = previousConMap.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<String, Connection> entry = it.next();
             if (currentConMap.containsKey(entry.getValue().getIpAddrURL())){
-                //System.out.print("this ip is in the both lists: ");
-                //System.out.println(entry.getValue().getIpAddrURL());
+                //If the Ip Address is in both lists.
                 currentConMap.remove(entry.getValue().getIpAddrURL());
             }else{
                 //System.out.println("the value: "+ entry.getValue().getIpAddrURL()+"no longer in current removing adding to total");
