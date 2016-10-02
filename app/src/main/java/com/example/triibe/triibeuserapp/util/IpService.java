@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Matthew on 2/09/2016.
@@ -186,6 +187,11 @@ public class IpService extends Service {
                 String dataKey = mDatabase.child("data").child("Total Connections").push().getKey();
                 connectionValues = previousConMap.get(entry.getValue().getIpAddrURL()).toMap();
                 totalConMap.put("/data/Total Connections/"+user.getUid()+"/"+currentDate+"/"+dataKey,connectionValues);
+                try {
+                    TimeUnit.MILLISECONDS.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 mDatabase.updateChildren(totalConMap);
                 /**************************/
                 it.remove();
