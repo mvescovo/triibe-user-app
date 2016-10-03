@@ -84,8 +84,9 @@ public class RunAppWhenAtMallService extends Service {
         // I think maybe also put a comment where you add stuff so I can see what it's for in case I accidentally think I'd done it myself and delete it.
 
 
-        // Method to start the service
+        // Method to start the services
         startService(new Intent(getBaseContext(), IpService.class));
+        startService(new Intent(getBaseContext(), UsageStatsService.class));
 
         // Start the service in the foreground
         NotificationCompat.Builder mBuilder =

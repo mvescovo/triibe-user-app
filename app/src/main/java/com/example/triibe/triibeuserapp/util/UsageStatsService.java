@@ -19,6 +19,7 @@ import java.util.TimerTask;
 
 /**
  * Created by Matthew on 2/10/2016.
+ * This service makes calls to App Usage Stats on a longer times than that of the IP Service. L
  */
 
 public class UsageStatsService extends Service{
@@ -65,7 +66,7 @@ public class UsageStatsService extends Service{
                 public void run() {
 
                     //Method Calls Here
-
+                    System.out.println("usage stats service");
                 }
             });
         }
