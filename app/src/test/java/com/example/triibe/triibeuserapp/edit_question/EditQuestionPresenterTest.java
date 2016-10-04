@@ -73,7 +73,7 @@ public class EditQuestionPresenterTest {
         mEditQuestionPresenter.getQuestion("q1");
         verify(mView).setProgressIndicator(true);
 
-        // Callback captured. Pass in stubbed id's
+        // Callback captured. Pass in stubbed question
         verify(mTriibeRepository).getQuestion(anyString(), anyString(), mQuestionCallbackCaptor.capture());
         mQuestionCallbackCaptor.getValue().onQuestionLoaded(QUESITON_DETAILS);
 

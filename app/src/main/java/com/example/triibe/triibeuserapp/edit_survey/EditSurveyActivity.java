@@ -45,6 +45,7 @@ public class EditSurveyActivity extends AppCompatActivity
     private static String STATE_SURVEY_IDS = "com.example.triibe.SURVEY_IDS";
     public static final int REQUEST_EDIT_QUESTION = 1;
     public static final int REQUEST_EDIT_TRIGGER = 2;
+    public static final int RESULT_DELETE = -2;
     EditSurveyContract.UserActionsListener mUserActionsListener;
     BottomSheetBehavior mBottomSheetBehavior;
     private List<String> mSurveyIds;

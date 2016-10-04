@@ -187,6 +187,7 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     }
 
     private void startAddfencesService() {
+        Log.d(TAG, "startAddfencesService: START SERVICE");
         Intent addMallFencesIntent = new Intent(this, AddFencesIntentService.class);
         addMallFencesIntent.putExtra(AddFencesIntentService.EXTRA_TRIIBE_FENCE_TYPE,
                 AddFencesIntentService.TRIIBE_MALL);

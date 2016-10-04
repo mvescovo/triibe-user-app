@@ -90,6 +90,7 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
             Map<String, Object> childUpdates = new HashMap<>();
             childUpdates.put("/surveys/" + surveyId, null);
             childUpdates.put("/surveyIds/" + surveyId, null);
+            // TODO: 4/10/16 delete surveyIds for each user that might be watching it
             mDatabase.updateChildren(childUpdates);
         }
     }
@@ -120,7 +121,7 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
 
     @Override
     public void saveQuestionIds(@NonNull String path, @NonNull Map<String, Boolean> questionIds) {
-        // TODO: 25/09/16  
+        mDatabase.child(path).setValue(questionIds);
     }
 
     @Override
@@ -146,7 +147,7 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
 
     @Override
     public void getQuestion(@NonNull String surveyId, @NonNull String questionId, @NonNull final GetQuestionCallback callback) {
-        ValueEventListener surveyDetailsDataListener = new ValueEventListener() {
+        ValueEventListener questionDetailsDataListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 QuestionDetails questionDetails = dataSnapshot.getValue(QuestionDetails.class);
@@ -155,12 +156,12 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Getting survey details data failed, log a message
-                Log.w(TAG, "loadSurveyDetailsData:onCancelled", databaseError.toException());
+                // Getting question details data failed, log a message
+                Log.w(TAG, "loadQuestionDetailsData:onCancelled", databaseError.toException());
             }
         };
         mDatabase.child("surveys/" + surveyId + "/questions/" + questionId + "/questionDetails")
-                .addListenerForSingleValueEvent(surveyDetailsDataListener);
+                .addListenerForSingleValueEvent(questionDetailsDataListener);
     }
 
     @Override
@@ -174,7 +175,13 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
 
     @Override
     public void deleteQuestion(@NonNull String surveyId, @NonNull String questionId) {
-        // TODO: 25/09/16  
+        if (!surveyId.contentEquals("") && !questionId.contentEquals("")) {
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/surveys/" + surveyId + "/questions/" + questionId, null);
+            childUpdates.put("/surveys/" + surveyId + "/questionIds/" + questionId, null);
+
+            mDatabase.updateChildren(childUpdates);
+        }
     }
 
     
@@ -182,39 +189,177 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
     * Options
     * */
     @Override
-    public void getOptionIds(@NonNull String path, @NonNull GetOptionIdsCallback callback) {
-        // TODO: 25/09/16  
+    public void getOptionIds(@NonNull String path, @NonNull final GetOptionIdsCallback callback) {
+        final ValueEventListener userDataListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<Map<String, Boolean>> t =
+                        new GenericTypeIndicator<Map<String, Boolean>>() {};
+                Map<String, Boolean> allOptionIds = dataSnapshot.getValue(t);
+                callback.onOptionIdsLoaded(allOptionIds);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting user data failed, log a message
+                Log.w(TAG, "loadUserData:onCancelled", databaseError.toException());
+            }
+        };
+        mDatabase.child(path).addListenerForSingleValueEvent(userDataListener);
     }
 
     @Override
     public void saveOptionIds(@NonNull String path, @NonNull Map<String, Boolean> optionIds) {
-        // TODO: 25/09/16  
+        mDatabase.child(path).setValue(optionIds);
     }
 
     @Override
-    public void getOptions(@NonNull String surveyId, @NonNull String questionId, @NonNull GetOptionsCallback callback) {
-        // TODO: 25/09/16  
+    public void getOptions(@NonNull String surveyId, @NonNull String questionId, @NonNull final GetOptionsCallback callback) {
+        ValueEventListener optionListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<Map<String, Option>> t =
+                        new GenericTypeIndicator<Map<String, Option>>() {};
+                Map<String, Option> options = dataSnapshot.getValue(t);
+                callback.onOptionsLoaded(options);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting options failed, log a message
+                Log.w(TAG, "loadOptions:onCancelled", databaseError.toException());
+            }
+        };
+        mDatabase.child("surveys").child(surveyId).child("questions").child(questionId).child("options")
+                .addListenerForSingleValueEvent(optionListener);
     }
 
     @Override
-    public void getOption(@NonNull String surveyId, @NonNull String questionId, @NonNull String optionId, @NonNull GetOptionCallback callback) {
-        // TODO: 25/09/16  
+    public void getOption(@NonNull String surveyId, @NonNull String questionId, @NonNull String optionId, @NonNull final GetOptionCallback callback) {
+        ValueEventListener optionDataListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Option option = dataSnapshot.getValue(Option.class);
+                callback.onOptionLoaded(option);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting option data failed, log a message
+                Log.w(TAG, "loadOptionData:onCancelled", databaseError.toException());
+            }
+        };
+        mDatabase.child("surveys/" + surveyId + "/questions/" + questionId + "/options/" + optionId)
+                .addListenerForSingleValueEvent(optionDataListener);
     }
 
     @Override
     public void saveOption(@NonNull String surveyId, @NonNull String questionId, @NonNull String optionId, @NonNull Option option) {
-        // TODO: 25/09/16  
+        Map<String, Object> optionValues = option.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/surveys/" + surveyId + "/questions/" + questionId + "/options/" + optionId, optionValues);
+        childUpdates.put("/surveys/" + surveyId + "/questions/" + questionId + "/optionIds/" + optionId, true);
+        mDatabase.updateChildren(childUpdates);
     }
 
     @Override
     public void deleteOption(@NonNull String surveyId, @NonNull String questionId, @NonNull String optionId) {
-        // TODO: 25/09/16  
+        if (!surveyId.contentEquals("") && !questionId.contentEquals("") && !optionId.contentEquals("")) {
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/surveys/" + surveyId + "/questions/" + questionId + "/options/" + optionId, null);
+            childUpdates.put("/surveys/" + surveyId + "/questions/" + questionId + "/optionIds/" + optionId, null);
+            mDatabase.updateChildren(childUpdates);
+        }
     }
 
-    
+
     /*
     * Triggers
     * */
+    @Override
+    public void getTriggerIds(@NonNull String path, @NonNull final GetTriggerIdsCallback callback) {
+        final ValueEventListener userDataListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<Map<String, Boolean>> t =
+                        new GenericTypeIndicator<Map<String, Boolean>>() {};
+                Map<String, Boolean> allTriggerIds = dataSnapshot.getValue(t);
+                callback.onTriggerIdsLoaded(allTriggerIds);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting user data failed, log a message
+                Log.w(TAG, "loadUserData:onCancelled", databaseError.toException());
+            }
+        };
+        mDatabase.child(path).addListenerForSingleValueEvent(userDataListener);
+    }
+
+    @Override
+    public void saveTriggerIds(@NonNull String path, @NonNull Map<String, Boolean> triggerIds) {
+        mDatabase.child(path).setValue(triggerIds);
+    }
+
+    @Override
+    public void getTriggers(@NonNull String surveyId, @NonNull final GetTriggersCallback callback) {
+        ValueEventListener triggerListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<Map<String, SurveyTrigger>> t =
+                        new GenericTypeIndicator<Map<String, SurveyTrigger>>() {};
+                Map<String, SurveyTrigger> triggers = dataSnapshot.getValue(t);
+                callback.onTriggersLoaded(triggers);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting triggers failed, log a message
+                Log.w(TAG, "loadTriggers:onCancelled", databaseError.toException());
+            }
+        };
+        mDatabase.child("surveys").child(surveyId).child("triggers")
+                .addListenerForSingleValueEvent(triggerListener);
+    }
+
+    @Override
+    public void getTrigger(@NonNull String surveyId, @NonNull String triggerId, @NonNull final GetTriggerCallback callback) {
+        ValueEventListener triggerDataListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                SurveyTrigger trigger = dataSnapshot.getValue(SurveyTrigger.class);
+                callback.onTriggerLoaded(trigger);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting trigger data failed, log a message
+                Log.w(TAG, "loadTriggerData:onCancelled", databaseError.toException());
+            }
+        };
+        mDatabase.child("surveys/" + surveyId + "/triggers/" + triggerId)
+                .addListenerForSingleValueEvent(triggerDataListener);
+    }
+
+    @Override
+    public void saveTrigger(@NonNull String surveyId, @NonNull String triggerId, @NonNull SurveyTrigger trigger) {
+        Map<String, Object> triggerValues = trigger.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/surveys/" + surveyId + "/triggers/" + triggerId, triggerValues);
+        childUpdates.put("triggerIds/" + triggerId, true);
+        mDatabase.updateChildren(childUpdates);
+    }
+
+    @Override
+    public void deleteTrigger(@NonNull String surveyId, @NonNull String triggerId) {
+        if (!surveyId.contentEquals("") && !triggerId.contentEquals("")) {
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/surveys/" + surveyId + "/triggers/" + triggerId, null);
+            childUpdates.put("triggerIds/" + triggerId, null);
+
+            mDatabase.updateChildren(childUpdates);
+        }
+    }
     
     
     /*

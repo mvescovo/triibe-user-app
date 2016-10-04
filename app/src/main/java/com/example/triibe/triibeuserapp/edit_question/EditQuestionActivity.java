@@ -21,13 +21,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.QuestionDetails;
 import com.example.triibe.triibeuserapp.edit_option.EditOptionActivity;
+import com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 import com.example.triibe.triibeuserapp.util.Globals;
 
@@ -44,6 +44,7 @@ public class EditQuestionActivity extends AppCompatActivity
 //    public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
     public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
     private static final int REQUEST_EDIT_OPTION = 1;
+    public static final int RESULT_DELETE = -2;
     EditQuestionContract.UserActionsListener mUserActionsListener;
     private String mSurveyId;
     BottomSheetBehavior mBottomSheetBehavior;
@@ -57,9 +58,6 @@ public class EditQuestionActivity extends AppCompatActivity
 
     @BindView(R.id.edit_option_button_layout)
     LinearLayout mEditOptionButtonLayout;
-
-    @BindView(R.id.TEST_BUTTON)
-    Button mTestButton;
 
     @BindView(R.id.question_id)
     AppCompatAutoCompleteTextView mQuestionId;
@@ -98,13 +96,6 @@ public class EditQuestionActivity extends AppCompatActivity
         } else {
             Log.d(TAG, "onCreate: NO SURVEY ID");
         }
-
-        mTestButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mUserActionsListener.editOption();
-            }
-        });
 
         mEditOptionButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -247,6 +238,10 @@ public class EditQuestionActivity extends AppCompatActivity
                 if (validate()) {
                     showEditSurvey(Activity.RESULT_OK);
                 }
+                return true;
+            case R.id.delete_question:
+                mUserActionsListener.deleteQuestion(mQuestionId.getText().toString().trim());
+                showEditSurvey(EditSurveyActivity.RESULT_DELETE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

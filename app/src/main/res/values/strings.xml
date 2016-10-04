@@ -44,6 +44,7 @@
     <string name="edit_image_url_hint">Image url</string>
     <string name="edit_question_bottom_sheet_title">Add</string>
     <string name="edit_question_add_option">Option</string>
+    <string name="delete_question">Delete question</string>
 
     <!--EditOptionActivity-->
     <string name="title_activity_edit_option">Edit Option</string>
@@ -53,6 +54,7 @@
     <string name="edit_option_phrase_hint">Phrase</string>
     <string name="edit_option_extra_input_type_hint">Extra input type</string>
     <string name="edit_option_extra_input_hint_hint">Extra input hint</string>
+    <string name="delete_option">Delete option</string>
 
     <!--EditLocationActivity-->
     <string name="title_activity_edit_location">Edit Location</string>
@@ -71,6 +73,8 @@
     <string name="edit_trigger_lon_hint">Longitude</string>
     <string name="edit_trigger_level_hint">Level</string>
     <string name="edit_trigger_time_hint">Time</string>
+    <string name="delete_trigger">Delete trigger</string>
+
 
     <!--TrackDataActivity-->
     <string name="title_activity_track_data">Track data</string>

@@ -2,34 +2,52 @@ package com.example.triibe.triibeuserapp.edit_option;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TextInputEditText;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 
 import com.example.triibe.triibeuserapp.R;
+import com.example.triibe.triibeuserapp.data.Option;
+import com.example.triibe.triibeuserapp.edit_question.EditQuestionActivity;
+import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
+import com.example.triibe.triibeuserapp.util.Globals;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class EditOptionActivity extends AppCompatActivity implements EditOptionContract.View {
+public class EditOptionActivity extends AppCompatActivity
+        implements EditOptionContract.View, TextWatcher {
 
+    private static final String TAG = "EditOptionActivity";
     public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
     public final static String EXTRA_QUESTION_ID = "com.example.triibe.QUESTION_ID";
     EditOptionContract.UserActionsListener mUserActionsListener;
     private String mSurveyId;
     private String mQuestionId;
+    private List<String> mOptionIds;
+
 
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
 
     @BindView(R.id.option_id)
-    TextInputEditText mOptionId;
+    AppCompatAutoCompleteTextView mOptionId;
 
     @BindView(R.id.option_phrase)
     TextInputEditText mOptionPhrase;
@@ -51,7 +69,10 @@ public class EditOptionActivity extends AppCompatActivity implements EditOptionC
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mUserActionsListener = new EditOptionPresenter(this);
+        mUserActionsListener = new EditOptionPresenter(
+                Globals.getInstance().getTriibeRepository(),
+                this
+        );
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -64,6 +85,15 @@ public class EditOptionActivity extends AppCompatActivity implements EditOptionC
         if (getIntent().getStringExtra(EXTRA_QUESTION_ID) != null) {
             mQuestionId = getIntent().getStringExtra(EXTRA_QUESTION_ID);
         }
+
+        mOptionIds = new ArrayList<>();
+        mOptionId.addTextChangedListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mUserActionsListener.getOptionIds(mSurveyId, mQuestionId, true);
     }
 
     @Override
@@ -76,18 +106,52 @@ public class EditOptionActivity extends AppCompatActivity implements EditOptionC
     }
 
     @Override
-    public void showEditQuestion() {
-        setResult(Activity.RESULT_OK);
+    public void addOptionIdsToAutoComplete(List<String> optionIds) {
+        mOptionIds = optionIds;
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                mOptionIds
+        );
+
+        mOptionId.setAdapter(adapter);
+    }
+
+    @Override
+    public void showOption(Option option) {
+        mOptionPhrase.setText(option.getPhrase());
+        if (option.getHasExtraInput()) {
+            mExtraInputType.setText(option.getExtraInputType());
+            mOptionExtraInputHint.setText(option.getExtraInputHint());
+        }
+    }
+
+    @Override
+    public void showEditQuestion(@NonNull Integer resultCode) {
+        setResult(resultCode);
         finish();
     }
 
     private boolean validate() {
-
         if (mOptionPhrase.getText().toString().trim().contentEquals("")) {
             mOptionPhrase.setError("Phrase must not be empty"); // TODO: 18/09/16 set in strings
             mOptionPhrase.requestFocus();
             return false;
         }
+
+        Option option;
+        if (!mExtraInputType.getText().toString().trim().contentEquals("")
+                && !mOptionExtraInputHint.getText().toString().trim().contentEquals("")) {
+            option = new Option(mSurveyId, mQuestionId, mOptionId.getText().toString().trim(),
+                    mOptionPhrase.getText().toString().trim(), true);
+            option.setExtraInputType(mExtraInputType.getText().toString().trim());
+            option.setExtraInputHint(mOptionExtraInputHint.getText().toString().trim());
+        } else {
+            option = new Option(mSurveyId, mQuestionId, mOptionId.getText().toString().trim(),
+                    mOptionPhrase.getText().toString().trim(), false);
+        }
+        mUserActionsListener.saveOption(option);
 
         return true;
     }
@@ -104,15 +168,39 @@ public class EditOptionActivity extends AppCompatActivity implements EditOptionC
         switch (item.getItemId()) {
             case R.id.done:
                 if (validate()) {
-                    mUserActionsListener.editOption(mSurveyId, mQuestionId,
-                            mOptionId.getText().toString().trim(),
-                            mOptionPhrase.getText().toString().trim(),
-                            "false", mExtraInputType.getText().toString().trim(), // TODO: 18/09/16 set in strings
-                            mOptionExtraInputHint.getText().toString().trim());
+                    showEditQuestion(Activity.RESULT_OK);
                 }
+                return true;
+            case R.id.delete_option:
+                mUserActionsListener.deleteOption(mOptionId.getText().toString().trim());
+                showEditQuestion(EditQuestionActivity.RESULT_DELETE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        for (int i = 0; i < mOptionIds.size(); i++) {
+            if (s.toString().contentEquals(mOptionIds.get(i))) {
+                mUserActionsListener.getOption(mOptionIds.get(i));
+            }
+        }
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+    }
+
+    @VisibleForTesting
+    public IdlingResource getCountingIdlingResource() {
+        return EspressoIdlingResource.getIdlingResource();
     }
 }

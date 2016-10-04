@@ -55,7 +55,17 @@ public interface TriibeServiceApi {
     }
 
     // Triggers
+    interface GetTriggerIdsCallback {
+        void onTriggerIdsLoaded(@Nullable Map<String, Boolean> triggerIds);
+    }
 
+    interface GetTriggersCallback {
+        void onTriggersLoaded(@Nullable Map<String, SurveyTrigger> triggers);
+    }
+
+    interface GetTriggerCallback {
+        void onTriggerLoaded(@Nullable SurveyTrigger trigger);
+    }
 
     // Answers
     interface GetAnswersCallback {
@@ -105,6 +115,17 @@ public interface TriibeServiceApi {
     void deleteOption(@NonNull String surveyId, @NonNull String questionId, @NonNull String optionId);
 
     // Triggers
+    void getTriggerIds(@NonNull String path, @NonNull GetTriggerIdsCallback callback);
+
+    void saveTriggerIds(@NonNull String path, @NonNull Map<String, Boolean> triggerIds);
+
+    void getTriggers(@NonNull String surveyId, @NonNull GetTriggersCallback callback);
+
+    void getTrigger(@NonNull String surveyId, @NonNull String triggerId, @NonNull GetTriggerCallback callback);
+
+    void saveTrigger(@NonNull String surveyId, @NonNull String triggerId, @NonNull SurveyTrigger trigger);
+
+    void deleteTrigger(@NonNull String surveyId, @NonNull String triggerId);
 
     // Answers
     void getAnswers(@NonNull String surveyId, @NonNull String userId, @NonNull GetAnswersCallback callback);
