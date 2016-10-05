@@ -14,7 +14,9 @@
 
 package com.example.triibe.triibeuserapp.util;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
 import android.support.annotation.StringRes;
@@ -114,7 +116,15 @@ public class AuthUiActivity extends AppCompatActivity {
         if (mAuth.getCurrentUser() != null) {
             User user = new User(mAuth.getCurrentUser().getUid());
             mUserId = user.getId();
-            Globals.getInstance().setUser(user);
+
+            // Set userId in preferences so the services can access it.
+            SharedPreferences sharedPref = getSharedPreferences(
+                    getString(R.string.user_id),
+                    Context.MODE_PRIVATE
+            );
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(getString(R.string.user_id), mUserId);
+            editor.apply();
         }
     }
 }

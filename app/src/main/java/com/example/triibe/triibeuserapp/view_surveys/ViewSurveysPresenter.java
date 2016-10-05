@@ -41,7 +41,7 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                         if (userSurveyIds != null) {
                             Object[] surveyIds = userSurveyIds.keySet().toArray();
                             surveys.clear();
-                            for (int i = 0; i < userSurveyIds.size(); i++) {
+                            for (int i = 0; i < surveyIds.length; i++) {
                                 final int position = i;
                                 EspressoIdlingResource.increment();
                                 mTriibeRepository.getSurvey(surveyIds[i].toString(),

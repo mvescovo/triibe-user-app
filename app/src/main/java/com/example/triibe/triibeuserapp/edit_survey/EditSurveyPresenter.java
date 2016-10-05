@@ -77,7 +77,7 @@ public class EditSurveyPresenter implements EditSurveyContract.UserActionsListen
         mView.setProgressIndicator(true);
 
         SurveyDetails surveyDetails = new SurveyDetails(surveyId, version, description,
-                timeTillExpiry, points);
+                timeTillExpiry, points, true);
 
         mTriibeRepository.saveSurvey(surveyId, surveyDetails);
 

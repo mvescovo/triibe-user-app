@@ -55,7 +55,7 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
     }
 
     @Override
-    public void getSurvey(@NonNull String surveyId, @NonNull final GetSurveyCallback callback) {
+    public void getSurvey(@NonNull final String surveyId, @NonNull final GetSurveyCallback callback) {
         ValueEventListener surveyDetailsDataListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -318,7 +318,7 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
                 Log.w(TAG, "loadTriggers:onCancelled", databaseError.toException());
             }
         };
-        mDatabase.child("surveys").child(surveyId).child("triggers")
+        mDatabase.child("/surveys/" + surveyId + "/triggers/")
                 .addListenerForSingleValueEvent(triggerListener);
     }
 
@@ -346,7 +346,7 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
         Map<String, Object> triggerValues = trigger.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/surveys/" + surveyId + "/triggers/" + triggerId, triggerValues);
-        childUpdates.put("triggerIds/" + triggerId, true);
+        childUpdates.put("/surveys/" + surveyId + "/triggerIds/" + triggerId, true);
         mDatabase.updateChildren(childUpdates);
     }
 
@@ -355,7 +355,7 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
         if (!surveyId.contentEquals("") && !triggerId.contentEquals("")) {
             Map<String, Object> childUpdates = new HashMap<>();
             childUpdates.put("/surveys/" + surveyId + "/triggers/" + triggerId, null);
-            childUpdates.put("triggerIds/" + triggerId, null);
+            childUpdates.put("/surveys/" + surveyId + "/triggerIds/" + triggerId, null);
 
             mDatabase.updateChildren(childUpdates);
         }

@@ -189,17 +189,11 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     private void startAddfencesService() {
         Log.d(TAG, "startAddfencesService: START SERVICE");
         Intent addMallFencesIntent = new Intent(this, AddFencesIntentService.class);
-        addMallFencesIntent.putExtra(AddFencesIntentService.EXTRA_TRIIBE_FENCE_TYPE,
-                AddFencesIntentService.TRIIBE_MALL);
+        addMallFencesIntent.putExtra(
+                AddFencesIntentService.EXTRA_TRIIBE_FENCE_TYPE,
+                AddFencesIntentService.TYPE_MALL
+        );
         startService(addMallFencesIntent);
-
-
-        // This was just for testing. Real landmark fences are added when the app service starts
-        // after it listens for available fences to add, then ideally filters on them before adding
-
-//        Intent addLandmarkFencesIntent = new Intent(this, AddFencesIntentService.class);
-//        addLandmarkFencesIntent.putExtra("type", "landmark");
-//        startService(addLandmarkFencesIntent);
     }
 
     @Override

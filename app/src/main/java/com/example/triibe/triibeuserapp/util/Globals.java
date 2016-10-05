@@ -3,8 +3,10 @@ package com.example.triibe.triibeuserapp.util;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.data.TriibeRepositoryImpl;
 import com.example.triibe.triibeuserapp.data.TriibeServiceApiImpl;
-import com.example.triibe.triibeuserapp.data.User;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Singleton for storing global variables.
@@ -16,7 +18,7 @@ public class Globals {
     private volatile static Globals sUniqueInstance;
     private static TriibeRepository sTriibeRepository;
     private static boolean sFirebasePersistenceSet;
-    private static volatile User sUser;
+    private static List<String> sLandmarkFences = new ArrayList<>();
 //    public static GoogleMap mMap;
 
     private Globals() {}
@@ -48,11 +50,15 @@ public class Globals {
         this.sFirebasePersistenceSet = true;
     }
 
-    public User getUser() {
-        return sUser;
+    public List<String> getLandmarkFences() {
+        return sLandmarkFences;
     }
 
-    public void setUser(User user) {
-        sUser = user;
+    public void addLandmarkFence(String fenceKey) {
+        sLandmarkFences.add(fenceKey);
+    }
+
+    public void removeLandmarkFence(String fenceKey) {
+        sLandmarkFences.remove(fenceKey);
     }
 }

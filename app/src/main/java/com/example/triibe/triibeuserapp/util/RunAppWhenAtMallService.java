@@ -9,12 +9,21 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 import com.example.triibe.triibeuserapp.R;
+import com.example.triibe.triibeuserapp.data.SurveyDetails;
+import com.example.triibe.triibeuserapp.data.SurveyTrigger;
+import com.example.triibe.triibeuserapp.data.TriibeRepository;
+import com.example.triibe.triibeuserapp.data.TriibeRepositoryImpl;
+import com.example.triibe.triibeuserapp.data.TriibeServiceApiImpl;
+import com.example.triibe.triibeuserapp.track_location.AddFencesIntentService;
 import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
+
+import java.util.Map;
 
 /**
  * @author michael.
@@ -23,9 +32,12 @@ public class RunAppWhenAtMallService extends Service {
 
     private static final String TAG = "RunAppWhenAtMallService";
     private static final int STOP_SERVICE_REQUEST = 9999;
+    public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private PendingIntent mStopTrackingPendingIntent;
+    private TriibeRepository mTriibeRepository;
+    private String mUserId;
 
     @Override
     public void onCreate() {
@@ -43,34 +55,26 @@ public class RunAppWhenAtMallService extends Service {
 
         Intent stopAppServiceIntent = new Intent(this, StopTrackingIntentService.class);
         mStopTrackingPendingIntent = PendingIntent.getService(this, STOP_SERVICE_REQUEST, stopAppServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+//        mTriibeRepository = Globals.getInstance().getTriibeRepository();
+        mTriibeRepository = new TriibeRepositoryImpl(new TriibeServiceApiImpl());
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand: app service starting");
 
+        if (intent.getStringExtra(EXTRA_USER_ID) != null) {
+            mUserId = intent.getStringExtra(EXTRA_USER_ID);
+        } else {
+            mUserId = "TestUserId";
+        }
+
         // For each start request, send a message to start a job and deliver the
         // start ID so we know which request we're stopping when we finish the job
         Message msg = mServiceHandler.obtainMessage();
         msg.arg1 = startId;
         mServiceHandler.sendMessage(msg);
-
-
-        // The code directly above is just an example straight from the android docs. Just change as required.
-
-        // TODO: Matt to add data tracking tasks here. Do any required setup on oncreate and tear down in ondestroy.
-        // You shouldn't need to touch anything else hopefully - which is a good thing as it's a bit of a mess currently.
-        // I'll clean it up over time but this should get you running for now.
-
-        // So this method will run when the user is within 1000 meters of the mall. See the constants file for the locations that trigger this
-        // and add any you need for testing. Let me know if you have any questions.
-
-        // Stick your classes in the trackData package and any utilities in the util package. Add constants to the Constants file.
-        // Add global variables to Globals. If you need permissions added let me know and I can stick them in at the same time it asks for location permission.
-        // I'm going to change the class where they're currently set so it's better not to do it yourself otherwise there'll be merge conflicts. Just tell me which permissions you need.
-
-        // I think maybe also put a comment where you add stuff so I can see what it's for in case I accidentally think I'd done it myself and delete it.
-
 
         // Start the service in the foreground
         NotificationCompat.Builder mBuilder =
@@ -80,14 +84,96 @@ public class RunAppWhenAtMallService extends Service {
                         .setContentText("Tracking data")
                         .addAction(R.drawable.ic_stop_black_24dp, "Stop", mStopTrackingPendingIntent);
         Intent resultIntent = new Intent(this, AuthUiActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        final TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(ViewSurveysActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
         startForeground(Constants.APP_SERVICE_RUNNING_ID, mBuilder.build());
+
+        // Get all surveyIds so we can get triggers for active surveys.
+        final String path = "/surveyIds";
+        mTriibeRepository.refreshSurveyIds();
+
+        EspressoIdlingResource.increment();
+        mTriibeRepository.getSurveyIds(path, new TriibeRepository.GetSurveyIdsCallback() {
+            @Override
+            public void onSurveyIdsLoaded(@Nullable final Map<String, Boolean> surveyIds) {
+                EspressoIdlingResource.decrement();
+                if (surveyIds != null) {
+                    Object[] surveyIdsKeys = surveyIds.keySet().toArray();
+
+                    // Get each surveyDetails.
+                    for (int i = 0; i < surveyIds.size(); i++) {
+                        EspressoIdlingResource.increment();
+                        mTriibeRepository.getSurvey(surveyIdsKeys[i].toString(),
+                                new TriibeRepository.GetSurveyCallback() {
+                                    @Override
+                                    public void onSurveyLoaded(SurveyDetails survey) {
+                                        EspressoIdlingResource.decrement();
+                                        if (survey != null) {
+                                            if (survey.getActive()) {
+                                                // Only get triggers for active surveys.
+                                                getSurveyTriggers(survey.getId());
+                                            }
+                                        }
+                                    }
+                                });
+                    }
+                }
+            }
+        });
+
+        /*
+        * Matt's services
+        * */
+//        startService(new Intent(getBaseContext(), IpService.class));
+//        startService(new Intent(getBaseContext(), UsageStatsService.class));
+
         return START_STICKY;
+    }
+
+    private void getSurveyTriggers(final String surveyId) {
+        EspressoIdlingResource.increment();
+        mTriibeRepository.getTriggers(surveyId, new TriibeRepository.GetTriggersCallback() {
+            @Override
+            public void onTriggersLoaded(@Nullable Map<String, SurveyTrigger> triggers) {
+                EspressoIdlingResource.decrement();
+                if (triggers != null) {
+                    for (String triggerId : triggers.keySet()) {
+                        // Immediately add a fence for this trigger.
+                        addFence(triggers.get(triggerId));
+                    }
+                }
+            }
+        });
+    }
+
+    private void addFence(SurveyTrigger trigger) {
+        // Add a location fence
+        if (trigger.getLatitude() != null && trigger.getLongitude() != null) {
+            Intent addLocationFencesIntent = new Intent(this, AddFencesIntentService.class);
+            addLocationFencesIntent.putExtra(
+                    AddFencesIntentService.EXTRA_TRIIBE_FENCE_TYPE,
+                    AddFencesIntentService.TYPE_LANDMARK
+            );
+            addLocationFencesIntent.putExtra(
+                    AddFencesIntentService.EXTRA_FENCE_KEY,
+                    trigger.getSurveyId() + trigger.getId()
+            );
+            addLocationFencesIntent.putExtra(
+                    AddFencesIntentService.EXTRA_LATITUDE,
+                    trigger.getLatitude()
+            );
+            addLocationFencesIntent.putExtra(
+                    AddFencesIntentService.EXTRA_LONGITUDE,
+                    trigger.getLongitude()
+            );
+            startService(addLocationFencesIntent);
+        }
+
+        // Add time fence
     }
 
     @Override
@@ -108,7 +194,6 @@ public class RunAppWhenAtMallService extends Service {
 
         @Override
         public void handleMessage(Message msg) {
-            // TODO: Matt to handle messages here
             Log.d(TAG, "handleMessage: test data tracking task (print to console)");
         }
     }

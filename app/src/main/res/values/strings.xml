@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">TRIIBE User</string>
+    
+    <!--Preferences-->
+    <string name="user_id">com.example.triibe.triibeuserapp.USER_ID</string>
 
     <!--Boot detection receiver-->
     <string name="foreground_service_started">Foreground service started</string>
@@ -74,8 +77,7 @@
     <string name="edit_trigger_level_hint">Level</string>
     <string name="edit_trigger_time_hint">Time</string>
     <string name="delete_trigger">Delete trigger</string>
-
-
+    
     <!--TrackDataActivity-->
     <string name="title_activity_track_data">Track data</string>
     <string name="sign_out">Sign out</string>

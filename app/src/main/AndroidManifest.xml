@@ -49,14 +49,6 @@
             android:name=".trackData.TrackDataActivity"
             android:label="@string/title_activity_track_data"/>
         <activity
-            android:name=".takeSurvey.TakeSurveyActivity"
-            android:label="@string/title_activity_take_survey"
-            android:parentActivityName=".view_surveys.ViewSurveysActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
-        </activity>
-        <activity
             android:name=".view_surveys.ViewSurveysActivity"
             android:label="@string/title_activity_view_surveys"
             android:theme="@style/AppTheme.NoActionBar">
@@ -113,6 +105,10 @@
         </service>
         <service
             android:name=".track_location.AddFencesIntentService"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".track_location.RemoveFenceIntentService"
             android:exported="false">
         </service>
         <service
@@ -234,6 +230,15 @@
         <!-- <category android:name="android.intent.category.LAUNCHER"/> -->
         <!-- </intent-filter> -->
         <!-- </activity> -->
+
+        <!--<activity-->
+            <!--android:name=".takeSurvey.TakeSurveyActivity"-->
+            <!--android:label="@string/title_activity_take_survey"-->
+            <!--android:parentActivityName=".view_surveys.ViewSurveysActivity">-->
+            <!--<meta-data-->
+                <!--android:name="android.support.PARENT_ACTIVITY"-->
+                <!--android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>-->
+        <!--</activity>-->
         <activity android:name=".edit_survey.TestActivity">
         </activity>
     </application>

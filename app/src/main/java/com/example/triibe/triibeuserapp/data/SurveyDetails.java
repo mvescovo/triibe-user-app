@@ -16,17 +16,19 @@ public class SurveyDetails implements Serializable {
     private String mDescription;
     private String mDurationTillExpiry;
     private String mPoints;
+    private boolean mActive;
 
     // Empty constructor required for firebase
     public SurveyDetails() {}
 
     public SurveyDetails(String id, String version, String description, String durationTillExpiry,
-                         String points) {
+                         String points, boolean active) {
         mId = id;
         mVersion = version;
         mDescription = description;
         mDurationTillExpiry = durationTillExpiry;
         mPoints = points;
+        mActive = active;
     }
 
     /*
@@ -75,6 +77,14 @@ public class SurveyDetails implements Serializable {
         mPoints = points;
     }
 
+    public boolean getActive() {
+        return mActive;
+    }
+
+    public void setActive(boolean active) {
+        mActive = active;
+    }
+
     // For firebase map
     @Exclude
     public Map<String, Object> toMap() {
@@ -84,6 +94,7 @@ public class SurveyDetails implements Serializable {
         result.put("description", mDescription);
         result.put("durationTillExpiry", mDurationTillExpiry);
         result.put("points", mPoints);
+        result.put("active", mActive);
 
         return result;
     }

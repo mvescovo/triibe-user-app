@@ -33,7 +33,7 @@ public class EditTriggerPresenter implements EditTriggerContract.UserActionsList
 
         mView.setProgressIndicator(true);
 
-        final String path = "triggerIds";
+        final String path = "surveys/" + surveyId + "/triggerIds";
         if (forceUpdate) {
             mTriibeRepository.refreshTriggerIds();
         }

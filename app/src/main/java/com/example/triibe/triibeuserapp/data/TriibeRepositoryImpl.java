@@ -14,14 +14,14 @@ import java.util.Map;
 public class TriibeRepositoryImpl implements TriibeRepository {
 
     private final TriibeServiceApi mTriibeServiceApi;
-    Map<String, Boolean> mCachedSurveyIds;
-    Map<String, Boolean> mCachedQuestionIds;
-    Map<String, Question> mCachedQuestions;
-    Map<String, Boolean> mCachedOptionIds;
-    Map<String, Option> mCachedOptions;
-    Map<String, Boolean> mCachedTriggerIds;
-    Map<String, SurveyTrigger> mCachedTriggers;
-    Map<String, Answer> mCachedAnswers;
+    private Map<String, Boolean> mCachedSurveyIds;
+    private Map<String, Boolean> mCachedQuestionIds;
+    private Map<String, Question> mCachedQuestions;
+    private Map<String, Boolean> mCachedOptionIds;
+    private Map<String, Option> mCachedOptions;
+    private Map<String, Boolean> mCachedTriggerIds;
+    private Map<String, SurveyTrigger> mCachedTriggers;
+    private Map<String, Answer> mCachedAnswers;
 
     public TriibeRepositoryImpl(@NonNull TriibeServiceApi triibeServiceApi) {
         mTriibeServiceApi = triibeServiceApi;
