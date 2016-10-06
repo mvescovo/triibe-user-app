@@ -55,7 +55,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 if (mQuestions == null) {
                     mQuestions = new HashMap<>();
                 }
-                Log.d(TAG, "onQuestionsLoaded: questions size: " + mQuestions.size());
                 loadAnswers(new LoadAnswersCallback() {
                     @Override
                     public void onAnswersLoaded(Map<String, Answer> answers) {
@@ -110,90 +109,90 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
         * Display question details
         * */
         Question question = mQuestions.get("q" + mCurrentQuestionNum);
-        QuestionDetails questionDetails = question.getQuestionDetails();
+        if (question != null) {
+            QuestionDetails questionDetails = question.getQuestionDetails();
+            String imageUrl = questionDetails.getImageUrl();
+            if (imageUrl != null && !imageUrl.contentEquals("")) {
+                mView.showImage(imageUrl);
+            } else {
+                mView.hideImage();
+            }
 
-        String imageUrl = questionDetails.getImageUrl();
-        if (imageUrl != null && !imageUrl.contentEquals("")) {
-            mView.showImage(imageUrl);
-        } else {
-            mView.hideImage();
-        }
+            String title = questionDetails.getTitle();
+            if (title != null && !title.contentEquals("")) {
+                mView.showTitle(title);
+            } else {
+                mView.hideTitle();
+            }
 
-        String title = questionDetails.getTitle();
-        if (title != null && !title.contentEquals("")) {
-            mView.showTitle(title);
-        } else {
-            mView.hideTitle();
-        }
+            String intro = questionDetails.getIntro();
+            String introLinkKey = questionDetails.getIntroLinkKey();
+            String introLinkUrl = questionDetails.getIntroLinkUrl();
+            if (intro != null && !intro.contentEquals("")) {
+                mView.showIntro(intro, introLinkKey, introLinkUrl);
+            } else {
+                mView.hideIntro();
+            }
 
-        String intro = questionDetails.getIntro();
-        String introLinkKey = questionDetails.getIntroLinkKey();
-        String introLinkUrl = questionDetails.getIntroLinkUrl();
-        if (intro != null && !intro.contentEquals("")) {
-            mView.showIntro(intro, introLinkKey, introLinkUrl);
-        } else {
-            mView.hideIntro();
-        }
-
-        String phrase = questionDetails.getPhrase();
-        if (phrase != null && !phrase.contentEquals("")) {
-            mView.showPhrase(phrase);
-        } else {
-            mView.hidePhrase();
-        }
+            String phrase = questionDetails.getPhrase();
+            if (phrase != null && !phrase.contentEquals("")) {
+                mView.showPhrase(phrase);
+            } else {
+                mView.hidePhrase();
+            }
 
         /*
         * Display question options
         * */
-        Map<String, Option> options = question.getOptions();
-        String type = questionDetails.getType();
-        if (type == null) {
-            Log.d(TAG, "displayCurrentQuestion: NO TYPE");
-            return;
-        }
+            Map<String, Option> options = question.getOptions();
+            String type = questionDetails.getType();
+            if (type == null) {
+                Log.d(TAG, "displayCurrentQuestion: NO TYPE");
+                return;
+            }
 
-        switch (type) {
-            case "radio":
-                mView.showRadioButtonGroup();
-                for (int i = 1; i <= options.size(); i++) {
-                    Option option = options.get("o" + i);
-                    String optionPhrase = option.getPhrase();
-                    String extraInputHint = option.getExtraInputHint();
-                    String extraInputType = option.getExtraInputType();
-                    if (optionPhrase == null) {
-                        Log.d(TAG, "displayCurrentQuestion: NO OPTION PHRASE");
-                    } else {
-                        mView.showRadioButtonItem(optionPhrase, extraInputHint, extraInputType);
+            switch (type) {
+                case "radio":
+                    mView.showRadioButtonGroup();
+                    for (int i = 1; i <= options.size(); i++) {
+                        Option option = options.get("o" + i);
+                        String optionPhrase = option.getPhrase();
+                        String extraInputHint = option.getExtraInputHint();
+                        String extraInputType = option.getExtraInputType();
+                        if (optionPhrase == null) {
+                            Log.d(TAG, "displayCurrentQuestion: NO OPTION PHRASE");
+                        } else {
+                            mView.showRadioButtonItem(optionPhrase, extraInputHint, extraInputType);
+                        }
                     }
-                }
-                break;
-            case "checkbox":
-                mView.showCheckboxGroup();
-                for (int i = 1; i <= options.size(); i++) {
-                    Option option = options.get("o" + i);
-                    String optionPhrase = option.getPhrase();
-                    String extraInputHint = option.getExtraInputHint();
-                    String extraInputType = option.getExtraInputType();
-                    if (optionPhrase == null) {
-                        Log.d(TAG, "displayCurrentQuestion: NO OPTIONS PHRASE");
-                    } else {
-                        mView.showCheckboxItem(optionPhrase, extraInputHint, extraInputType, options.size());
+                    break;
+                case "checkbox":
+                    mView.showCheckboxGroup();
+                    for (int i = 1; i <= options.size(); i++) {
+                        Option option = options.get("o" + i);
+                        String optionPhrase = option.getPhrase();
+                        String extraInputHint = option.getExtraInputHint();
+                        String extraInputType = option.getExtraInputType();
+                        if (optionPhrase == null) {
+                            Log.d(TAG, "displayCurrentQuestion: NO OPTIONS PHRASE");
+                        } else {
+                            mView.showCheckboxItem(optionPhrase, extraInputHint, extraInputType, options.size());
+                        }
                     }
-                }
-                break;
-            case "text":
-                mView.showTextboxGroup();
-                for (int i = 1; i <= options.size(); i++) {
-                    Option option = options.get("o" + i);
-                    String optionPhrase = option.getPhrase();
+                    break;
+                case "text":
+                    mView.showTextboxGroup();
+                    for (int i = 1; i <= options.size(); i++) {
+                        Option option = options.get("o" + i);
+                        String optionPhrase = option.getPhrase();
 //                    String extraInputType = option.getExtraInputType(); // TODO: 19/09/16 set this for all question options in firebase
-                    String extraInputType = "text";
-                    if (optionPhrase == null) {
-                        Log.d(TAG, "displayCurrentQuestion: NO OPTIONS PHRASE");
-                    } else {
-                        mView.showTextboxItem(optionPhrase, extraInputType);
+                        String extraInputType = "text";
+                        if (optionPhrase == null) {
+                            Log.d(TAG, "displayCurrentQuestion: NO OPTIONS PHRASE");
+                        } else {
+                            mView.showTextboxItem(optionPhrase, extraInputType);
+                        }
                     }
-                }
 //                mEditTextGroup.removeAllViews();
 //                mEditTextGroup.setVisibility(View.VISIBLE);
 //
@@ -211,7 +210,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 //                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
 //                    }
 //                }
-                break;
+                    break;
+            }
         }
 
         float progress = (float) mCurrentQuestionNum / mQuestions.size() * 100;
@@ -226,13 +226,14 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
     private void displayCurrentAnswer() {
 //        mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
         Question question = mQuestions.get("q" + mCurrentQuestionNum);
-        QuestionDetails questionDetails = question.getQuestionDetails();
-        Map<String, Option> options = question.getOptions();
-        String type = questionDetails.getType();
+        if (question != null) {
+            QuestionDetails questionDetails = question.getQuestionDetails();
+            Map<String, Option> options = question.getOptions();
+            String type = questionDetails.getType();
 
-        if (mAnswers.size() < mCurrentQuestionNum) {
-            if (type.contentEquals("text")) {
-                for (int i = 0; i < options.size(); i++) {
+            if (mAnswers.size() < mCurrentQuestionNum) {
+                if (type.contentEquals("text")) {
+                    for (int i = 0; i < options.size(); i++) {
 //                    final int viewNumber = i;
 //                    Option option = options.get("o" + i);
 //                    String extraInputType = option.getExtraInputType();
@@ -242,7 +243,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 //                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 //                    } else {
 //                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
-                }
+                    }
 //                    ((TextInputEditText) mEditTextGroup.getChildAt(i)).addTextChangedListener(new TextWatcher() {
 //                        @Override
 //                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -260,38 +261,38 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 //                        }
 //                    });
 //                }
-            }
-        } else {
-            Answer answer = mAnswers.get("a" + mCurrentQuestionNum);
+                }
+            } else {
+                Answer answer = mAnswers.get("a" + mCurrentQuestionNum);
 //            Log.d(TAG, "displayCurrentAnswer: size: " + mAnswers.size());
-            AnswerDetails answerDetails = answer.getAnswerDetails();
-            Map<String, Option> selectedOptions = answer.getSelectedOptions();
-            String answerType = answerDetails.getType();
-            if (answerType == null) {
-                Log.d(TAG, "displayCurrentAnswer: NO ANSWER TYPE");
-                return;
-            }
-            switch (type) {
-                case "radio":
-                    if (selectedOptions != null) {
-                        // There can only be one selected radio button so get this only key
-                        Set keySet = selectedOptions.keySet();
-                        String onlykey = "";
-                        for (Object key : keySet) {
-                            onlykey = (String) key;
-                        }
-                        Option selectedOption = selectedOptions.get(onlykey);
-                        String selectedOptionPhrase = selectedOption.getPhrase();
-                        boolean selectedOptionHasExtraInput = selectedOption.getHasExtraInput();
-                        String selectedOptionExtraInput = selectedOption.getExtraInput();
-                        String selectedOptionExtraInputHint = selectedOption.getExtraInputHint();
-                        String selectedOptionExtraInputType = selectedOption.getExtraInputType();
-                        mView.selectRadioButtonItem(selectedOptionPhrase,
-                                selectedOptionHasExtraInput,
-                                selectedOptionExtraInputHint,
-                                selectedOptionExtraInputType,
-                                selectedOptionExtraInput,
-                                options.size());
+                AnswerDetails answerDetails = answer.getAnswerDetails();
+                Map<String, Option> selectedOptions = answer.getSelectedOptions();
+                String answerType = answerDetails.getType();
+                if (answerType == null) {
+                    Log.d(TAG, "displayCurrentAnswer: NO ANSWER TYPE");
+                    return;
+                }
+                switch (type) {
+                    case "radio":
+                        if (selectedOptions != null) {
+                            // There can only be one selected radio button so get this only key
+                            Set keySet = selectedOptions.keySet();
+                            String onlykey = "";
+                            for (Object key : keySet) {
+                                onlykey = (String) key;
+                            }
+                            Option selectedOption = selectedOptions.get(onlykey);
+                            String selectedOptionPhrase = selectedOption.getPhrase();
+                            boolean selectedOptionHasExtraInput = selectedOption.getHasExtraInput();
+                            String selectedOptionExtraInput = selectedOption.getExtraInput();
+                            String selectedOptionExtraInputHint = selectedOption.getExtraInputHint();
+                            String selectedOptionExtraInputType = selectedOption.getExtraInputType();
+                            mView.selectRadioButtonItem(selectedOptionPhrase,
+                                    selectedOptionHasExtraInput,
+                                    selectedOptionExtraInputHint,
+                                    selectedOptionExtraInputType,
+                                    selectedOptionExtraInput,
+                                    options.size());
 //                        for (int i = 0; i < options.size(); i++) {
 //                            if (((RadioButton) mRadioGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(0).getPhrase())) {
 //                                ((RadioButton) mRadioGroup.getChildAt(i)).toggle();
@@ -316,19 +317,19 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 //                                }
 //                            }
 //                        }
-                    }
-                    break;
-                case "checkbox":
-                    if (selectedOptions != null) {
-                        for (int i = 1; i <= options.size(); i++) {
-                            Option selectedOption = selectedOptions.get("o" + i);
-                            if (selectedOption != null) {
-                                String selectedOptionPhrase = selectedOption.getPhrase();
-                                boolean selectedOptionChecked = selectedOption.isChecked();
-                                mView.selectCheckboxItem(selectedOptionPhrase,
-                                        selectedOptionChecked,
-                                        options.size());
-                            }
+                        }
+                        break;
+                    case "checkbox":
+                        if (selectedOptions != null) {
+                            for (int i = 1; i <= options.size(); i++) {
+                                Option selectedOption = selectedOptions.get("o" + i);
+                                if (selectedOption != null) {
+                                    String selectedOptionPhrase = selectedOption.getPhrase();
+                                    boolean selectedOptionChecked = selectedOption.isChecked();
+                                    mView.selectCheckboxItem(selectedOptionPhrase,
+                                            selectedOptionChecked,
+                                            options.size());
+                                }
 
 //                            for (int j = 0; j < answer.getSelectedOptions().size(); j++) {
 //                                if (((CheckBox) mCheckboxGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(j).getPhrase())) {
@@ -358,10 +359,10 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 //                                    }
 //                                }
 //                            }
+                            }
                         }
-                    }
-                    break;
-                case "text":
+                        break;
+                    case "text":
 //                    for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
 //                        final int viewNumber = i;
 //
@@ -399,7 +400,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 //                            }
 //                        }
 //                    }
-                    break;
+                        break;
+                }
             }
         }
 
