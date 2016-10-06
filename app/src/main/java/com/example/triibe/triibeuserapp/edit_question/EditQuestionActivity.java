@@ -238,16 +238,34 @@ public class EditQuestionActivity extends AppCompatActivity
         QuestionDetails questionDetails = new QuestionDetails(
                 mSurveyId,
                 mQuestionId.getText().toString().trim(),
-                mSelectedQuestionType,
-                mImageUrl.getText().toString().trim(), // TODO: 18/09/16 FIX THIS WITH REAL VALUES
-                mTitle.getText().toString().trim(),
-                mIntro.getText().toString().trim(),
-                mPhrase.getText().toString().trim(),
-                mIntroLinkKey.getText().toString().trim(),
-                mIntroLinkUrl.getText().toString().trim(),
-                mRequiredPhrase.getText().toString().trim(),
-                mIncorrectAnswerPhrase.getText().toString().trim()
+                mSelectedQuestionType
         );
+
+        if (!mImageUrl.getText().toString().contentEquals("")) {
+            questionDetails.setImageUrl(mImageUrl.getText().toString().trim());
+        }
+        if (!mTitle.getText().toString().contentEquals("")) {
+            questionDetails.setTitle(mTitle.getText().toString().trim());
+        }
+        if (!mIntro.getText().toString().contentEquals("")) {
+            questionDetails.setIntro(mIntro.getText().toString().trim());
+        }
+        if (!mPhrase.getText().toString().contentEquals("")) {
+            questionDetails.setPhrase(mPhrase.getText().toString().trim());
+        }
+        if (!mIntroLinkKey.getText().toString().contentEquals("")) {
+            questionDetails.setIntroLinkKey(mIntroLinkKey.getText().toString().trim());
+        }
+        if (!mIntroLinkUrl.getText().toString().contentEquals("")) {
+            questionDetails.setIntroLinkUrl(mIntroLinkUrl.getText().toString().trim());
+        }
+        if (!mRequiredPhrase.getText().toString().contentEquals("")) {
+            questionDetails.setRequiredPhrase(mRequiredPhrase.getText().toString().trim());
+        }
+        if (!mIncorrectAnswerPhrase.getText().toString().contentEquals("")) {
+            questionDetails.setIncorrectAnswerPhrase(mIncorrectAnswerPhrase.getText().toString().trim());
+        }
+        
         mUserActionsListener.saveQuestion(questionDetails);
 
         return true;

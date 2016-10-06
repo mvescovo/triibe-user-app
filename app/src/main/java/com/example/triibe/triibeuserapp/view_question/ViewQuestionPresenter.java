@@ -523,86 +523,88 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
         }, false);
     }
 
-    public void checkAnswerToGoNext() {
-        Question question = mQuestions.get("q" + mCurrentQuestionNum);
-        QuestionDetails questionDetails = question.getQuestionDetails();
-        Map<String, Option> options = question.getOptions();
-        String requiredPhrase = questionDetails.getRequiredPhrase();
-        String incorrectAnswerPhrase = questionDetails.getIncorrectAnswerPhrase();
-        String type = questionDetails.getType();
-        
-        Answer answer = mAnswers.get("a" + mCurrentQuestionNum);
-        Map<String, Option> selectedOptions = new HashMap<>();
-        if (answer != null) {
-            selectedOptions = answer.getSelectedOptions();
-        }
+    private void checkAnswerToGoNext() {
+        if (mQuestions != null && mQuestions.size() >= mCurrentQuestionNum) {
+            Question question = mQuestions.get("q" + mCurrentQuestionNum);
+            QuestionDetails questionDetails = question.getQuestionDetails();
+            Map<String, Option> options = question.getOptions();
+            String requiredPhrase = questionDetails.getRequiredPhrase();
+            String incorrectAnswerPhrase = questionDetails.getIncorrectAnswerPhrase();
+            String type = questionDetails.getType();
 
-        if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum) {
-            boolean answerOk = false;
-            if (requiredPhrase != null) {
-                for (int i = 1; i <= options.size(); i++) {
-                    Option selectedOption = selectedOptions.get("o" + i);
-                    if (selectedOption != null) {
-                        String selectedOptionPhrase = selectedOption.getPhrase();
-                        if (selectedOptionPhrase.contentEquals(requiredPhrase)) {
-                            answerOk = true;
-                        }
-                    }
+            if (mAnswers != null && mAnswers.size() >= mCurrentQuestionNum) {
+                Answer answer = mAnswers.get("a" + mCurrentQuestionNum);
+                Map<String, Option> selectedOptions = new HashMap<>();
+                if (answer != null) {
+                    selectedOptions = answer.getSelectedOptions();
                 }
-            } else {
-                if (type.contentEquals("text")) {
-                    answerOk = true;
-                    for (int i = 1; i <= options.size(); i++) {
-                        Option selectedOption = selectedOptions.get("o" + i);
-                        if (selectedOption != null) {
-                            String extraInput = selectedOption.getExtraInput();
-                            if (extraInput == null || extraInput.contentEquals("")) {
-                                answerOk = false;
-                            }
-                        }
-                    }
-                } else {
+
+                boolean answerOk = false;
+                if (requiredPhrase != null) {
                     for (int i = 1; i <= options.size(); i++) {
                         Option selectedOption = selectedOptions.get("o" + i);
                         if (selectedOption != null) {
                             String selectedOptionPhrase = selectedOption.getPhrase();
-                            boolean hasExtraInput = selectedOption.getHasExtraInput();
-                            String extraInput = selectedOption.getExtraInput();
-                            if (!selectedOptionPhrase.contentEquals("")) {
-                                answerOk = !hasExtraInput || extraInput != null && !extraInput.contentEquals("");
+                            if (selectedOptionPhrase.contentEquals(requiredPhrase)) {
+                                answerOk = true;
+                            }
+                        }
+                    }
+                } else {
+                    if (type.contentEquals("text")) {
+                        answerOk = true;
+                        for (int i = 1; i <= options.size(); i++) {
+                            Option selectedOption = selectedOptions.get("o" + i);
+                            if (selectedOption != null) {
+                                String extraInput = selectedOption.getExtraInput();
+                                if (extraInput == null || extraInput.contentEquals("")) {
+                                    answerOk = false;
+                                }
+                            }
+                        }
+                    } else {
+                        for (int i = 1; i <= options.size(); i++) {
+                            Option selectedOption = selectedOptions.get("o" + i);
+                            if (selectedOption != null) {
+                                String selectedOptionPhrase = selectedOption.getPhrase();
+                                boolean hasExtraInput = selectedOption.getHasExtraInput();
+                                String extraInput = selectedOption.getExtraInput();
+                                if (!selectedOptionPhrase.contentEquals("")) {
+                                    answerOk = !hasExtraInput || extraInput != null && !extraInput.contentEquals("");
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            Log.d(TAG, "answerOk: " + answerOk);
+                Log.d(TAG, "answerOk: " + answerOk);
 
-            if (answerOk) {
-                if (mCurrentQuestionNum == mQuestions.size()) {
-                    // TODO: 17/09/16 remove survey from users list
-                    // Also, when adding surveys, check that an answer for the user doesn't already exist.
-                    mView.showViewSurveys();
-                } else {
-                    mCurrentQuestionNum++;
-//                    mTextInputEditText.removeTextChangedListener(this);
-                    displayCurrentQuestion();
+                if (answerOk) {
                     if (mCurrentQuestionNum == mQuestions.size()) {
-                        mView.showSubmitButton();
+                        // TODO: 17/09/16 remove survey from users list
+                        // Also, when adding surveys, check that an answer for the user doesn't already exist.
+                        mView.showViewSurveys();
+                    } else {
+                        mCurrentQuestionNum++;
+//                    mTextInputEditText.removeTextChangedListener(this);
+                        displayCurrentQuestion();
+                        if (mCurrentQuestionNum == mQuestions.size()) {
+                            mView.showSubmitButton();
+                        }
+                    }
+                } else {
+                    if (incorrectAnswerPhrase != null) {
+                        mView.showSnackbar(incorrectAnswerPhrase, Snackbar.LENGTH_SHORT);
+                    } else {
+                        mView.showSnackbar(((Context) mView).getString(R.string.question_incomplete), Snackbar.LENGTH_SHORT);
                     }
                 }
-            } else {
-                if (incorrectAnswerPhrase != null) {
-                    mView.showSnackbar(incorrectAnswerPhrase, Snackbar.LENGTH_SHORT);
-                } else {
-                    mView.showSnackbar(((Context) mView).getString(R.string.question_incomplete), Snackbar.LENGTH_SHORT);
-                }
-            }
 
-        } else if (requiredPhrase != null) {
-            mView.showSnackbar(incorrectAnswerPhrase, Snackbar.LENGTH_SHORT);
-        } else {
-            mView.showSnackbar(((Context) mView).getString(R.string.question_incomplete), Snackbar.LENGTH_SHORT);
+            } else if (requiredPhrase != null) {
+                mView.showSnackbar(incorrectAnswerPhrase, Snackbar.LENGTH_SHORT);
+            } else {
+                mView.showSnackbar(((Context) mView).getString(R.string.question_incomplete), Snackbar.LENGTH_SHORT);
+            }
         }
     }
 
@@ -619,8 +621,9 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 
     public void checkAnswerToGoPrevious() {
         // Prevent users from changing their responses to qualifying questions
-        if ((mCurrentQuestionNum <= Constants.NUM_QUALIFYING_QUESTIONS) ||
-                (mCurrentQuestionNum >= Constants.NUM_QUALIFYING_QUESTIONS + 2)) {
+        if ((mCurrentQuestionNum > 1) &&
+                ((mCurrentQuestionNum <= Constants.NUM_QUALIFYING_QUESTIONS) ||
+                (mCurrentQuestionNum >= Constants.NUM_QUALIFYING_QUESTIONS + 2))) {
             mCurrentQuestionNum--;
             displayCurrentQuestion();
         } else {
