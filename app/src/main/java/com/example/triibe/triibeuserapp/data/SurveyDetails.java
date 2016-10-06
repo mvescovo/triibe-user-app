@@ -14,15 +14,18 @@ public class SurveyDetails implements Serializable {
     private String mId;
     private String mDescription;
     private String mPoints;
+    private String mNumProtectedQuestions;
     private boolean mActive;
 
     // Empty constructor required for firebase
     public SurveyDetails() {}
 
-    public SurveyDetails(String id, String description, String points, boolean active) {
+    public SurveyDetails(String id, String description, String points,
+                         String numProtectedQuestions, boolean active) {
         mId = id;
         mDescription = description;
         mPoints = points;
+        mNumProtectedQuestions = numProtectedQuestions;
         mActive = active;
     }
 
@@ -56,7 +59,15 @@ public class SurveyDetails implements Serializable {
         mPoints = points;
     }
 
-    public boolean getActive() {
+    public String getNumProtectedQuestions() {
+        return mNumProtectedQuestions;
+    }
+
+    public void setNumProtectedQuestions(String numProtectedQuestions) {
+        mNumProtectedQuestions = numProtectedQuestions;
+    }
+
+    public boolean isActive() {
         return mActive;
     }
 
@@ -71,6 +82,7 @@ public class SurveyDetails implements Serializable {
         result.put("id", mId);
         result.put("description", mDescription);
         result.put("points", mPoints);
+        result.put("numProtectedQuestions", mNumProtectedQuestions);
         result.put("active", mActive);
 
         return result;

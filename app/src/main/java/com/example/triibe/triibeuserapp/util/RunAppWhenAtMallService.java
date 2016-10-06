@@ -111,7 +111,7 @@ public class RunAppWhenAtMallService extends Service {
                                     public void onSurveyLoaded(SurveyDetails survey) {
                                         EspressoIdlingResource.decrement();
                                         if (survey != null) {
-                                            if (survey.getActive()) {
+                                            if (survey.isActive()) {
                                                 // Only get triggers for active surveys.
                                                 getSurveyTriggers(survey.getId(), survey.getDescription());
                                             }

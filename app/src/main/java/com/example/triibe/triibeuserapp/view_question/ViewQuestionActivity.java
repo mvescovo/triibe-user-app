@@ -43,9 +43,11 @@ public class ViewQuestionActivity extends AppCompatActivity
     private static final String TAG = "SurveyDetailsActivity";
     public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
     public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
+    public final static String EXTRA_NUM_PROTECTED_QUESTIONS = "com.example.triibe.NUM_PROTECTED_QUESTIONS";
     ViewQuestionContract.UserActionsListener mUserActionsListener;
     private String mSurveyId;
     private String mUserId;
+    private int mNumProtectedQuestions;
 
     @BindView(R.id.view_root)
     RelativeLayout mRootView;
@@ -110,11 +112,14 @@ public class ViewQuestionActivity extends AppCompatActivity
             mUserId = "TestUserId";
         }
 
+        mNumProtectedQuestions = getIntent().getIntExtra(EXTRA_NUM_PROTECTED_QUESTIONS, 0);
+
         mUserActionsListener = new ViewQuestionPresenter(
                 Globals.getInstance().getTriibeRepository(),
                 this,
                 mSurveyId,
-                mUserId
+                mUserId,
+                mNumProtectedQuestions
         );
 
         mNextButton.setOnClickListener(new View.OnClickListener() {

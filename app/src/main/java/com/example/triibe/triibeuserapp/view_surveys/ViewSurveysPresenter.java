@@ -76,7 +76,7 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
     }
 
     @Override
-    public void openSurveyQuestions(@NonNull String surveyId) {
-        mView.showQuestionUi(surveyId, "q1");
+    public void openSurveyQuestions(@NonNull String surveyId, @NonNull Integer numProtectedQuestions) {
+        mView.showQuestionUi(surveyId, "q1", numProtectedQuestions);
     }
 }

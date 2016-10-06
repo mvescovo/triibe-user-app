@@ -31,17 +31,17 @@ public class EditSurveyPresenterTest {
     private static SurveyDetails SURVEY1_DETAILS = new SurveyDetails();
     private static String SURVEY1_ID = "Test survey 1";
     private static String SURVEY1_DESCRIPTION = "Test survey";
-    private static String SURVEY1_VERSION = "1.0";
     private static String SURVEY1_POINTS = "1";
-    private static String SURVEY1_TIME_TILL_EXPIRY = "1";
+    private static String SURVEY1_NUM_PROTECTED_QUESTIONS = "1";
+    private static boolean SURVEY1_ACTIVE = true;
 
 
     static {
         SURVEY1_DETAILS.setId(SURVEY1_ID);
         SURVEY1_DETAILS.setDescription(SURVEY1_DESCRIPTION);
-        SURVEY1_DETAILS.setVersion(SURVEY1_VERSION);
         SURVEY1_DETAILS.setPoints(SURVEY1_POINTS);
-        SURVEY1_DETAILS.setDurationTillExpiry(SURVEY1_TIME_TILL_EXPIRY);
+        SURVEY1_DETAILS.setNumProtectedQuestions(SURVEY1_NUM_PROTECTED_QUESTIONS);
+        SURVEY1_DETAILS.setActive(SURVEY1_ACTIVE);
 
         SURVEY_IDS_MAP.put("enrollmentSurvey", true);
         SURVEY_IDS_MAP.put("Test", true);
@@ -50,10 +50,10 @@ public class EditSurveyPresenterTest {
         SURVEY_IDS.add("enrollmentSurvey");
 
         SURVEYS.put("enrollmentSurvey", new SurveyDetails(
-                "enrollmentSurvey", "1", "first required survey", "1", "10", true
+                "enrollmentSurvey", "first required survey", "10", "2", true
         ));
         SURVEYS.put("Test", new SurveyDetails(
-                "Test", "1", "test survey", "1", "1", true
+                "Test", "test survey", "1", "0", true
         ));
     }
 
@@ -111,8 +111,8 @@ public class EditSurveyPresenterTest {
 
     @Test
     public void saveSurveyToRepository() {
-        mEditSurveyPresenter.saveSurvey(SURVEY1_ID, SURVEY1_DESCRIPTION, SURVEY1_VERSION,
-                SURVEY1_POINTS, SURVEY1_TIME_TILL_EXPIRY);
+        mEditSurveyPresenter.saveSurvey(SURVEY1_ID, SURVEY1_DESCRIPTION, SURVEY1_POINTS,
+                SURVEY1_NUM_PROTECTED_QUESTIONS, SURVEY1_ACTIVE);
 
         verify(mView).setProgressIndicator(true);
 

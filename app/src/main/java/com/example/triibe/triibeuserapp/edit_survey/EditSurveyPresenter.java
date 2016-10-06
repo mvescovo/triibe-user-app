@@ -72,10 +72,12 @@ public class EditSurveyPresenter implements EditSurveyContract.UserActionsListen
     }
 
     @Override
-    public void saveSurvey(String surveyId, String description, String points, boolean active) {
+    public void saveSurvey(String surveyId, String description, String points,
+                           String numProtectedQuestions, boolean active) {
         mView.setProgressIndicator(true);
 
-        SurveyDetails surveyDetails = new SurveyDetails(surveyId, description, points, active);
+        SurveyDetails surveyDetails = new SurveyDetails(surveyId, description, points,
+                numProtectedQuestions, active);
 
         mTriibeRepository.saveSurvey(surveyId, surveyDetails);
 

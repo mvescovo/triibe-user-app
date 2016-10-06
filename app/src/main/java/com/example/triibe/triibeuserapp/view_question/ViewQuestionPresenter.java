@@ -2,6 +2,7 @@ package com.example.triibe.triibeuserapp.view_question;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 
@@ -12,7 +13,6 @@ import com.example.triibe.triibeuserapp.data.Option;
 import com.example.triibe.triibeuserapp.data.Question;
 import com.example.triibe.triibeuserapp.data.QuestionDetails;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
-import com.example.triibe.triibeuserapp.util.Constants;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 
 import java.util.HashMap;
@@ -29,16 +29,21 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
     ViewQuestionContract.View mView;
     private String mSurveyId;
     private String mUserId;
+    private int mNumProtectedQuestions;
     private int mCurrentQuestionNum;
+    @VisibleForTesting
     public Map<String, Question> mQuestions;
+    @VisibleForTesting
     public Map<String, Answer> mAnswers;
 
+
     public ViewQuestionPresenter(TriibeRepository triibeRepository, ViewQuestionContract.View view,
-                                 String surveyId, String userId) {
+                                 String surveyId, String userId, int numProtectedQuestions) {
         mTriibeRepository = triibeRepository;
         mView = view;
         mSurveyId = surveyId;
         mUserId = userId;
+        mNumProtectedQuestions = numProtectedQuestions;
         mCurrentQuestionNum = 1;
         mQuestions = new HashMap<>();
         mAnswers = new HashMap<>();
@@ -62,8 +67,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         if (mAnswers == null) {
                             mAnswers = new HashMap<>();
                         }
-                        if (mAnswers.size() >= Constants.NUM_QUALIFYING_QUESTIONS &&
-                                mCurrentQuestionNum <= Constants.NUM_QUALIFYING_QUESTIONS) {
+                        if (mAnswers.size() >= mNumProtectedQuestions &&
+                                mCurrentQuestionNum <= mNumProtectedQuestions) {
                             mCurrentQuestionNum = mAnswers.size() + 1;
                         }
                         displayCurrentQuestion();
@@ -418,7 +423,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
             mView.showSubmitButton();
         }
         if (mCurrentQuestionNum > 1 &&
-                mCurrentQuestionNum != Constants.NUM_QUALIFYING_QUESTIONS + 1) {
+                mCurrentQuestionNum != mNumProtectedQuestions + 1) {
             mView.showBackButton();
         }
     }
@@ -640,11 +645,11 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
     public void checkAnswerToGoPrevious() {
         // Prevent users from changing their responses to qualifying questions
         if ((mCurrentQuestionNum > 1) &&
-                ((mCurrentQuestionNum <= Constants.NUM_QUALIFYING_QUESTIONS) ||
-                (mCurrentQuestionNum >= Constants.NUM_QUALIFYING_QUESTIONS + 2))) {
+                ((mCurrentQuestionNum <= mNumProtectedQuestions) ||
+                (mCurrentQuestionNum >= mNumProtectedQuestions + 2))) {
             mCurrentQuestionNum--;
             if (mCurrentQuestionNum == 1 ||
-                    mCurrentQuestionNum == Constants.NUM_QUALIFYING_QUESTIONS + 1) {
+                    mCurrentQuestionNum == mNumProtectedQuestions + 1) {
                 mView.hideBackButton();
             }
             displayCurrentQuestion();

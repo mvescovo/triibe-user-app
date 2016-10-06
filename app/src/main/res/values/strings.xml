@@ -25,6 +25,7 @@
     <string name="edit_description_hint">Description*</string>
     <string name="edit_time_till_expiry_hint">Time till expiry</string>
     <string name="edit_points_hint">Points*</string>
+    <string name="edit_num_protected_questions_hint">Number of protected question*</string>
     <string name="successfully_saved_survey">Survey saved</string>
     <string name="successfully_deleted_survey">Survey deleted</string>
     <string name="successfully_saved_question">Question saved</string>
@@ -39,6 +40,7 @@
     <string name="edit_survey_active">Active:</string>
     <string name="edit_survey_active_yes">Yes</string>
     <string name="edit_survey_active_no">No</string>
+    <string name="edit_survey_default_num_protected_questions">0</string>
 
     <!--EditQuestionActivity-->
     <string name="title_activity_edit_question">Edit Question</string>

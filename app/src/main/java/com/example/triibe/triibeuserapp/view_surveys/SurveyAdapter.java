@@ -59,8 +59,10 @@ public class SurveyAdapter extends RecyclerView.Adapter {
             mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mUserActionsListener.openSurveyQuestions((mSurveyDetails
-                            .get("" + getAdapterPosition())).getId());
+                    mUserActionsListener.openSurveyQuestions(
+                            (mSurveyDetails.get("" + getAdapterPosition())).getId(),
+                            Integer.parseInt(mSurveyDetails.get("" + getAdapterPosition()).getNumProtectedQuestions())
+                    );
                 }
             });
         }

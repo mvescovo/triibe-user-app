@@ -146,10 +146,11 @@ public class ViewSurveysActivity extends AppCompatActivity
     }
 
     @Override
-    public void showQuestionUi(String surveyId, String questionId) {
+    public void showQuestionUi(String surveyId, String questionId, int numProtectedQuestions) {
         Intent intent = new Intent(this, ViewQuestionActivity.class);
         intent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, surveyId);
         intent.putExtra(ViewQuestionActivity.EXTRA_USER_ID, mUserId);
+        intent.putExtra(ViewQuestionActivity.EXTRA_NUM_PROTECTED_QUESTIONS, numProtectedQuestions);
         startActivity(intent);
     }
 

@@ -51,26 +51,40 @@ public class EditSurveyActivity extends AppCompatActivity
     private static String STATE_SURVEY_IDS = "com.example.triibe.SURVEY_IDS";
     EditSurveyContract.UserActionsListener mUserActionsListener;
     BottomSheetBehavior mBottomSheetBehavior;
+
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
-    @BindView(R.id.bottom_sheet)
-    View mBottomSheet;
-    @BindView(R.id.edit_question_button_layout)
-    LinearLayout mEditQuestionButtonLayout;
-    @BindView(R.id.edit_trigger_button_layout)
-    LinearLayout mEditTriggerButtonLayout;
-    @BindView(R.id.survey_id)
-    AppCompatAutoCompleteTextView mSurveyId;
-    @BindView(R.id.survey_active_yes)
-    RadioButton mActiveYes;
-    @BindView(R.id.survey_active_no)
-    RadioButton mActiveNo;
-    @BindView(R.id.survey_description)
-    TextInputEditText mDescription;
-    @BindView(R.id.survey_points)
-    TextInputEditText mPoints;
+
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
+
+    @BindView(R.id.bottom_sheet)
+    View mBottomSheet;
+
+    @BindView(R.id.edit_question_button_layout)
+    LinearLayout mEditQuestionButtonLayout;
+
+    @BindView(R.id.edit_trigger_button_layout)
+    LinearLayout mEditTriggerButtonLayout;
+
+    @BindView(R.id.survey_id)
+    AppCompatAutoCompleteTextView mSurveyId;
+
+    @BindView(R.id.survey_active_yes)
+    RadioButton mActiveYes;
+
+    @BindView(R.id.survey_active_no)
+    RadioButton mActiveNo;
+
+    @BindView(R.id.survey_description)
+    TextInputEditText mDescription;
+
+    @BindView(R.id.survey_points)
+    TextInputEditText mPoints;
+
+    @BindView(R.id.survey_num_protected_questions)
+    TextInputEditText mNumProtectedQuestions;
+
     private List<String> mSurveyIds;
     private boolean mSurveyActive = false;
 
@@ -165,6 +179,7 @@ public class EditSurveyActivity extends AppCompatActivity
     public void showSurveyDetails(SurveyDetails surveyDetails) {
         mDescription.setText(surveyDetails.getDescription());
         mPoints.setText(surveyDetails.getPoints());
+        mNumProtectedQuestions.setText(surveyDetails.getNumProtectedQuestions());
     }
 
     @Override
@@ -216,6 +231,7 @@ public class EditSurveyActivity extends AppCompatActivity
                 mSurveyId.getText().toString().trim(),
                 mDescription.getText().toString().trim(),
                 mPoints.getText().toString().trim(),
+                mNumProtectedQuestions.getText().toString().trim(),
                 mSurveyActive
         );
         return true;
@@ -293,6 +309,7 @@ public class EditSurveyActivity extends AppCompatActivity
     private void clearOtherFields() {
         mDescription.setText("");
         mPoints.setText("");
+        mNumProtectedQuestions.setText("");
     }
 
     @VisibleForTesting

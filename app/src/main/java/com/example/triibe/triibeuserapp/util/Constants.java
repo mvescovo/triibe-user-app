@@ -9,7 +9,6 @@ import java.util.HashMap;
  */
 public final class Constants {
 
-    public static final int NUM_QUALIFYING_QUESTIONS = 2;
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     public static final float FENCE_MALL_RADIUS_IN_METERS = 500;
     public static final long FENCE_MALL_DWELL_IN_MILLISECONDS = 1000;
