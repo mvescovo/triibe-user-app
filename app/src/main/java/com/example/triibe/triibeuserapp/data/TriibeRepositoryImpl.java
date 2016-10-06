@@ -349,6 +349,10 @@ public class TriibeRepositoryImpl implements TriibeRepository {
         mTriibeServiceApi.saveAnswer(surveyId, userId, questionId, answer);
     }
 
+
+    /*
+    * Users
+    * */
     @Override
     public void addUserSurvey(@NonNull String userId, @NonNull String surveyId) {
         mTriibeServiceApi.addUserSurvey(userId, surveyId);

@@ -398,6 +398,10 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
                 .setValue(answer);
     }
 
+
+    /*
+    * Users
+    * */
     @Override
     public void addUserSurvey(@NonNull String userId, @NonNull String surveyId) {
         mDatabase.child("users/").child(userId).child("surveyIds").child(surveyId)
