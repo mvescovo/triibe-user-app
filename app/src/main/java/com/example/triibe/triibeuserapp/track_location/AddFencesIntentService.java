@@ -247,6 +247,9 @@ public class AddFencesIntentService extends IntentService
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            NotificationManager mNotificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
             FenceState fenceState = FenceState.extract(intent);
 
             // Start or stop the app service
@@ -277,6 +280,9 @@ public class AddFencesIntentService extends IntentService
                             removeFenceIntent.putExtra(EXTRA_TRIIBE_FENCE_TYPE, TYPE_LANDMARK);
                             removeFenceIntent.putExtra(EXTRA_FENCE_KEY, landmarkFences.get(i));
                             context.startService(removeFenceIntent);
+
+                            // Clear notifications.
+                            mNotificationManager.cancelAll();
                         }
 
                         // Stop app
@@ -302,6 +308,7 @@ public class AddFencesIntentService extends IntentService
                                 new NotificationCompat.Builder(context)
                                         .setSmallIcon(R.drawable.westfieldicon_transparent)
                                         .setContentTitle("New Survey Available")
+                                        .setContentText(fenceState.getFenceKey())
                                         .setAutoCancel(true);
                         Intent resultIntent = new Intent(context, ViewQuestionActivity.class);
                         resultIntent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, fenceState.getFenceKey());
@@ -312,14 +319,14 @@ public class AddFencesIntentService extends IntentService
                         PendingIntent resultPendingIntent =
                                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(resultPendingIntent);
-                        NotificationManager mNotificationManager =
-                                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                        int mId = 5;
-                        mNotificationManager.notify(mId, mBuilder.build());
+                        mNotificationManager.notify(fenceState.getFenceKey(), 1, mBuilder.build());
 
                         break;
                     case FenceState.FALSE:
                         Log.d(TAG, "Not in non mall fence");
+                        // Clear notification.
+                        mNotificationManager.cancel(fenceState.getFenceKey(), 1);
+
                         break;
                     case FenceState.UNKNOWN:
                         Log.d(TAG, "UNKONWN if in non mall fence");
