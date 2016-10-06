@@ -149,6 +149,7 @@ public class ViewSurveysActivity extends AppCompatActivity
     public void showQuestionUi(String surveyId, String questionId) {
         Intent intent = new Intent(this, ViewQuestionActivity.class);
         intent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, surveyId);
+        intent.putExtra(ViewQuestionActivity.EXTRA_USER_ID, mUserId);
         startActivity(intent);
     }
 

@@ -1,16 +1,20 @@
 package com.example.triibe.triibeuserapp.view_question;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.util.Linkify;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -24,6 +28,7 @@ import android.widget.TextView;
 
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.util.Globals;
+import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.regex.Matcher;
@@ -128,6 +133,20 @@ public class ViewQuestionActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mUserActionsListener.loadCurrentQuestion();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent upIntent = NavUtils.getParentActivityIntent(this);
+                upIntent.putExtra(ViewSurveysActivity.EXTRA_USER_ID, mUserId);
+                Log.d(TAG, "onOptionsItemSelected: userId: " + mUserId);
+                NavUtils.navigateUpTo(this, upIntent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
