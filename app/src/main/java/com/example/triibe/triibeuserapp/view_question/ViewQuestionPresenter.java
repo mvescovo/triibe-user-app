@@ -404,8 +404,23 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 }
             }
         }
-
+        updateNextButton();
         mView.setIndeterminateProgressIndicator(false);
+    }
+
+    /*
+    * Ensure the next button is of the correct type.
+    * If this is the last question in the survey it should be a submit button.
+    * If there was only one question in the survey the user wouldn't have pressed next yet.
+    * */
+    private void updateNextButton() {
+        if (mCurrentQuestionNum == mQuestions.size()) {
+            mView.showSubmitButton();
+        }
+        if (mCurrentQuestionNum > 1 &&
+                mCurrentQuestionNum != Constants.NUM_QUALIFYING_QUESTIONS + 1) {
+            mView.showBackButton();
+        }
     }
 
     @Override
@@ -588,6 +603,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         mView.showViewSurveys();
                     } else {
                         mCurrentQuestionNum++;
+                        mView.showBackButton();
 //                    mTextInputEditText.removeTextChangedListener(this);
                         displayCurrentQuestion();
                         if (mCurrentQuestionNum == mQuestions.size()) {
@@ -627,6 +643,10 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 ((mCurrentQuestionNum <= Constants.NUM_QUALIFYING_QUESTIONS) ||
                 (mCurrentQuestionNum >= Constants.NUM_QUALIFYING_QUESTIONS + 2))) {
             mCurrentQuestionNum--;
+            if (mCurrentQuestionNum == 1 ||
+                    mCurrentQuestionNum == Constants.NUM_QUALIFYING_QUESTIONS + 1) {
+                mView.hideBackButton();
+            }
             displayCurrentQuestion();
         } else {
             mView.showSnackbar("You're at the first question.", Snackbar.LENGTH_SHORT); // TODO: 22/09/16 work out where to put this string (testing will not work when calling from strings.xml because of no mock context. Or work out how to mock it).

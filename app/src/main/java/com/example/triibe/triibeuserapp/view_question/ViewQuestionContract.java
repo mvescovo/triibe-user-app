@@ -62,6 +62,10 @@ public interface ViewQuestionContract {
 
         void hideSubmitButton();
 
+        void showBackButton();
+
+        void hideBackButton();
+
         void showViewSurveys();
     }
 

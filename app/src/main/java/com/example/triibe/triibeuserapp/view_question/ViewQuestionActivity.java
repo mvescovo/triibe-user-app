@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -84,6 +85,9 @@ public class ViewQuestionActivity extends AppCompatActivity
 
     @BindView(R.id.next_button)
     Button mNextButton;
+
+    @BindView(R.id.previous_button_image)
+    ImageButton mPreviousButtonImage;
 
     @BindView(R.id.previous_button)
     Button mPreviousButton;
@@ -362,6 +366,18 @@ public class ViewQuestionActivity extends AppCompatActivity
     @Override
     public void hideSubmitButton() {
         mNextButton.setText("Next");
+    }
+
+    @Override
+    public void showBackButton() {
+        mPreviousButton.setVisibility(View.VISIBLE);
+        mPreviousButtonImage.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideBackButton() {
+        mPreviousButton.setVisibility(View.INVISIBLE);
+        mPreviousButtonImage.setVisibility(View.INVISIBLE);
     }
 
     @Override
