@@ -469,7 +469,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         }
                     }
 
-                    AnswerDetails answerDetails = new AnswerDetails(questionId, "a" + questionId, type);
+                    AnswerDetails answerDetails = new AnswerDetails(questionId, "a" + mCurrentQuestionNum, type);
                     if (selectedOptions.size() == 0) {
                         // Don't save an answerDetails object. This will make firebase delete the
                         // current answer.We want to do this so we don't have just answerDetails and no
