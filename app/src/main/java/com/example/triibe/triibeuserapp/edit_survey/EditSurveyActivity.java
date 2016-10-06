@@ -185,14 +185,14 @@ public class EditSurveyActivity extends AppCompatActivity
     @Override
     public void showEditQuestion() {
         Intent intent = new Intent(this, EditQuestionActivity.class);
-        intent.putExtra(EXTRA_SURVEY_ID, mSurveyId.getText().toString().trim());
+        intent.putExtra(EditQuestionActivity.EXTRA_SURVEY_ID, mSurveyId.getText().toString().trim());
         startActivityForResult(intent, REQUEST_EDIT_QUESTION);
     }
 
     @Override
     public void showEditTrigger() {
         Intent intent = new Intent(this, EditTriggerActivity.class);
-        intent.putExtra(EXTRA_SURVEY_ID, mSurveyId.getText().toString().trim());
+        intent.putExtra(EditTriggerActivity.EXTRA_SURVEY_ID, mSurveyId.getText().toString().trim());
         startActivityForResult(intent, REQUEST_EDIT_TRIGGER);
     }
 

@@ -13,7 +13,6 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -141,7 +140,6 @@ public class ViewQuestionActivity extends AppCompatActivity
             case android.R.id.home:
                 Intent upIntent = NavUtils.getParentActivityIntent(this);
                 upIntent.putExtra(ViewSurveysActivity.EXTRA_USER_ID, mUserId);
-                Log.d(TAG, "onOptionsItemSelected: userId: " + mUserId);
                 NavUtils.navigateUpTo(this, upIntent);
                 return true;
             default:

@@ -356,7 +356,7 @@ public class EditQuestionActivity extends AppCompatActivity
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        mSelectedQuestionType = (String) parent.getItemAtPosition(position);
+        mSelectedQuestionType = parent.getItemAtPosition(position).toString().toLowerCase();
     }
 
     @Override

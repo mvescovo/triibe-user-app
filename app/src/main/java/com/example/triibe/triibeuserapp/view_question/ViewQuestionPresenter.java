@@ -141,9 +141,9 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 mView.hidePhrase();
             }
 
-        /*
-        * Display question options
-        * */
+            /*
+            * Display question options
+            * */
             Map<String, Option> options = question.getOptions();
             String type = questionDetails.getType();
             if (type == null) {
