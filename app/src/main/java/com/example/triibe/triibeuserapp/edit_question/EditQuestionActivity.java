@@ -12,6 +12,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -38,7 +40,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class EditQuestionActivity extends AppCompatActivity
-        implements EditQuestionContract.View, TextWatcher {
+        implements EditQuestionContract.View, TextWatcher, AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "EditQuestionActivity";
 //    public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
@@ -49,6 +51,7 @@ public class EditQuestionActivity extends AppCompatActivity
     private String mSurveyId;
     BottomSheetBehavior mBottomSheetBehavior;
     private List<String> mQuestionIds;
+    private String mSelectedQuestionType = "radio";
 
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
@@ -62,14 +65,32 @@ public class EditQuestionActivity extends AppCompatActivity
     @BindView(R.id.question_id)
     AppCompatAutoCompleteTextView mQuestionId;
 
+    @BindView(R.id.question_type)
+    AppCompatSpinner mQuestionType;
+
+    @BindView(R.id.question_image_url)
+    TextInputEditText mImageUrl;
+
     @BindView(R.id.question_title)
     TextInputEditText mTitle;
 
     @BindView(R.id.question_intro)
     TextInputEditText mIntro;
 
-    @BindView(R.id.question_image_url)
-    TextInputEditText mImageUrl;
+    @BindView(R.id.question_phrase)
+    TextInputEditText mPhrase;
+
+    @BindView(R.id.question_intro_link_key)
+    TextInputEditText mIntroLinkKey;
+
+    @BindView(R.id.question_intro_link_url)
+    TextInputEditText mIntroLinkUrl;
+
+    @BindView(R.id.question_required_phrase)
+    TextInputEditText mRequiredPhrase;
+
+    @BindView(R.id.question_incorrect_answer_phrase)
+    TextInputEditText mIncorrectAnswerPhrase;
 
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
@@ -122,6 +143,13 @@ public class EditQuestionActivity extends AppCompatActivity
 
         });
 
+        // Setup question type spinner
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.question_type_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mQuestionType.setAdapter(adapter);
+        mQuestionType.setOnItemSelectedListener(this);
+
         mQuestionIds = new ArrayList<>();
         mQuestionId.addTextChangedListener(this);
     }
@@ -156,9 +184,25 @@ public class EditQuestionActivity extends AppCompatActivity
 
     @Override
     public void showQuestionDetails(QuestionDetails questionDetails) {
+        switch (questionDetails.getType()) {
+            case "radio":
+                mQuestionType.setSelection(0);
+                break;
+            case "checkbox":
+                mQuestionType.setSelection(1);
+                break;
+            case "text":
+                mQuestionType.setSelection(2);
+                break;
+        }
+        mImageUrl.setText(questionDetails.getImageUrl());
         mTitle.setText(questionDetails.getTitle());
         mIntro.setText(questionDetails.getIntro());
-        mImageUrl.setText(questionDetails.getImageUrl());
+        mPhrase.setText(questionDetails.getPhrase());
+        mIntroLinkKey.setText(questionDetails.getIntroLinkKey());
+        mIntroLinkUrl.setText(questionDetails.getIntroLinkUrl());
+        mRequiredPhrase.setText(questionDetails.getRequiredPhrase());
+        mIncorrectAnswerPhrase.setText(questionDetails.getIncorrectAnswerPhrase());
     }
 
     @Override
@@ -177,36 +221,32 @@ public class EditQuestionActivity extends AppCompatActivity
 
     private boolean validate() {
 
-        if (mTitle.getText().toString().trim().contentEquals("")) {
-            mTitle.setError("Title must not be empty"); // TODO: 18/09/16 set in strings
-            mTitle.requestFocus();
+        if (mQuestionId.getText().toString().trim().contentEquals("")) {
+            mQuestionId.setError("Question ID must not be empty"); // TODO: 18/09/16 set in strings
+            mQuestionId.requestFocus();
             return false;
         } else if (mTitle.getText().toString().trim().contentEquals("")) {
             mTitle.setError("Title must not be empty");
             mTitle.requestFocus();
             return false;
-        } else if (mIntro.getText().toString().trim().contentEquals("")) {
-            mIntro.setError("Intro must not be empty");
-            mIntro.requestFocus();
-            return false;
-        } else if (mImageUrl.getText().toString().trim().contentEquals("")) {
-            mImageUrl.setError("Image url must not be empty");
-            mImageUrl.requestFocus();
+        } else if (mPhrase.getText().toString().trim().contentEquals("")) {
+            mPhrase.setError("Phrase must not be empty");
+            mPhrase.requestFocus();
             return false;
         }
 
         QuestionDetails questionDetails = new QuestionDetails(
                 mSurveyId,
                 mQuestionId.getText().toString().trim(),
-                "",
+                mSelectedQuestionType,
                 mImageUrl.getText().toString().trim(), // TODO: 18/09/16 FIX THIS WITH REAL VALUES
                 mTitle.getText().toString().trim(),
                 mIntro.getText().toString().trim(),
-                "",
-                "",
-                "",
-                "",
-                ""
+                mPhrase.getText().toString().trim(),
+                mIntroLinkKey.getText().toString().trim(),
+                mIntroLinkUrl.getText().toString().trim(),
+                mRequiredPhrase.getText().toString().trim(),
+                mIncorrectAnswerPhrase.getText().toString().trim()
         );
         mUserActionsListener.saveQuestion(questionDetails);
 
@@ -270,5 +310,15 @@ public class EditQuestionActivity extends AppCompatActivity
     @VisibleForTesting
     public IdlingResource getCountingIdlingResource() {
         return EspressoIdlingResource.getIdlingResource();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        mSelectedQuestionType = (String) parent.getItemAtPosition(position);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

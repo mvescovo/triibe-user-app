@@ -530,7 +530,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
         String requiredPhrase = questionDetails.getRequiredPhrase();
         String incorrectAnswerPhrase = questionDetails.getIncorrectAnswerPhrase();
         String type = questionDetails.getType();
-
+        
         Answer answer = mAnswers.get("a" + mCurrentQuestionNum);
         Map<String, Option> selectedOptions = new HashMap<>();
         if (answer != null) {

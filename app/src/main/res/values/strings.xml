@@ -42,12 +42,24 @@
     <string name="title_activity_edit_question">Edit Question</string>
     <string name="edit_question_details_title">Question Details</string>
     <string name="edit_question_id_hint">Question ID</string>
+    <string name="edit_image_url_hint">Image url</string>
     <string name="edit_title_hint">Title</string>
     <string name="edit_intro_hint">Intro</string>
-    <string name="edit_image_url_hint">Image url</string>
+    <string name="edit_question_phrase">Phrase</string>
+    <string name="edit_question_type">Type:</string>
     <string name="edit_question_bottom_sheet_title">Add</string>
     <string name="edit_question_add_option">Option</string>
     <string name="delete_question">Delete question</string>
+    <string name="edit_question_intro_link_key">Intro link key</string>
+    <string name="edit_question_intro_link_url">Intro link URL</string>
+    <string name="edit_question_required_phrase">Required phrase</string>
+    <string name="edit_question_incorrect_answer_phrase">Incorrect answer phrase</string>
+
+    <string-array name="question_type_array">
+        <item>Radio</item>
+        <item>Checkbox</item>
+        <item>Text input</item>
+    </string-array>
 
     <!--EditOptionActivity-->
     <string name="title_activity_edit_option">Edit Option</string>
