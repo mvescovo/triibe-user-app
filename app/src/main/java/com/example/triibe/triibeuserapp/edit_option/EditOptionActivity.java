@@ -1,6 +1,7 @@
 package com.example.triibe.triibeuserapp.edit_option;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
@@ -16,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 
@@ -41,7 +43,6 @@ public class EditOptionActivity extends AppCompatActivity
     private String mSurveyId;
     private String mQuestionId;
     private List<String> mOptionIds;
-
 
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
@@ -134,7 +135,11 @@ public class EditOptionActivity extends AppCompatActivity
     }
 
     private boolean validate() {
-        if (mOptionPhrase.getText().toString().trim().contentEquals("")) {
+        if (mOptionId.getText().toString().trim().contentEquals("")) {
+            mOptionId.setError("Option ID must not be empty"); // TODO: 18/09/16 set in strings
+            mOptionId.requestFocus();
+            return false;
+        } else  if (mOptionPhrase.getText().toString().trim().contentEquals("")) {
             mOptionPhrase.setError("Phrase must not be empty"); // TODO: 18/09/16 set in strings
             mOptionPhrase.requestFocus();
             return false;
@@ -143,13 +148,23 @@ public class EditOptionActivity extends AppCompatActivity
         Option option;
         if (!mExtraInputType.getText().toString().trim().contentEquals("")
                 && !mOptionExtraInputHint.getText().toString().trim().contentEquals("")) {
-            option = new Option(mSurveyId, mQuestionId, mOptionId.getText().toString().trim(),
-                    mOptionPhrase.getText().toString().trim(), true);
+            option = new Option(
+                    mSurveyId,
+                    mQuestionId,
+                    mOptionId.getText().toString().trim(),
+                    mOptionPhrase.getText().toString().trim(),
+                    true
+            );
             option.setExtraInputType(mExtraInputType.getText().toString().trim());
             option.setExtraInputHint(mOptionExtraInputHint.getText().toString().trim());
         } else {
-            option = new Option(mSurveyId, mQuestionId, mOptionId.getText().toString().trim(),
-                    mOptionPhrase.getText().toString().trim(), false);
+            option = new Option(
+                    mSurveyId,
+                    mQuestionId,
+                    mOptionId.getText().toString().trim(),
+                    mOptionPhrase.getText().toString().trim(),
+                    false
+            );
         }
         mUserActionsListener.saveOption(option);
 
@@ -168,16 +183,23 @@ public class EditOptionActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.done:
                 if (validate()) {
+                    hideSoftKeyboard(mRootView);
                     showEditQuestion(Activity.RESULT_OK);
                 }
                 return true;
             case R.id.delete_option:
+                hideSoftKeyboard(mRootView);
                 mUserActionsListener.deleteOption(mOptionId.getText().toString().trim());
                 showEditQuestion(EditQuestionActivity.RESULT_DELETE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void hideSoftKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     @Override
@@ -187,16 +209,27 @@ public class EditOptionActivity extends AppCompatActivity
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
+        boolean matched = false;
         for (int i = 0; i < mOptionIds.size(); i++) {
             if (s.toString().contentEquals(mOptionIds.get(i))) {
                 mUserActionsListener.getOption(mOptionIds.get(i));
+                matched = true;
             }
+        }
+        if (!matched) {
+            clearOtherFields();
         }
     }
 
     @Override
     public void afterTextChanged(Editable s) {
 
+    }
+
+    private void clearOtherFields() {
+        mOptionPhrase.setText("");
+        mExtraInputType.setText("");
+        mOptionExtraInputHint.setText("");
     }
 
     @VisibleForTesting

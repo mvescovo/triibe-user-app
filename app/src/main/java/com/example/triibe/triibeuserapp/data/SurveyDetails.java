@@ -12,21 +12,16 @@ import java.util.Map;
 public class SurveyDetails implements Serializable {
 
     private String mId;
-    private String mVersion;
     private String mDescription;
-    private String mDurationTillExpiry;
     private String mPoints;
     private boolean mActive;
 
     // Empty constructor required for firebase
     public SurveyDetails() {}
 
-    public SurveyDetails(String id, String version, String description, String durationTillExpiry,
-                         String points, boolean active) {
+    public SurveyDetails(String id, String description, String points, boolean active) {
         mId = id;
-        mVersion = version;
         mDescription = description;
-        mDurationTillExpiry = durationTillExpiry;
         mPoints = points;
         mActive = active;
     }
@@ -45,28 +40,12 @@ public class SurveyDetails implements Serializable {
         mId = id;
     }
 
-    public String getVersion() {
-        return mVersion;
-    }
-
-    public void setVersion(String version) {
-        mVersion = version;
-    }
-
     public String getDescription() {
         return mDescription;
     }
 
     public void setDescription(String description) {
         mDescription = description;
-    }
-
-    public String getDurationTillExpiry() {
-        return mDurationTillExpiry;
-    }
-
-    public void setDurationTillExpiry(String durationTillExpiry) {
-        mDurationTillExpiry = durationTillExpiry;
     }
 
     public String getPoints() {
@@ -90,9 +69,7 @@ public class SurveyDetails implements Serializable {
     public Map<String, Object> toMap() {
         Map<String, Object> result = new HashMap<>();
         result.put("id", mId);
-        result.put("version", mVersion);
         result.put("description", mDescription);
-        result.put("durationTillExpiry", mDurationTillExpiry);
         result.put("points", mPoints);
         result.put("active", mActive);
 

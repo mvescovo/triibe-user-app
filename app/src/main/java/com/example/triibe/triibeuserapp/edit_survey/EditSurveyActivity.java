@@ -1,6 +1,7 @@
 package com.example.triibe.triibeuserapp.edit_survey;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,9 +20,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
@@ -40,45 +43,36 @@ import butterknife.ButterKnife;
 public class EditSurveyActivity extends AppCompatActivity
         implements EditSurveyContract.View, TextWatcher {
 
-    private static final String TAG = "EditSurveyActivity";
     public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
-    private static String STATE_SURVEY_IDS = "com.example.triibe.SURVEY_IDS";
     public static final int REQUEST_EDIT_QUESTION = 1;
     public static final int REQUEST_EDIT_TRIGGER = 2;
     public static final int RESULT_DELETE = -2;
+    private static final String TAG = "EditSurveyActivity";
+    private static String STATE_SURVEY_IDS = "com.example.triibe.SURVEY_IDS";
     EditSurveyContract.UserActionsListener mUserActionsListener;
     BottomSheetBehavior mBottomSheetBehavior;
-    private List<String> mSurveyIds;
-
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
-
     @BindView(R.id.bottom_sheet)
     View mBottomSheet;
-
     @BindView(R.id.edit_question_button_layout)
     LinearLayout mEditQuestionButtonLayout;
-
     @BindView(R.id.edit_trigger_button_layout)
     LinearLayout mEditTriggerButtonLayout;
-
     @BindView(R.id.survey_id)
     AppCompatAutoCompleteTextView mSurveyId;
-
+    @BindView(R.id.survey_active_yes)
+    RadioButton mActiveYes;
+    @BindView(R.id.survey_active_no)
+    RadioButton mActiveNo;
     @BindView(R.id.survey_description)
     TextInputEditText mDescription;
-
-    @BindView(R.id.survey_version)
-    TextInputEditText mVersion;
-
     @BindView(R.id.survey_points)
     TextInputEditText mPoints;
-
-    @BindView(R.id.survey_time_till_expiry)
-    TextInputEditText mTimeTillExpiry;
-
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
+    private List<String> mSurveyIds;
+    private boolean mSurveyActive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +94,7 @@ public class EditSurveyActivity extends AppCompatActivity
         mEditQuestionButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (validateForQuestion()) {
+                if (validate()) {
                     mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                     mUserActionsListener.editQuestion();
                 }
@@ -110,7 +104,7 @@ public class EditSurveyActivity extends AppCompatActivity
         mEditTriggerButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (validateForQuestion()) {
+                if (validate()) {
                     mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                     mUserActionsListener.editTrigger();
                 }
@@ -125,6 +119,7 @@ public class EditSurveyActivity extends AppCompatActivity
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
 
             }
+
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
             }
@@ -169,9 +164,7 @@ public class EditSurveyActivity extends AppCompatActivity
     @Override
     public void showSurveyDetails(SurveyDetails surveyDetails) {
         mDescription.setText(surveyDetails.getDescription());
-        mVersion.setText(surveyDetails.getVersion());
         mPoints.setText(surveyDetails.getPoints());
-        mTimeTillExpiry.setText(surveyDetails.getDurationTillExpiry());
     }
 
     @Override
@@ -203,7 +196,7 @@ public class EditSurveyActivity extends AppCompatActivity
         startActivityForResult(intent, REQUEST_EDIT_TRIGGER);
     }
 
-    private boolean validateForQuestion() {
+    private boolean validate() {
         if (mSurveyId.getText().toString().trim().contentEquals("")) {
             mSurveyId.setError("Name must not be empty"); // TODO: 18/09/16 set in strings
             mSurveyId.requestFocus();
@@ -212,38 +205,21 @@ public class EditSurveyActivity extends AppCompatActivity
             mDescription.setError("Description must not be empty");
             mDescription.requestFocus();
             return false;
-        } else if (mVersion.getText().toString().trim().contentEquals("")) {
-            mVersion.setError("Version must not be empty");
-            mVersion.requestFocus();
-            return false;
         } else if (mPoints.getText().toString().trim().contentEquals("")) {
             mPoints.setError("Points must not be empty");
             mPoints.requestFocus();
             return false;
-        } else if (mTimeTillExpiry.getText().toString().trim().contentEquals("")) {
-            mTimeTillExpiry.setError("Time till expiry must not be empty");
-            mTimeTillExpiry.requestFocus();
-            return false;
         }
 
         // If all ok save survey.
-        mUserActionsListener.saveSurvey(mSurveyId.getText().toString().trim(),
+        mUserActionsListener.saveSurvey(
+                mSurveyId.getText().toString().trim(),
                 mDescription.getText().toString().trim(),
-                mVersion.getText().toString().trim(),
                 mPoints.getText().toString().trim(),
-                mTimeTillExpiry.getText().toString().trim());
-
+                mSurveyActive
+        );
         return true;
     }
-
-//    private boolean validateForTrigger() {
-//        if (mSurveyId.getText().toString().trim().contentEquals("")) {
-//            mSurveyId.setError("Name must not be empty"); // TODO: 18/09/16 set in strings
-//            mSurveyId.requestFocus();
-//            return false;
-//        }
-//        return true;
-//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -270,17 +246,24 @@ public class EditSurveyActivity extends AppCompatActivity
                 mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 return true;
             case R.id.done:
-                if (validateForQuestion()) {
+                if (validate()) {
+                    hideSoftKeyboard(mRootView);
                     showSurveys(Activity.RESULT_OK);
                 }
                 return true;
             case R.id.delete_survey:
+                hideSoftKeyboard(mRootView);
                 mUserActionsListener.deleteSurvey(mSurveyId.getText().toString().trim());
                 showSurveys(ViewSurveysActivity.RESULT_DELETE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void hideSoftKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     @Override
@@ -290,10 +273,15 @@ public class EditSurveyActivity extends AppCompatActivity
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
+        boolean matched = false;
         for (int i = 0; i < mSurveyIds.size(); i++) {
             if (s.toString().contentEquals(mSurveyIds.get(i))) {
                 mUserActionsListener.getSurvey(mSurveyIds.get(i));
+                matched = true;
             }
+        }
+        if (!matched) {
+            clearOtherFields();
         }
     }
 
@@ -302,8 +290,28 @@ public class EditSurveyActivity extends AppCompatActivity
 
     }
 
+    private void clearOtherFields() {
+        mDescription.setText("");
+        mPoints.setText("");
+    }
+
     @VisibleForTesting
     public IdlingResource getCountingIdlingResource() {
         return EspressoIdlingResource.getIdlingResource();
+    }
+
+    public void onSurveyActiveRadioButtonClicked(View view) {
+        boolean checked = ((RadioButton) view).isChecked();
+
+        switch (view.getId()) {
+            case R.id.survey_active_yes:
+                if (checked)
+                    mSurveyActive = true;
+                break;
+            case R.id.survey_active_no:
+                if (checked)
+                    mSurveyActive = false;
+                break;
+        }
     }
 }

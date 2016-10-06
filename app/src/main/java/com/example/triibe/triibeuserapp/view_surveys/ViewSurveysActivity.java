@@ -31,6 +31,7 @@ import com.example.triibe.triibeuserapp.util.Constants;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.example.triibe.triibeuserapp.util.RunAppWhenAtMallService;
+import com.example.triibe.triibeuserapp.util.SimpleDividerItemDecoration;
 import com.example.triibe.triibeuserapp.view_question.ViewQuestionActivity;
 
 import java.util.HashMap;
@@ -41,8 +42,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class ViewSurveysActivity extends AppCompatActivity implements ViewSurveysContract.View,
-        EasyPermissions.PermissionCallbacks {
+public class ViewSurveysActivity extends AppCompatActivity
+        implements ViewSurveysContract.View, EasyPermissions.PermissionCallbacks {
 
     private static final String TAG = "ViewSurveysActivity";
     public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
@@ -98,6 +99,7 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mSurveyAdapter = new SurveyAdapter(mUserActionsListener, new HashMap<String, SurveyDetails>());
         mRecyclerView.setAdapter(mSurveyAdapter);
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Add mall fences if not already added (will also be added automatically on boot)
         SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);

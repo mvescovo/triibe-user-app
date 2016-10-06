@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TextInputEditText;
 import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 
@@ -47,6 +49,9 @@ public class EditTriggerActivity extends AppCompatActivity
     GetCurrentLocationIntentService mGetCurrentLocationIntentService;
     boolean mBound = false;
     private List<String> mTriggerIds;
+
+    @BindView(R.id.view_root)
+    CoordinatorLayout mRootView;
 
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
@@ -181,16 +186,23 @@ public class EditTriggerActivity extends AppCompatActivity
                 return true;
             case R.id.done:
                 if (validate()) {
+                    hideSoftKeyboard(mRootView);
                     showEditSurey(Activity.RESULT_OK);
                 }
                 return true;
             case R.id.delete_trigger:
+                hideSoftKeyboard(mRootView);
                 mUserActionsListener.deleteTrigger(mTriggerId.getText().toString().trim());
                 showEditSurey(EditSurveyActivity.RESULT_DELETE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void hideSoftKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     private boolean validate() {
@@ -230,17 +242,29 @@ public class EditTriggerActivity extends AppCompatActivity
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
+        boolean matched = false;
         Log.d(TAG, "onTextChanged: CHANGED");
         for (int i = 0; i < mTriggerIds.size(); i++) {
             if (s.toString().contentEquals(mTriggerIds.get(i))) {
                 mUserActionsListener.getTrigger(mTriggerIds.get(i));
+                matched = true;
             }
+        }
+        if (!matched) {
+            clearOtherFields();
         }
     }
 
     @Override
     public void afterTextChanged(Editable s) {
 
+    }
+
+    private void clearOtherFields() {
+        mLatitude.setText("");
+        mLongitude.setText("");
+        mLevel.setText("");
+        mTime.setText("");
     }
 
     @VisibleForTesting

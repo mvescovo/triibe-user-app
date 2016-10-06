@@ -1,6 +1,7 @@
 package com.example.triibe.triibeuserapp.edit_question;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -220,7 +222,6 @@ public class EditQuestionActivity extends AppCompatActivity
     }
 
     private boolean validate() {
-
         if (mQuestionId.getText().toString().trim().contentEquals("")) {
             mQuestionId.setError("Question ID must not be empty"); // TODO: 18/09/16 set in strings
             mQuestionId.requestFocus();
@@ -235,6 +236,7 @@ public class EditQuestionActivity extends AppCompatActivity
             return false;
         }
 
+        // If all ok, save question.
         QuestionDetails questionDetails = new QuestionDetails(
                 mSurveyId,
                 mQuestionId.getText().toString().trim(),
@@ -265,9 +267,8 @@ public class EditQuestionActivity extends AppCompatActivity
         if (!mIncorrectAnswerPhrase.getText().toString().contentEquals("")) {
             questionDetails.setIncorrectAnswerPhrase(mIncorrectAnswerPhrase.getText().toString().trim());
         }
-        
-        mUserActionsListener.saveQuestion(questionDetails);
 
+        mUserActionsListener.saveQuestion(questionDetails);
         return true;
     }
 
@@ -294,16 +295,23 @@ public class EditQuestionActivity extends AppCompatActivity
                 return true;
             case R.id.done:
                 if (validate()) {
+                    hideSoftKeyboard(mRootView);
                     showEditSurvey(Activity.RESULT_OK);
                 }
                 return true;
             case R.id.delete_question:
+                hideSoftKeyboard(mRootView);
                 mUserActionsListener.deleteQuestion(mQuestionId.getText().toString().trim());
                 showEditSurvey(EditSurveyActivity.RESULT_DELETE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void hideSoftKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     @Override
@@ -313,16 +321,32 @@ public class EditQuestionActivity extends AppCompatActivity
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
+        boolean matched = false;
         for (int i = 0; i < mQuestionIds.size(); i++) {
             if (s.toString().contentEquals(mQuestionIds.get(i))) {
                 mUserActionsListener.getQuestion(mQuestionIds.get(i));
+                matched = true;
             }
+        }
+        if (!matched) {
+            clearOtherFields();
         }
     }
 
     @Override
     public void afterTextChanged(Editable s) {
 
+    }
+
+    private void clearOtherFields() {
+        mImageUrl.setText("");
+        mTitle.setText("");
+        mIntro.setText("");
+        mPhrase.setText("");
+        mIntroLinkKey.setText("");
+        mIntroLinkUrl.setText("");
+        mRequiredPhrase.setText("");
+        mIncorrectAnswerPhrase.setText("");
     }
 
     @VisibleForTesting

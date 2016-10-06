@@ -39,9 +39,6 @@ public class SurveyAdapter extends RecyclerView.Adapter {
         textView = (TextView) ((SurveyViewHolder)holder).getView().findViewById(R.id.survey_points);
         String points = (mSurveyDetails.get("" + position)).getPoints();
         textView.setText("Points: " + points); // TODO: 20/09/16 use string resource
-        textView = (TextView) ((SurveyViewHolder)holder).getView().findViewById(R.id.survey_expiry);
-        String expiry = (mSurveyDetails.get("" + position)).getDurationTillExpiry();
-        textView.setText("Expiry time: " + expiry + "hour.");
     }
 
     @Override

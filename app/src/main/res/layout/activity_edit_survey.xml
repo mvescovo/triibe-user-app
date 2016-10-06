@@ -69,6 +69,35 @@
 
                 </android.support.design.widget.TextInputLayout>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/edit_survey_active"
+                    android:textSize="18sp"/>
+
+                <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/survey_active_yes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="onSurveyActiveRadioButtonClicked"
+                        android:text="@string/edit_survey_active_yes"/>
+
+                    <RadioButton
+                        android:id="@+id/survey_active_no"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:onClick="onSurveyActiveRadioButtonClicked"
+                        android:text="@string/edit_survey_active_no"/>
+                </RadioGroup>
+
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -87,37 +116,11 @@
                     android:layout_height="wrap_content">
 
                     <android.support.design.widget.TextInputEditText
-                        android:id="@+id/survey_version"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/edit_version_hint"
-                        android:inputType="number"/>
-
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <android.support.design.widget.TextInputEditText
                         android:id="@+id/survey_points"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/edit_points_hint"
                         android:inputType="number"/>
-
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <android.support.design.widget.TextInputEditText
-                        android:id="@+id/survey_time_till_expiry"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/edit_time_till_expiry_hint"
-                        android:inputType="time"/>
 
                 </android.support.design.widget.TextInputLayout>
 
