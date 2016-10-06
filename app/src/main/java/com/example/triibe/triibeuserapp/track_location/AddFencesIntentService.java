@@ -20,6 +20,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.triibe.triibeuserapp.R;
+import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.util.Constants;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.example.triibe.triibeuserapp.util.RunAppWhenAtMallService;
@@ -32,6 +33,7 @@ import com.google.android.gms.awareness.fence.LocationFence;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.ResultCallbacks;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -82,13 +84,11 @@ public class AddFencesIntentService extends IntentService
         String surveyDescription = "";
         int requestCode;
         requestCode = intent.getIntExtra(EXTRA_REQUEST_CODE, 0);
-        Log.d(TAG, "onHandleIntent: requestCode: " + requestCode);
         Intent fenceIntent = new Intent(this, MallFenceReceiver.class);
         if (intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION) != null) {
             surveyDescription = intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION);
             fenceIntent.putExtra(EXTRA_SURVEY_DESCRIPTION, surveyDescription);
         }
-        Log.d(TAG, "onHandleIntent: desciption: " + surveyDescription);
         mPendingIntent = PendingIntent.getBroadcast(this, requestCode, fenceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (!mGoogleApiClient.isConnected()) {
@@ -151,7 +151,7 @@ public class AddFencesIntentService extends IntentService
             SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
             boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED, false);
             if (!mallGeofencesAdded && mallFenceUpdateRequest != null) {
-                addFences(mallFenceUpdateRequest, TYPE_MALL);
+                addFences("mallFence", mallFenceUpdateRequest, TYPE_MALL);
             }
         }
     }
@@ -179,12 +179,12 @@ public class AddFencesIntentService extends IntentService
             Log.d(TAG, "createLandmarkFence: googleApiClient not connected");
             mGoogleApiClient.connect();
         } else {
-            addFences(landmarkFenceUpdateRequest, TYPE_LANDMARK);
+            addFences(fenceKey, landmarkFenceUpdateRequest, TYPE_LANDMARK);
             Globals.getInstance().addLandmarkFence(fenceKey);
         }
     }
 
-    private void addFences(FenceUpdateRequest fenceUpdateRequest, String type) {
+    private void addFences(final String fenceKey, final FenceUpdateRequest fenceUpdateRequest, String type) {
         if (!mGoogleApiClient.isConnected()) {
             Toast.makeText(this, "Google API client not connected", Toast.LENGTH_SHORT).show();
             return;
@@ -210,7 +210,17 @@ public class AddFencesIntentService extends IntentService
                 Awareness.FenceApi.updateFences(
                         mGoogleApiClient,
                         fenceUpdateRequest
-                ).setResultCallback(this);
+                ).setResultCallback(new ResultCallbacks<Status>() {
+                    @Override
+                    public void onSuccess(@NonNull Status status) {
+                        Log.i(TAG, "Fence " + fenceKey + " successfully added.");
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Status status) {
+                        Log.i(TAG, "Fence " + fenceKey + " could NOT be added.");
+                    }
+                });
             } catch (SecurityException securityException) {
                 // Catch exception generated if the app does not use ACCESS_FINE_LOCATION permission.
             }
@@ -238,9 +248,9 @@ public class AddFencesIntentService extends IntentService
     @Override
     public void onResult(@NonNull Status status) {
         if (status.isSuccess()) {
-            Log.i(TAG, "Fence was successfully registered.");
+            Log.i(TAG, "Mall fence was successfully registered.");
         } else {
-            Log.e(TAG, "Fence could not be registered: " + status);
+            Log.e(TAG, "Mall fence could not be registered: " + status);
         }
     }
 
@@ -259,23 +269,19 @@ public class AddFencesIntentService extends IntentService
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            TriibeRepository mTriibeRepository = Globals.getInstance().getTriibeRepository();
+
             NotificationManager mNotificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
             FenceState fenceState = FenceState.extract(intent);
             String surveyDescription = "No description.";
             if (intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION) != null) {
-                Log.d(TAG, "onReceive: HAD STRING EXTRA");
                 surveyDescription = intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION);
-            } else {
-                Log.d(TAG, "onReceive: DIDN'T HAVE STRING EXTRA");
             }
-            Log.d(TAG, "onReceive: description from pending intent: " + surveyDescription);
 
             // Start or stop the app service
             Intent AppServiceIntent = new Intent(context, RunAppWhenAtMallService.class);
-
-            Log.d(TAG, "onReceive: fenceKey: " + fenceState.getFenceKey());
 
             if (TextUtils.equals(fenceState.getFenceKey(), "southland")) { // TODO: 18/09/16 add southland and others to constants file
                 switch (fenceState.getCurrentState()) {
@@ -323,6 +329,9 @@ public class AddFencesIntentService extends IntentService
                         );
                         String userId = sharedPref.getString(context.getString(R.string.user_id), "testUser");
 
+                        // Add survey to user's survey list
+                        mTriibeRepository.addUserSurvey(userId, fenceState.getFenceKey());
+
                         // Show survey notification
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(context)
@@ -353,48 +362,6 @@ public class AddFencesIntentService extends IntentService
                         break;
                 }
             }
-
-//            if (TextUtils.equals(fenceState.getFenceKey(), "eastSide")) {
-//                switch (fenceState.getCurrentState()) {
-//                    case FenceState.TRUE:
-//                        Log.d(TAG, "In eastSide");
-//                        break;
-//                    case FenceState.FALSE:
-//                        Log.d(TAG, "Not in eastSide");
-//                        break;
-//                    case FenceState.UNKNOWN:
-//                        Log.d(TAG, "UNKONWN if in eastSide");
-//                        break;
-//                }
-//            }
-//
-//            if (TextUtils.equals(fenceState.getFenceKey(), "westSide")) {
-//                switch (fenceState.getCurrentState()) {
-//                    case FenceState.TRUE:
-//                        Log.d(TAG, "In westSide");
-//                        break;
-//                    case FenceState.FALSE:
-//                        Log.d(TAG, "Not in westSide");
-//                        break;
-//                    case FenceState.UNKNOWN:
-//                        Log.d(TAG, "UNKONWN if in westSide");
-//                        break;
-//                }
-//            }
-//
-//            if (TextUtils.equals(fenceState.getFenceKey(), "furtherSouth")) {
-//                switch (fenceState.getCurrentState()) {
-//                    case FenceState.TRUE:
-//                        Log.d(TAG, "In furtherSouth");
-//                        break;
-//                    case FenceState.FALSE:
-//                        Log.d(TAG, "Not in furtherSouth");
-//                        break;
-//                    case FenceState.UNKNOWN:
-//                        Log.d(TAG, "UNKONWN if in furtherSouth");
-//                        break;
-//                }
-//            }
         }
     }
 

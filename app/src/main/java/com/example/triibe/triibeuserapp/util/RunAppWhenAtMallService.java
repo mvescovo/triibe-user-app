@@ -18,8 +18,6 @@ import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.SurveyTrigger;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
-import com.example.triibe.triibeuserapp.data.TriibeRepositoryImpl;
-import com.example.triibe.triibeuserapp.data.TriibeServiceApiImpl;
 import com.example.triibe.triibeuserapp.track_location.AddFencesIntentService;
 import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
 
@@ -57,8 +55,7 @@ public class RunAppWhenAtMallService extends Service {
         Intent stopAppServiceIntent = new Intent(this, StopTrackingIntentService.class);
         mStopTrackingPendingIntent = PendingIntent.getService(this, STOP_SERVICE_REQUEST, stopAppServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-//        mTriibeRepository = Globals.getInstance().getTriibeRepository();
-        mTriibeRepository = new TriibeRepositoryImpl(new TriibeServiceApiImpl());
+        mTriibeRepository = Globals.getInstance().getTriibeRepository();
     }
 
     @Override
@@ -208,7 +205,7 @@ public class RunAppWhenAtMallService extends Service {
 
         @Override
         public void handleMessage(Message msg) {
-            Log.d(TAG, "handleMessage: test data tracking task (print to console)");
+
         }
     }
 }

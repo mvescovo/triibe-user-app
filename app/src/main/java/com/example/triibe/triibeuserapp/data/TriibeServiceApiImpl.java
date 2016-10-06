@@ -398,5 +398,17 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
                 .setValue(answer);
     }
 
+    @Override
+    public void addUserSurvey(@NonNull String userId, @NonNull String surveyId) {
+        mDatabase.child("users/").child(userId).child("surveyIds").child(surveyId)
+                .setValue(true);
+    }
+
+    @Override
+    public void removeUserSurvey(@NonNull String userId, @NonNull String surveyId) {
+        mDatabase.child("users/").child(userId).child("surveyIds").child(surveyId)
+                .setValue(null);
+    }
+
     // TODO: 25/09/16 maybe put a method to detach listeners when the activity is destroyed? Not sure if it's necessary.
 }

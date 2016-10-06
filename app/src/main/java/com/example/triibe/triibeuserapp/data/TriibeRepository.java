@@ -145,4 +145,9 @@ public interface TriibeRepository {
     void getAnswer(@NonNull String surveyId, @NonNull String questionId, @NonNull GetAnswerCallback callback);
 
     void saveAnswer(@NonNull String surveyId, @NonNull String userId, @NonNull String questionId, @NonNull Answer answer);
+
+    // Users
+    void addUserSurvey(@NonNull String userId, @NonNull String surveyId);
+
+    void removeUserSurvey(@NonNull String userId, @NonNull String surveyId);
 }

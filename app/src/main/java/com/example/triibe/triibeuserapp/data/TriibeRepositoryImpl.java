@@ -2,6 +2,7 @@ package com.example.triibe.triibeuserapp.data;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -14,7 +15,8 @@ import java.util.Map;
 public class TriibeRepositoryImpl implements TriibeRepository {
 
     private final TriibeServiceApi mTriibeServiceApi;
-    private Map<String, Boolean> mCachedSurveyIds;
+    @VisibleForTesting
+    Map<String, Boolean> mCachedSurveyIds;
     private Map<String, Boolean> mCachedQuestionIds;
     private Map<String, Question> mCachedQuestions;
     private Map<String, Boolean> mCachedOptionIds;
@@ -345,5 +347,15 @@ public class TriibeRepositoryImpl implements TriibeRepository {
     public void saveAnswer(@NonNull String surveyId, @NonNull String userId,
                            @NonNull String questionId, @NonNull Answer answer) {
         mTriibeServiceApi.saveAnswer(surveyId, userId, questionId, answer);
+    }
+
+    @Override
+    public void addUserSurvey(@NonNull String userId, @NonNull String surveyId) {
+        mTriibeServiceApi.addUserSurvey(userId, surveyId);
+    }
+
+    @Override
+    public void removeUserSurvey(@NonNull String userId, @NonNull String surveyId) {
+        mTriibeServiceApi.removeUserSurvey(userId, surveyId);
     }
 }

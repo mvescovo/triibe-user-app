@@ -50,9 +50,11 @@ public class EditSurveyPresenterTest {
         SURVEY_IDS.add("enrollmentSurvey");
 
         SURVEYS.put("enrollmentSurvey", new SurveyDetails(
-                "enrollmentSurvey", "1", "first required survey", "1", "10"));
+                "enrollmentSurvey", "1", "first required survey", "1", "10", true
+        ));
         SURVEYS.put("Test", new SurveyDetails(
-                "Test", "1", "test survey", "1", "1"));
+                "Test", "1", "test survey", "1", "1", true
+        ));
     }
 
     @Mock
