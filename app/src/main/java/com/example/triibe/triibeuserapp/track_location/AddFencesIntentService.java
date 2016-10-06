@@ -298,14 +298,13 @@ public class AddFencesIntentService extends IntentService
                         String userId = sharedPref.getString(context.getString(R.string.user_id), "testUser");
 
                         // Show survey notification
-                        // TODO: 5/10/16 also, remove survey when user clicks on it
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(context)
                                         .setSmallIcon(R.drawable.westfieldicon_transparent)
-                                        .setContentTitle(fenceState.getFenceKey())
-                                        .setContentText("New Survey Available");
+                                        .setContentTitle("New Survey Available")
+                                        .setAutoCancel(true);
                         Intent resultIntent = new Intent(context, ViewQuestionActivity.class);
-                        resultIntent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, "enrollmentSurvey"); // TODO: 5/10/16 NEED TO GET SURVEYID!
+                        resultIntent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, fenceState.getFenceKey());
                         resultIntent.putExtra(ViewQuestionActivity.EXTRA_USER_ID, userId);
                         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
                         stackBuilder.addParentStack(ViewQuestionActivity.class);
@@ -328,107 +327,47 @@ public class AddFencesIntentService extends IntentService
                 }
             }
 
-            if (TextUtils.equals(fenceState.getFenceKey(), "enrollmentSurveyt1")) {
-                switch (fenceState.getCurrentState()) {
-                    case FenceState.TRUE:
-                        Log.d(TAG, "In enrollmentSurveyt1");
-
-                        // Show notification for survey.
-
-//                        SharedPreferences sharedPref = context.getSharedPreferences(
-//                                context.getString(R.string.user_id),
-//                                Context.MODE_PRIVATE
-//                        );
-//                        String userId = sharedPref.getString(context.getString(R.string.user_id), "testUser");
-//                        AppServiceIntent.putExtra(context.getString(R.string.user_id), userId);
+//            if (TextUtils.equals(fenceState.getFenceKey(), "eastSide")) {
+//                switch (fenceState.getCurrentState()) {
+//                    case FenceState.TRUE:
+//                        Log.d(TAG, "In eastSide");
+//                        break;
+//                    case FenceState.FALSE:
+//                        Log.d(TAG, "Not in eastSide");
+//                        break;
+//                    case FenceState.UNKNOWN:
+//                        Log.d(TAG, "UNKONWN if in eastSide");
+//                        break;
+//                }
+//            }
 //
-//                        context.startService(AppServiceIntent);
-
-
-
-                        break;
-                    case FenceState.FALSE:
-                        Log.d(TAG, "Not in enrollmentSurveyt1");
-                        // Remove survey notification.
-//                        context.stopService(AppServiceIntent);
-                        break;
-                    case FenceState.UNKNOWN:
-                        Log.d(TAG, "UNKONWN if in enrollmentSurveyt1");
-                        break;
-                }
-            }
-
-            if (TextUtils.equals(fenceState.getFenceKey(), "Testt1")) {
-                switch (fenceState.getCurrentState()) {
-                    case FenceState.TRUE:
-                        Log.d(TAG, "In Testt1");
-
-                        // Show notification for survey.
-
-//                        SharedPreferences sharedPref = context.getSharedPreferences(
-//                                context.getString(R.string.user_id),
-//                                Context.MODE_PRIVATE
-//                        );
-//                        String userId = sharedPref.getString(context.getString(R.string.user_id), "testUser");
-//                        AppServiceIntent.putExtra(context.getString(R.string.user_id), userId);
+//            if (TextUtils.equals(fenceState.getFenceKey(), "westSide")) {
+//                switch (fenceState.getCurrentState()) {
+//                    case FenceState.TRUE:
+//                        Log.d(TAG, "In westSide");
+//                        break;
+//                    case FenceState.FALSE:
+//                        Log.d(TAG, "Not in westSide");
+//                        break;
+//                    case FenceState.UNKNOWN:
+//                        Log.d(TAG, "UNKONWN if in westSide");
+//                        break;
+//                }
+//            }
 //
-//                        context.startService(AppServiceIntent);
-
-
-
-                        break;
-                    case FenceState.FALSE:
-                        Log.d(TAG, "Not in Testt1");
-                        // Remove survey notification.
-//                        context.stopService(AppServiceIntent);
-                        break;
-                    case FenceState.UNKNOWN:
-                        Log.d(TAG, "UNKONWN if in Testt1");
-                        break;
-                }
-            }
-
-            if (TextUtils.equals(fenceState.getFenceKey(), "eastSide")) {
-                switch (fenceState.getCurrentState()) {
-                    case FenceState.TRUE:
-                        Log.d(TAG, "In eastSide");
-                        break;
-                    case FenceState.FALSE:
-                        Log.d(TAG, "Not in eastSide");
-                        break;
-                    case FenceState.UNKNOWN:
-                        Log.d(TAG, "UNKONWN if in eastSide");
-                        break;
-                }
-            }
-
-            if (TextUtils.equals(fenceState.getFenceKey(), "westSide")) {
-                switch (fenceState.getCurrentState()) {
-                    case FenceState.TRUE:
-                        Log.d(TAG, "In westSide");
-                        break;
-                    case FenceState.FALSE:
-                        Log.d(TAG, "Not in westSide");
-                        break;
-                    case FenceState.UNKNOWN:
-                        Log.d(TAG, "UNKONWN if in westSide");
-                        break;
-                }
-            }
-
-            if (TextUtils.equals(fenceState.getFenceKey(), "furtherSouth")) {
-                switch (fenceState.getCurrentState()) {
-                    case FenceState.TRUE:
-                        Log.d(TAG, "In furtherSouth");
-                        break;
-                    case FenceState.FALSE:
-                        Log.d(TAG, "Not in furtherSouth");
-                        break;
-                    case FenceState.UNKNOWN:
-                        Log.d(TAG, "UNKONWN if in furtherSouth");
-                        break;
-                }
-            }
+//            if (TextUtils.equals(fenceState.getFenceKey(), "furtherSouth")) {
+//                switch (fenceState.getCurrentState()) {
+//                    case FenceState.TRUE:
+//                        Log.d(TAG, "In furtherSouth");
+//                        break;
+//                    case FenceState.FALSE:
+//                        Log.d(TAG, "Not in furtherSouth");
+//                        break;
+//                    case FenceState.UNKNOWN:
+//                        Log.d(TAG, "UNKONWN if in furtherSouth");
+//                        break;
+//                }
+//            }
         }
     }
 

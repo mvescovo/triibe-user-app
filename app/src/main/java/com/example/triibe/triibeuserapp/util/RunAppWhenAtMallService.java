@@ -160,7 +160,7 @@ public class RunAppWhenAtMallService extends Service {
             );
             addLocationFencesIntent.putExtra(
                     AddFencesIntentService.EXTRA_FENCE_KEY,
-                    trigger.getSurveyId() + trigger.getId()
+                    trigger.getSurveyId()
             );
             addLocationFencesIntent.putExtra(
                     AddFencesIntentService.EXTRA_LATITUDE,

@@ -29,9 +29,9 @@ public final class Constants {
         WESTFIELD_MALLS.put("southland", new LatLng(-37.958388, 145.052658));
     }
 
-    public static final HashMap<String, LatLng> WESTFIELD_LANDMARKS = new HashMap<>();
-    static {
-        WESTFIELD_LANDMARKS.put("eastSide", new LatLng(-37.958201, 145.056192));
-        WESTFIELD_LANDMARKS.put("westSide", new LatLng(-37.958876, 145.049591));
-    }
+//    public static final HashMap<String, LatLng> WESTFIELD_LANDMARKS = new HashMap<>();
+//    static {
+//        WESTFIELD_LANDMARKS.put("eastSide", new LatLng(-37.958201, 145.056192));
+//        WESTFIELD_LANDMARKS.put("westSide", new LatLng(-37.958876, 145.049591));
+//    }
 }
