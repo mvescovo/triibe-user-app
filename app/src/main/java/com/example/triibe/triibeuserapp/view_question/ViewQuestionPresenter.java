@@ -446,6 +446,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         Option option = options.get("o" + i);
                         String optionPhrase = option.getPhrase();
                         if (optionPhrase.contentEquals(phrase) && checked) {
+                            option.setChecked(true);
                             previousOptions.put("o" + i, option);
                         } else if (optionPhrase.contentEquals(phrase) && !checked) {
                             previousOptions.remove("o" + i);
@@ -465,6 +466,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         Option option = options.get("o" + i);
                         String optionPhrase = option.getPhrase();
                         if (optionPhrase.contentEquals(phrase) && checked) {
+                            option.setChecked(true);
                             selectedOptions.put("o" + i, option);
                         }
                     }
