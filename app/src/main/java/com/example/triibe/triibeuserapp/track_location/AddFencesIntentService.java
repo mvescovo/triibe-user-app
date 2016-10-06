@@ -54,6 +54,8 @@ public class AddFencesIntentService extends IntentService
     public final static String EXTRA_FENCE_KEY = "com.example.triibe.TRIIBE_FENCE_KEY";
     public final static String EXTRA_LATITUDE = "com.example.triibe.TRIIBE_LATITUDE";
     public final static String EXTRA_LONGITUDE = "com.example.triibe.TRIIBE_LONGITUDE";
+    public final static String EXTRA_SURVEY_DESCRIPTION = "com.example.triibe.TRIIBE_SURVEY_DESCRIPTION";
+    public final static String EXTRA_REQUEST_CODE = "com.example.triibe.TRIIBE_REQUEST_CODE";
     private GoogleApiClient mGoogleApiClient;
     private PendingIntent mPendingIntent;
     private volatile List<Intent> mIntents;
@@ -66,8 +68,6 @@ public class AddFencesIntentService extends IntentService
     public void onCreate() {
         super.onCreate();
 
-        Intent intent = new Intent(this, MallFenceReceiver.class);
-        mPendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
         mIntents = new ArrayList<>();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -79,6 +79,18 @@ public class AddFencesIntentService extends IntentService
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        String surveyDescription = "";
+        int requestCode;
+        requestCode = intent.getIntExtra(EXTRA_REQUEST_CODE, 0);
+        Log.d(TAG, "onHandleIntent: requestCode: " + requestCode);
+        Intent fenceIntent = new Intent(this, MallFenceReceiver.class);
+        if (intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION) != null) {
+            surveyDescription = intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION);
+            fenceIntent.putExtra(EXTRA_SURVEY_DESCRIPTION, surveyDescription);
+        }
+        Log.d(TAG, "onHandleIntent: desciption: " + surveyDescription);
+        mPendingIntent = PendingIntent.getBroadcast(this, requestCode, fenceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         if (!mGoogleApiClient.isConnected()) {
             mIntents.add(intent);
             mGoogleApiClient.connect();
@@ -251,6 +263,14 @@ public class AddFencesIntentService extends IntentService
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
             FenceState fenceState = FenceState.extract(intent);
+            String surveyDescription = "No description.";
+            if (intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION) != null) {
+                Log.d(TAG, "onReceive: HAD STRING EXTRA");
+                surveyDescription = intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION);
+            } else {
+                Log.d(TAG, "onReceive: DIDN'T HAVE STRING EXTRA");
+            }
+            Log.d(TAG, "onReceive: description from pending intent: " + surveyDescription);
 
             // Start or stop the app service
             Intent AppServiceIntent = new Intent(context, RunAppWhenAtMallService.class);
@@ -308,7 +328,7 @@ public class AddFencesIntentService extends IntentService
                                 new NotificationCompat.Builder(context)
                                         .setSmallIcon(R.drawable.westfieldicon_transparent)
                                         .setContentTitle("New Survey Available")
-                                        .setContentText(fenceState.getFenceKey())
+                                        .setContentText(surveyDescription)
                                         .setAutoCancel(true);
                         Intent resultIntent = new Intent(context, ViewQuestionActivity.class);
                         resultIntent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, fenceState.getFenceKey());

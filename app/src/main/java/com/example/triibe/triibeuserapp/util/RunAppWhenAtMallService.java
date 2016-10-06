@@ -24,6 +24,7 @@ import com.example.triibe.triibeuserapp.track_location.AddFencesIntentService;
 import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
 
 import java.util.Map;
+import java.util.Random;
 
 /**
  * @author michael.
@@ -115,7 +116,7 @@ public class RunAppWhenAtMallService extends Service {
                                         if (survey != null) {
                                             if (survey.getActive()) {
                                                 // Only get triggers for active surveys.
-                                                getSurveyTriggers(survey.getId());
+                                                getSurveyTriggers(survey.getId(), survey.getDescription());
                                             }
                                         }
                                     }
@@ -134,7 +135,7 @@ public class RunAppWhenAtMallService extends Service {
         return START_STICKY;
     }
 
-    private void getSurveyTriggers(final String surveyId) {
+    private void getSurveyTriggers(final String surveyId, final String surveyDescription) {
         EspressoIdlingResource.increment();
         mTriibeRepository.getTriggers(surveyId, new TriibeRepository.GetTriggersCallback() {
             @Override
@@ -143,14 +144,14 @@ public class RunAppWhenAtMallService extends Service {
                 if (triggers != null) {
                     for (String triggerId : triggers.keySet()) {
                         // Immediately add a fence for this trigger.
-                        addFence(triggers.get(triggerId));
+                        addFence(triggers.get(triggerId), surveyDescription);
                     }
                 }
             }
         });
     }
 
-    private void addFence(SurveyTrigger trigger) {
+    private void addFence(SurveyTrigger trigger, String surveyDescription) {
         // Add a location fence
         if (trigger.getLatitude() != null && trigger.getLongitude() != null) {
             Intent addLocationFencesIntent = new Intent(this, AddFencesIntentService.class);
@@ -169,6 +170,19 @@ public class RunAppWhenAtMallService extends Service {
             addLocationFencesIntent.putExtra(
                     AddFencesIntentService.EXTRA_LONGITUDE,
                     trigger.getLongitude()
+            );
+            // Add survey description so it can be shown on the notification.
+            addLocationFencesIntent.putExtra(
+                    AddFencesIntentService.EXTRA_SURVEY_DESCRIPTION,
+                    surveyDescription
+            );
+            // Add random requestId so each pendingIntent will be different
+            int requestCode;
+            Random random = new Random();
+            requestCode = random.nextInt();
+            addLocationFencesIntent.putExtra(
+                    AddFencesIntentService.EXTRA_REQUEST_CODE,
+                    requestCode
             );
             startService(addLocationFencesIntent);
         }
