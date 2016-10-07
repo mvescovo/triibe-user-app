@@ -149,5 +149,7 @@ public interface TriibeServiceApi {
 
     void markUserSurveyDone(@NonNull String userId, @NonNull String surveyId);
 
+    void addUserPoints(@NonNull String userId, @NonNull String points);
+
     void removeUserSurvey(@NonNull String userId, @NonNull String surveyId);
 }

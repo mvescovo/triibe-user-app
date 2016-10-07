@@ -25,15 +25,18 @@ public class User {
 //    private Map<String, Answer> mResponses;
     private boolean mEnrolled;
     private boolean mAdmin;
+    private String mPoints;
 
     // Empty constructor required for firebase
     public User() {}
 
-    public User(String id, Map<String, Boolean> activeSurveyIds, boolean enrolled, boolean admin) {
+    public User(String id, Map<String, Boolean> activeSurveyIds, boolean enrolled, boolean admin,
+                String points) {
         mId = id;
         mActiveSurveyIds = activeSurveyIds;
         mEnrolled = enrolled;
         mAdmin = admin;
+        mPoints = points;
     }
 
     /*
@@ -130,6 +133,14 @@ public class User {
         mAdmin = admin;
     }
 
+    public String getPoints() {
+        return mPoints;
+    }
+
+    public void setPoints(String points) {
+        mPoints = points;
+    }
+
     // For firebase map
     @Exclude
     public Map<String, Object> toMap() {
@@ -139,6 +150,7 @@ public class User {
         result.put("activeSurveyIds", mActiveSurveyIds);
         result.put("enrolled", mEnrolled);
         result.put("admin", mAdmin);
+        result.put("points", mPoints);
         return result;
     }
 }

@@ -444,6 +444,11 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
     }
 
     @Override
+    public void addUserPoints(@NonNull String userId, @NonNull String points) {
+        mDatabase.child("users/").child(userId).child("points").setValue(points);
+    }
+
+    @Override
     public void removeUserSurvey(@NonNull String userId, @NonNull String surveyId) {
         mDatabase.child("users/").child(userId).child("activeSurveyIds").child(surveyId)
                 .setValue(null);

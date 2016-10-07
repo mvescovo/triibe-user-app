@@ -135,7 +135,7 @@ public class AuthUiActivity extends AppCompatActivity {
                         Map<String, Boolean> activeSurveyIds = new HashMap<>();
                         // Start a new user with the enrollment survey.
                         activeSurveyIds.put("enrollmentSurvey", true);
-                        User newUser = new User(mUserId, activeSurveyIds, false, false);
+                        User newUser = new User(mUserId, activeSurveyIds, false, false, "0");
                         mTriibeRepository.saveUser(newUser);
                     }
 

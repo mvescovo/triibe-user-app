@@ -13,6 +13,7 @@ import com.example.triibe.triibeuserapp.data.AnswerDetails;
 import com.example.triibe.triibeuserapp.data.Option;
 import com.example.triibe.triibeuserapp.data.Question;
 import com.example.triibe.triibeuserapp.data.QuestionDetails;
+import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.data.User;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
@@ -609,6 +610,27 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 if (answerOk) {
                     if (mCurrentQuestionNum == mQuestions.size()) {
                         mTriibeRepository.markUserSurveyDone(mUserId, mSurveyId);
+
+                        // Update user points
+                        mTriibeRepository.getSurvey(mSurveyId, new TriibeRepository.GetSurveyCallback() {
+                            @Override
+                            public void onSurveyLoaded(@Nullable SurveyDetails survey) {
+                                if (survey != null) {
+                                    final int surveyPoints = Integer.parseInt(survey.getPoints());
+                                    mTriibeRepository.getUser(mUserId, new TriibeRepository.GetUserCallback() {
+                                        @Override
+                                        public void onUserLoaded(@Nullable User user) {
+                                            if (user != null) {
+                                                int currentPoints = Integer.parseInt(user.getPoints());
+                                                int newPoints = currentPoints += surveyPoints;
+                                                mTriibeRepository.addUserPoints(mUserId, String.valueOf(newPoints));
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+
 
                         // To ensure the enrollment survey doesn't come back and the user can get
                         // other surveys, mark them as enrolled once they've completed it.
