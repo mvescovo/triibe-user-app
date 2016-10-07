@@ -12,8 +12,8 @@ public final class Constants {
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     public static final float FENCE_MALL_RADIUS_IN_METERS = 500;
     public static final long FENCE_MALL_DWELL_IN_MILLISECONDS = 1000;
-    public static final long FENCE_LANDMARK_DWELL_IN_MILLISECONDS = 1000;
-    public static final float FENCE_LANDMARK_RADIUS_IN_METERS = 10;
+//    public static final long FENCE_LANDMARK_DWELL_IN_MILLISECONDS = 1000;
+//    public static final float FENCE_LANDMARK_RADIUS_IN_METERS = 10;
     public static final long FENCE_EXPIRATION_IN_HOURS = 12;
     public static final long FENCE_EXPIRATION_IN_MILLISECONDS = FENCE_EXPIRATION_IN_HOURS * 60 * 60 * 1000;
     public static final String MALL_FENCES = "mallGeofences";

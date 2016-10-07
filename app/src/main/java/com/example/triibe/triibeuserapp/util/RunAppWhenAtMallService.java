@@ -201,6 +201,14 @@ public class RunAppWhenAtMallService extends Service {
                     AddFencesIntentService.EXTRA_LONGITUDE,
                     trigger.getLongitude()
             );
+            addLocationFencesIntent.putExtra(
+                    AddFencesIntentService.EXTRA_RADIUS,
+                    trigger.getLongitude()
+            );
+            addLocationFencesIntent.putExtra(
+                    AddFencesIntentService.EXTRA_DWELL,
+                    trigger.getLongitude()
+            );
             // Add survey description so it can be shown on the notification.
             addLocationFencesIntent.putExtra(
                     AddFencesIntentService.EXTRA_SURVEY_DESCRIPTION,

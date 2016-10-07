@@ -56,6 +56,8 @@ public class AddFencesIntentService extends IntentService
     public final static String EXTRA_FENCE_KEY = "com.example.triibe.TRIIBE_FENCE_KEY";
     public final static String EXTRA_LATITUDE = "com.example.triibe.TRIIBE_LATITUDE";
     public final static String EXTRA_LONGITUDE = "com.example.triibe.TRIIBE_LONGITUDE";
+    public final static String EXTRA_RADIUS = "com.example.triibe.TRIIBE_RADIUS";
+    public final static String EXTRA_DWELL = "com.example.triibe.TRIIBE_DWELL";
     public final static String EXTRA_SURVEY_DESCRIPTION = "com.example.triibe.TRIIBE_SURVEY_DESCRIPTION";
     public final static String EXTRA_REQUEST_CODE = "com.example.triibe.TRIIBE_REQUEST_CODE";
     private GoogleApiClient mGoogleApiClient;
@@ -111,6 +113,9 @@ public class AddFencesIntentService extends IntentService
                 String key = "";
                 String lat = "";
                 String lon = "";
+                String radius = "";
+                String dwell = "";
+
                 if (intent.getStringExtra(EXTRA_FENCE_KEY) != null) {
                     key = intent.getStringExtra(EXTRA_FENCE_KEY);
                 }
@@ -120,8 +125,15 @@ public class AddFencesIntentService extends IntentService
                 if (intent.getStringExtra(EXTRA_LONGITUDE )!= null) {
                     lon = intent.getStringExtra(EXTRA_LONGITUDE);
                 }
-                if (!key.contentEquals("") && !lat.contentEquals("") && !lon.contentEquals("")) {
-                    createLandmarkFence(key, lat, lon);
+                if (intent.getStringExtra(EXTRA_RADIUS )!= null) {
+                    radius = intent.getStringExtra(EXTRA_RADIUS);
+                }
+                if (intent.getStringExtra(EXTRA_DWELL )!= null) {
+                    dwell = intent.getStringExtra(EXTRA_DWELL);
+                }
+                if (!key.contentEquals("") && !lat.contentEquals("") && !lon.contentEquals("")
+                        && !radius.contentEquals("") && !dwell.contentEquals("")) {
+                    createLandmarkFence(key, lat, lon, radius, dwell);
                 }
             }
         }
@@ -156,8 +168,10 @@ public class AddFencesIntentService extends IntentService
         }
     }
 
-    public void createLandmarkFence(String fenceKey, String lat, String lon) {
-        Log.d(TAG, "createLandmarkFence: fenceKey, lat, lon: " + fenceKey + lat + lon);
+    public void createLandmarkFence(String fenceKey, String lat, String lon, String radius,
+                                    String dwell) {
+        Log.d(TAG, "createLandmarkFence: fenceKey, lat, lon, radius, dwell: " + fenceKey + lat +
+                lon + radius + dwell);
 
         FenceUpdateRequest.Builder builder = new FenceUpdateRequest.Builder();
 
@@ -168,8 +182,8 @@ public class AddFencesIntentService extends IntentService
         AwarenessFence location = LocationFence.in(
                 Double.valueOf(lat),
                 Double.valueOf(lon),
-                Constants.FENCE_LANDMARK_RADIUS_IN_METERS,
-                Constants.FENCE_LANDMARK_DWELL_IN_MILLISECONDS
+                Double.valueOf(radius),
+                Long.valueOf(dwell)
         );
         builder.addFence(fenceKey, location, mPendingIntent).build();
 
