@@ -219,14 +219,6 @@ public class EditTriggerActivity extends AppCompatActivity
                     showEditSurey(Activity.RESULT_OK);
                 }
                 return true;
-            case R.id.use_current_location:
-                if (mBound) {
-                    setCurrentLocation(
-                            mGetCurrentLocationIntentService.getLat(),
-                            mGetCurrentLocationIntentService.getLon()
-                    );
-                }
-                return true;
             case R.id.delete_trigger:
                 hideSoftKeyboard(mRootView);
                 mUserActionsListener.deleteTrigger(mTriggerId.getText().toString().trim());
