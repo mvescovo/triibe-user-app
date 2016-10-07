@@ -26,7 +26,6 @@ import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import static com.example.triibe.triibeuserapp.track_location.AddFencesIntentService.EXTRA_FENCE_KEY;
 import static com.example.triibe.triibeuserapp.track_location.AddFencesIntentService.EXTRA_TRIIBE_FENCE_TYPE;
@@ -141,7 +140,6 @@ public class RunAppWhenAtMallService extends Service {
     }
 
     private void getSurveyTriggers(final String surveyId, final String surveyDescription) {
-        Log.d(TAG, "getSurveyTriggers: GOING TO GET TRIGGER FOR: " + surveyDescription);
         EspressoIdlingResource.increment();
         mTriibeRepository.getTriggers(surveyId, new TriibeRepository.GetTriggersCallback() {
             @Override
@@ -182,10 +180,8 @@ public class RunAppWhenAtMallService extends Service {
                     AddFencesIntentService.EXTRA_SURVEY_DESCRIPTION,
                     surveyDescription
             );
-            // Add random requestId so each pendingIntent will be different
-            int requestCode;
-            Random random = new Random();
-            requestCode = random.nextInt();
+            // Set requestId so each pendingIntent will be different
+            int requestCode = surveyDescription.hashCode();
             addLocationFencesIntent.putExtra(
                     AddFencesIntentService.EXTRA_REQUEST_CODE,
                     requestCode
