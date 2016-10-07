@@ -1,7 +1,9 @@
 package com.example.triibe.triibeuserapp.util;
 
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -19,19 +21,25 @@ import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.SurveyTrigger;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.track_location.AddFencesIntentService;
+import com.example.triibe.triibeuserapp.track_location.RemoveFenceIntentService;
 import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import static com.example.triibe.triibeuserapp.track_location.AddFencesIntentService.EXTRA_FENCE_KEY;
+import static com.example.triibe.triibeuserapp.track_location.AddFencesIntentService.EXTRA_TRIIBE_FENCE_TYPE;
+import static com.example.triibe.triibeuserapp.track_location.AddFencesIntentService.TYPE_LANDMARK;
 
 /**
  * @author michael.
  */
 public class RunAppWhenAtMallService extends Service {
 
+    public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
     private static final String TAG = "RunAppWhenAtMallService";
     private static final int STOP_SERVICE_REQUEST = 9999;
-    public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private PendingIntent mStopTrackingPendingIntent;
@@ -133,6 +141,7 @@ public class RunAppWhenAtMallService extends Service {
     }
 
     private void getSurveyTriggers(final String surveyId, final String surveyDescription) {
+        Log.d(TAG, "getSurveyTriggers: GOING TO GET TRIGGER FOR: " + surveyDescription);
         EspressoIdlingResource.increment();
         mTriibeRepository.getTriggers(surveyId, new TriibeRepository.GetTriggersCallback() {
             @Override
@@ -153,11 +162,11 @@ public class RunAppWhenAtMallService extends Service {
         if (trigger.getLatitude() != null && trigger.getLongitude() != null) {
             Intent addLocationFencesIntent = new Intent(this, AddFencesIntentService.class);
             addLocationFencesIntent.putExtra(
-                    AddFencesIntentService.EXTRA_TRIIBE_FENCE_TYPE,
-                    AddFencesIntentService.TYPE_LANDMARK
+                    EXTRA_TRIIBE_FENCE_TYPE,
+                    TYPE_LANDMARK
             );
             addLocationFencesIntent.putExtra(
-                    AddFencesIntentService.EXTRA_FENCE_KEY,
+                    EXTRA_FENCE_KEY,
                     trigger.getSurveyId()
             );
             addLocationFencesIntent.putExtra(
@@ -194,6 +203,20 @@ public class RunAppWhenAtMallService extends Service {
 
     @Override
     public void onDestroy() {
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Remove landmark fences
+        List<String> landmarkFences = Globals.getInstance().getLandmarkFences();
+        for (int i = 0; i < landmarkFences.size(); i++) {
+            Intent removeFenceIntent = new Intent(this, RemoveFenceIntentService.class);
+            removeFenceIntent.putExtra(EXTRA_TRIIBE_FENCE_TYPE, TYPE_LANDMARK);
+            removeFenceIntent.putExtra(EXTRA_FENCE_KEY, landmarkFences.get(i));
+            startService(removeFenceIntent);
+
+            // Clear notifications.
+            mNotificationManager.cancelAll();
+        }
         Log.d(TAG, "onDestroy: service done");
     }
 

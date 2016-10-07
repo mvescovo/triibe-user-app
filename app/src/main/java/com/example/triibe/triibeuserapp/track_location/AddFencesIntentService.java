@@ -299,17 +299,17 @@ public class AddFencesIntentService extends IntentService
                         break;
                     case FenceState.FALSE:
                         Log.d(TAG, "Not in southland");
-                        // Remove landmark fences
-                        List<String> landmarkFences = Globals.getInstance().getLandmarkFences();
-                        for (int i = 0; i < landmarkFences.size(); i++) {
-                            Intent removeFenceIntent = new Intent(context, RemoveFenceIntentService.class);
-                            removeFenceIntent.putExtra(EXTRA_TRIIBE_FENCE_TYPE, TYPE_LANDMARK);
-                            removeFenceIntent.putExtra(EXTRA_FENCE_KEY, landmarkFences.get(i));
-                            context.startService(removeFenceIntent);
-
-                            // Clear notifications.
-                            mNotificationManager.cancelAll();
-                        }
+//                        // Remove landmark fences
+//                        List<String> landmarkFences = Globals.getInstance().getLandmarkFences();
+//                        for (int i = 0; i < landmarkFences.size(); i++) {
+//                            Intent removeFenceIntent = new Intent(context, RemoveFenceIntentService.class);
+//                            removeFenceIntent.putExtra(EXTRA_TRIIBE_FENCE_TYPE, TYPE_LANDMARK);
+//                            removeFenceIntent.putExtra(EXTRA_FENCE_KEY, landmarkFences.get(i));
+//                            context.startService(removeFenceIntent);
+//
+//                            // Clear notifications.
+//                            mNotificationManager.cancelAll();
+//                        }
 
                         // Stop app
                         context.stopService(AppServiceIntent);
