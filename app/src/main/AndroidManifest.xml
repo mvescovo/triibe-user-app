@@ -22,6 +22,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+
         <!-- Meta data -->
         <meta-data
             android:name="com.google.android.awareness.API_KEY"
@@ -35,6 +36,7 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
+
 
         <!-- Activities -->
         <activity android:name=".util.AuthUiActivity">
@@ -97,6 +99,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity"/>
         </activity>
+        <activity
+            android:name=".view_points.ViewPointsActivity"
+            android:label="@string/title_activity_view_points"
+            android:parentActivityName=".view_surveys.ViewSurveysActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
+        </activity>
+
 
         <!-- Services -->
         <service
@@ -120,6 +132,7 @@
             android:exported="false">
         </service>
 
+
         <!-- Receivers -->
         <receiver android:name=".track_location.AddFencesIntentService$BootDetectionBroadcastReceiver">
             <intent-filter>
@@ -128,6 +141,7 @@
         </receiver>
         <receiver android:name=".track_location.AddFencesIntentService$MallFenceReceiver">
         </receiver>
+
 
         <!-- <service -->
         <!-- android:name=".util.FirebaseMessagingService" -->

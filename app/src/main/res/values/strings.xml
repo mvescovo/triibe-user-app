@@ -130,4 +130,9 @@
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_test">TestActivity</string>
 
+    <!--ViewPointsActivity-->
+    <string name="title_activity_view_points">Points</string>
+    <string name="new_points_earned_title">New Points Earned</string>
+    <string name="total_points_earned_title">Total Points Earned</string>
+
 </resources>

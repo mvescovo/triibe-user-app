@@ -38,6 +38,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
     public Map<String, Question> mQuestions;
     @VisibleForTesting
     public Map<String, Answer> mAnswers;
+    private String mSurveyPoints;
 
 
     public ViewQuestionPresenter(TriibeRepository triibeRepository, ViewQuestionContract.View view,
@@ -616,36 +617,35 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             @Override
                             public void onSurveyLoaded(@Nullable SurveyDetails survey) {
                                 if (survey != null) {
-                                    final int surveyPoints = Integer.parseInt(survey.getPoints());
+                                    mSurveyPoints = survey.getPoints();
+                                    final int surveyPoints = Integer.parseInt(mSurveyPoints);
                                     mTriibeRepository.getUser(mUserId, new TriibeRepository.GetUserCallback() {
                                         @Override
                                         public void onUserLoaded(@Nullable User user) {
                                             if (user != null) {
+                                                // To ensure the enrollment survey doesn't come back and the user can get
+                                                // other surveys, mark them as enrolled once they've completed it.
+                                                if (mSurveyId.contentEquals("enrollmentSurvey")) {
+                                                    mTriibeRepository.getUser(mUserId, new TriibeRepository.GetUserCallback() {
+                                                        @Override
+                                                        public void onUserLoaded(@Nullable User user) {
+                                                            if (user != null) {
+                                                                user.setEnrolled(true);
+                                                            }
+                                                        }
+                                                    });
+                                                }
+
                                                 int currentPoints = Integer.parseInt(user.getPoints());
-                                                int newPoints = currentPoints += surveyPoints;
-                                                mTriibeRepository.addUserPoints(mUserId, String.valueOf(newPoints));
+                                                int newtotalPoints = currentPoints += surveyPoints;
+                                                mTriibeRepository.addUserPoints(mUserId, String.valueOf(newtotalPoints));
+                                                mView.showPoints(mSurveyPoints);
                                             }
                                         }
                                     });
                                 }
                             }
                         });
-
-
-                        // To ensure the enrollment survey doesn't come back and the user can get
-                        // other surveys, mark them as enrolled once they've completed it.
-                        if (mSurveyId.contentEquals("enrollmentSurvey")) {
-                            mTriibeRepository.getUser(mUserId, new TriibeRepository.GetUserCallback() {
-                                @Override
-                                public void onUserLoaded(@Nullable User user) {
-                                    if (user != null) {
-                                        user.setEnrolled(true);
-                                    }
-                                }
-                            });
-                        }
-
-                        mView.showViewSurveys();
                     } else {
                         mCurrentQuestionNum++;
                         mView.showBackButton();

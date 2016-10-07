@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.util.Globals;
+import com.example.triibe.triibeuserapp.view_points.ViewPointsActivity;
 import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
 import com.squareup.picasso.Picasso;
 
@@ -391,6 +392,14 @@ public class ViewQuestionActivity extends AppCompatActivity
     @Override
     public void showViewSurveys() {
         finish();
+    }
+
+    @Override
+    public void showPoints(String surveyPoints) {
+        Intent intent = new Intent(this, ViewPointsActivity.class);
+        intent.putExtra(ViewPointsActivity.EXTRA_USER_ID, mUserId);
+        intent.putExtra(ViewPointsActivity.EXTRA_SURVEY_POINTS, surveyPoints);
+        startActivity(intent);
     }
 
     @Override

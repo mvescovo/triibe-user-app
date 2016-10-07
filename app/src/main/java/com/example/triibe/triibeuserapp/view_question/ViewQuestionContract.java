@@ -69,6 +69,8 @@ public interface ViewQuestionContract {
 
         void showViewSurveys();
 
+        void showPoints(String surveyPoints);
+
         void removeNotification(@NonNull String fenceKey);
     }
 
