@@ -97,6 +97,20 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
     }
 
     @Override
+    public void setAdminControls(@NonNull String userId) {
+        mTriibeRepository.getUser(userId, new TriibeRepository.GetUserCallback() {
+            @Override
+            public void onUserLoaded(@Nullable User user) {
+                if (user != null) {
+                    if (user.isAdmin()) {
+                        mView.showAdminControls();
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
     public void openSurveyQuestions(@NonNull String surveyId, @NonNull Integer numProtectedQuestions) {
         mView.showQuestionUi(surveyId, "q1", numProtectedQuestions);
     }

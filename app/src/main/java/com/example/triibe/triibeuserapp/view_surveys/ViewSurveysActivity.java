@@ -125,6 +125,7 @@ public class ViewSurveysActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mUserActionsListener.loadSurveys(mUserId, true);
+        mUserActionsListener.setAdminControls(mUserId);
     }
 
     @Override
@@ -146,6 +147,11 @@ public class ViewSurveysActivity extends AppCompatActivity
         // Refresh adapter.
         mSurveyAdapter.replaceData(new HashMap<String, SurveyDetails>());
         mSurveysTextView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showAdminControls() {
+        mModifySurveyFab.setVisibility(View.VISIBLE);
     }
 
     @Override

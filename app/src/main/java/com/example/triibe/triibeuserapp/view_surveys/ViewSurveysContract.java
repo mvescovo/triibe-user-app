@@ -19,12 +19,16 @@ public interface ViewSurveysContract {
 
         void showNoSurveysMessage();
 
+        void showAdminControls();
+
         void showQuestionUi(String surveyId, String questionId, int numProtectedQuestions);
     }
 
     interface UserActionsListener {
 
         void loadSurveys(@NonNull String userId, @NonNull Boolean forceUpdate);
+
+        void setAdminControls(@NonNull String userId);
 
         void openSurveyQuestions(@NonNull String surveyId, @NonNull Integer numProtectedQuestions);
     }
