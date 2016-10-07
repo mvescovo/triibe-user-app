@@ -138,11 +138,9 @@ public class ViewSurveysActivity extends AppCompatActivity
 
     @Override
     public void showNoSurveysMessage() {
-        if (mSurveyAdapter.getItemCount() == 0) {
-            mSurveysTextView.setVisibility(View.VISIBLE);
-        } else {
-            mSurveysTextView.setVisibility(View.GONE);
-        }
+        // Refresh adapter.
+        mSurveyAdapter.replaceData(new HashMap<String, SurveyDetails>());
+        mSurveysTextView.setVisibility(View.VISIBLE);
     }
 
     @Override
