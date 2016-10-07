@@ -1,5 +1,6 @@
 package com.example.triibe.triibeuserapp.view_question;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -639,7 +640,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                                                 int currentPoints = Integer.parseInt(user.getPoints());
                                                 int newtotalPoints = currentPoints += surveyPoints;
                                                 mTriibeRepository.addUserPoints(mUserId, String.valueOf(newtotalPoints));
-                                                mView.showPoints(mSurveyPoints);
+                                                mView.showViewSurveys(Activity.RESULT_OK, surveyPoints, newtotalPoints);
+//                                                mView.showPoints(mSurveyPoints);
                                             }
                                         }
                                     });

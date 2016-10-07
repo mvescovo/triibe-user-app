@@ -129,6 +129,7 @@
     <string name="finish_survey">Finish</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_test">TestActivity</string>
+    <string name="successfully_completed_survey">Survey Completed</string>
 
     <!--ViewPointsActivity-->
     <string name="title_activity_view_points">Points</string>

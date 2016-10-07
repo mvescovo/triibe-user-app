@@ -78,8 +78,48 @@ public class ViewPointsActivity extends AppCompatActivity implements ViewPointsC
     }
 
     @Override
-    public void showNewPoints(String points) {
-        mNewPoints.setText(points);
+    public void showNewPoints(final String points, final String totalPoints) {
+        // Show initial values.
+        mNewPoints.setText("0");
+        int newPointsInt = Integer.parseInt(points);
+        int totalPointsInt = Integer.parseInt(totalPoints);
+        final int previousPoints = totalPointsInt - newPointsInt;
+        showTotalPoints(Integer.toString(previousPoints));
+
+        // Show animation of points accumulating.
+        new Thread(new Runnable() {
+            public void run() {
+                int newPoints = Integer.valueOf(points);
+                for (int i = 1; i <= newPoints; i++) {
+                    final int finalI = i;
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mNewPoints.post(new Runnable() {
+                        public void run() {
+                            String incrementalPoints = Integer.toString(finalI);
+                            mNewPoints.setText(incrementalPoints);
+                        }
+                    });
+                }
+                for (int i = 1; i <= newPoints; i++) {
+                    final int finalI = i;
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mTotalPoints.post(new Runnable() {
+                        public void run() {
+                            String incrementalPoints = Integer.toString(finalI + previousPoints);
+                            mTotalPoints.setText(incrementalPoints);
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 
     @Override

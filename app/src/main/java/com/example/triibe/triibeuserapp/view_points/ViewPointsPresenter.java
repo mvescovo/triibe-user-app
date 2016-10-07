@@ -26,8 +26,7 @@ public class ViewPointsPresenter implements ViewPointsContract.UserActionsListen
             @Override
             public void onUserLoaded(@Nullable User user) {
                 if (user != null) {
-                    mView.showNewPoints(surveyPoints);
-                    mView.showTotalPoints(user.getPoints());
+                    mView.showNewPoints(surveyPoints, user.getPoints());
                 }
             }
         });

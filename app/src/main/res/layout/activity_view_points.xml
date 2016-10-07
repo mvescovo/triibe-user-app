@@ -37,15 +37,13 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin">
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:layout_marginTop="64dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -53,21 +51,24 @@
                     style="@style/Base.TextAppearance.AppCompat.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:text="@string/new_points_earned_title"/>
 
                 <TextView
-                    android:textColor="@color/colorFabDone"
                     android:id="@+id/new_points_earned_points"
                     style="@style/Base.TextAppearance.AppCompat.Display4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"/>
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="16dp"
+                    android:textColor="@color/colorFabDone"/>
 
                 <TextView
                     android:id="@+id/total_points_earned_title"
                     style="@style/Base.TextAppearance.AppCompat.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="16dp"
                     android:text="@string/total_points_earned_title"/>
 
@@ -76,7 +77,7 @@
                     style="@style/Base.TextAppearance.AppCompat.Display3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"/>
+                    android:layout_gravity="center_horizontal"/>
 
             </LinearLayout>
 

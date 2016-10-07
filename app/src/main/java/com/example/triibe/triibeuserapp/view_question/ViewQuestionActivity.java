@@ -390,7 +390,12 @@ public class ViewQuestionActivity extends AppCompatActivity
     }
 
     @Override
-    public void showViewSurveys() {
+    public void showViewSurveys(@NonNull Integer resultCode, @NonNull Integer surveyPoints,
+                                @NonNull Integer totalPoints) {
+        Intent data = new Intent();
+        data.putExtra(ViewSurveysActivity.EXTRA_SURVEY_POINTS, surveyPoints);
+        data.putExtra(ViewSurveysActivity.EXTRA_TOTAL_POINTS, totalPoints);
+        setResult(resultCode, data);
         finish();
     }
 

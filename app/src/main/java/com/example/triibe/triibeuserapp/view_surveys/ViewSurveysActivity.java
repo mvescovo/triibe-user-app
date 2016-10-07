@@ -33,6 +33,7 @@ import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.example.triibe.triibeuserapp.util.RunAppWhenAtMallService;
 import com.example.triibe.triibeuserapp.util.SimpleDividerItemDecoration;
+import com.example.triibe.triibeuserapp.view_points.ViewPointsActivity;
 import com.example.triibe.triibeuserapp.view_question.ViewQuestionActivity;
 
 import java.util.HashMap;
@@ -48,9 +49,12 @@ public class ViewSurveysActivity extends AppCompatActivity
 
     private static final String TAG = "ViewSurveysActivity";
     public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
+    public final static String EXTRA_SURVEY_POINTS = "com.example.triibe.SURVEY_POINTS";
+    public final static String EXTRA_TOTAL_POINTS = "com.example.triibe.TOTAL_POINTS";
     private static final int REQUEST_EDIT_SURVEY = 1;
-    public static final int RESULT_DELETE = -2;
-    private static final int FINE_LOCAITON = 123;
+    public static final int REQUEST_TAKE_SURVEY = 2;
+    public static final int RESULT_DELETE = 3;
+    private static final int FINE_LOCAITON = 4;
     private String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
     private ViewSurveysContract.UserActionsListener mUserActionsListener;
     private SurveyAdapter mSurveyAdapter;
@@ -160,7 +164,7 @@ public class ViewSurveysActivity extends AppCompatActivity
         intent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, surveyId);
         intent.putExtra(ViewQuestionActivity.EXTRA_USER_ID, mUserId);
         intent.putExtra(ViewQuestionActivity.EXTRA_NUM_PROTECTED_QUESTIONS, numProtectedQuestions);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_TAKE_SURVEY);
     }
 
     public void showCreateSurvey() {
@@ -178,6 +182,17 @@ public class ViewSurveysActivity extends AppCompatActivity
         if (requestCode == REQUEST_EDIT_SURVEY && resultCode == RESULT_DELETE) {
             Snackbar.make(mModifySurveyFab, getString(R.string.successfully_deleted_survey),
                     Snackbar.LENGTH_SHORT).show();
+        }
+        if (requestCode == REQUEST_TAKE_SURVEY && resultCode == Activity.RESULT_OK) {
+            Intent intent = new Intent(this, ViewPointsActivity.class);
+            intent.putExtra(ViewPointsActivity.EXTRA_USER_ID, mUserId);
+            intent.putExtra(ViewPointsActivity.EXTRA_SURVEY_POINTS,
+                    Integer.toString(data.getIntExtra(EXTRA_SURVEY_POINTS, -1)));
+            startActivity(intent);
+//            String message = getString(R.string.successfully_completed_survey) +
+//                    ". " + Integer.toString(data.getIntExtra(EXTRA_SURVEY_POINTS, -1)) + " points added." +
+//                    " " + Integer.toString(data.getIntExtra(EXTRA_TOTAL_POINTS, -1)) + " total points.";
+//            Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG).show();
         }
     }
 
