@@ -70,8 +70,6 @@ public interface ViewQuestionContract {
         void showViewSurveys(@NonNull Integer resultCode, @NonNull Integer surveyPoints,
                              @NonNull Integer totalPoints);
 
-        void showPoints(String surveyPoints);
-
         void removeNotification(@NonNull String fenceKey);
     }
 

@@ -555,6 +555,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 
     private void checkAnswerToGoNext() {
         if (mQuestions != null && mQuestions.size() >= mCurrentQuestionNum) {
+            mView.setIndeterminateProgressIndicator(true);
+
             Question question = mQuestions.get("q" + mCurrentQuestionNum);
             QuestionDetails questionDetails = question.getQuestionDetails();
             Map<String, Option> options = question.getOptions();
@@ -611,6 +613,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 
                 if (answerOk) {
                     if (mCurrentQuestionNum == mQuestions.size()) {
+                        // We're at the last question and the survey is complete.
+
                         mTriibeRepository.markUserSurveyDone(mUserId, mSurveyId);
 
                         // Update user points
@@ -640,8 +644,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                                                 int currentPoints = Integer.parseInt(user.getPoints());
                                                 int newtotalPoints = currentPoints += surveyPoints;
                                                 mTriibeRepository.addUserPoints(mUserId, String.valueOf(newtotalPoints));
+                                                mView.setIndeterminateProgressIndicator(false);
                                                 mView.showViewSurveys(Activity.RESULT_OK, surveyPoints, newtotalPoints);
-//                                                mView.showPoints(mSurveyPoints);
                                             }
                                         }
                                     });
@@ -653,6 +657,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         mView.showBackButton();
 //                    mTextInputEditText.removeTextChangedListener(this);
                         displayCurrentQuestion();
+                        mView.setIndeterminateProgressIndicator(false);
                         if (mCurrentQuestionNum == mQuestions.size()) {
                             mView.showSubmitButton();
                         }
@@ -660,15 +665,19 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 } else {
                     if (incorrectAnswerPhrase != null) {
                         mView.showSnackbar(incorrectAnswerPhrase, Snackbar.LENGTH_SHORT);
+                        mView.setIndeterminateProgressIndicator(false);
                     } else {
                         mView.showSnackbar(((Context) mView).getString(R.string.question_incomplete), Snackbar.LENGTH_SHORT);
+                        mView.setIndeterminateProgressIndicator(false);
                     }
                 }
 
             } else if (requiredPhrase != null) {
                 mView.showSnackbar(incorrectAnswerPhrase, Snackbar.LENGTH_SHORT);
+                mView.setIndeterminateProgressIndicator(false);
             } else {
                 mView.showSnackbar(((Context) mView).getString(R.string.question_incomplete), Snackbar.LENGTH_SHORT);
+                mView.setIndeterminateProgressIndicator(false);
             }
         }
     }
