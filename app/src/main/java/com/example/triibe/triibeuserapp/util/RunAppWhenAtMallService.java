@@ -24,6 +24,7 @@ import com.example.triibe.triibeuserapp.track_location.AddFencesIntentService;
 import com.example.triibe.triibeuserapp.track_location.RemoveFenceIntentService;
 import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,7 @@ public class RunAppWhenAtMallService extends Service {
     private PendingIntent mStopTrackingPendingIntent;
     private TriibeRepository mTriibeRepository;
     private String mUserId;
+    private List<SurveyDetails> mSurveys;
 
     @Override
     public void onCreate() {
@@ -63,6 +65,8 @@ public class RunAppWhenAtMallService extends Service {
         mStopTrackingPendingIntent = PendingIntent.getService(this, STOP_SERVICE_REQUEST, stopAppServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mTriibeRepository = Globals.getInstance().getTriibeRepository();
+
+        mSurveys = new ArrayList<>();
     }
 
     @Override
@@ -118,6 +122,7 @@ public class RunAppWhenAtMallService extends Service {
                                     public void onSurveyLoaded(SurveyDetails survey) {
                                         EspressoIdlingResource.decrement();
                                         if (survey != null) {
+                                            mSurveys.add(survey);
                                             if (survey.isActive()) {
                                                 // Only get triggers for active surveys.
                                                 getSurveyTriggers(survey.getId(), survey.getDescription());
@@ -213,6 +218,12 @@ public class RunAppWhenAtMallService extends Service {
             // Clear notifications.
             mNotificationManager.cancelAll();
         }
+
+        // Remove surveys from users list
+        for (int i = 0; i < mSurveys.size(); i++) {
+            mTriibeRepository.removeUserSurvey(mUserId, mSurveys.get(i).getId());
+        }
+
         Log.d(TAG, "onDestroy: service done");
     }
 

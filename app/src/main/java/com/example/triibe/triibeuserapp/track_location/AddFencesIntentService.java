@@ -293,7 +293,7 @@ public class AddFencesIntentService extends IntentService
                                 Context.MODE_PRIVATE
                         );
                         String userId = sharedPref.getString(context.getString(R.string.user_id), "testUser");
-                        AppServiceIntent.putExtra(context.getString(R.string.user_id), userId);
+                        AppServiceIntent.putExtra(RunAppWhenAtMallService.EXTRA_USER_ID, userId);
 
                         context.startService(AppServiceIntent);
                         break;
