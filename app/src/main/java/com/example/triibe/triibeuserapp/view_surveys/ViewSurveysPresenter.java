@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
+import com.example.triibe.triibeuserapp.data.User;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 
 import java.util.HashMap;
@@ -64,8 +65,24 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                                         });
                             }
                         } else {
-                            mView.showNoSurveysMessage();
-                            mView.setProgressIndicator(false);
+                            mTriibeRepository.getUser(userId, new TriibeRepository.GetUserCallback() {
+                                @Override
+                                public void onUserLoaded(@Nullable User user) {
+                                    if (user != null) {
+                                        if (!user.isEnrolled()) {
+                                            Map<String, Boolean> activeSurveyIds = new HashMap<>();
+                                            // User must complete enrollment survey if not enrolled.
+                                            activeSurveyIds.put("enrollmentSurvey", true);
+                                            user.setActiveSurveyIds(activeSurveyIds);
+                                            mTriibeRepository.saveUser(user);
+                                            loadSurveys(userId, forceUpdate);
+                                        } else {
+                                            mView.showNoSurveysMessage();
+                                            mView.setProgressIndicator(false);
+                                        }
+                                    }
+                                }
+                            });
                         }
                     }
                 });
