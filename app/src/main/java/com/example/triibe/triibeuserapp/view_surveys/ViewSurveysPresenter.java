@@ -25,7 +25,7 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
     }
 
     @Override
-    public void loadSurveys(@NonNull String userId, @NonNull Boolean forceUpdate) {
+    public void loadSurveys(@NonNull final String userId, @NonNull final Boolean forceUpdate) {
         mView.setProgressIndicator(true);
 
         final Map<String, SurveyDetails> surveys = new HashMap<>();
@@ -70,6 +70,7 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
 
                             // Set new ID's in firebase
                             mTriibeRepository.saveSurveyIds(path, newUserSurveyIds);
+                            loadSurveys(userId, forceUpdate);
                         }
                     }
                 });
