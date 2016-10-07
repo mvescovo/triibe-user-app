@@ -47,6 +47,7 @@ public class RunAppWhenAtMallService extends Service {
     private TriibeRepository mTriibeRepository;
     private String mUserId;
     private List<SurveyDetails> mSurveys;
+    private User mUser;
 
     @Override
     public void onCreate() {
@@ -107,6 +108,7 @@ public class RunAppWhenAtMallService extends Service {
             @Override
             public void onUserLoaded(@Nullable User user) {
                 if (user != null) {
+                    mUser = user;
                     if (user.isEnrolled()) {
                         getSurveyIds();
                     }
@@ -138,22 +140,25 @@ public class RunAppWhenAtMallService extends Service {
 
                     // Get each surveyDetails.
                     for (int i = 0; i < surveyIds.size(); i++) {
-                        EspressoIdlingResource.increment();
-                        mTriibeRepository.getSurvey(surveyIdsKeys[i].toString(),
-                                new TriibeRepository.GetSurveyCallback() {
-                                    @Override
-                                    public void onSurveyLoaded(SurveyDetails survey) {
-                                        EspressoIdlingResource.decrement();
-                                        if (survey != null) {
-                                            mSurveys.add(survey);
-                                            if (survey.isActive()) {
-                                                // Only get triggers for active surveys.
-                                                getSurveyTriggers(survey.getId(),
-                                                        survey.getDescription());
+                        // Filter out surveys user has already completed.
+                        if (!mUser.getCompletedSurveyIds().containsKey(surveyIdsKeys[i].toString())) {
+                            EspressoIdlingResource.increment();
+                            mTriibeRepository.getSurvey(surveyIdsKeys[i].toString(),
+                                    new TriibeRepository.GetSurveyCallback() {
+                                        @Override
+                                        public void onSurveyLoaded(SurveyDetails survey) {
+                                            EspressoIdlingResource.decrement();
+                                            if (survey != null) {
+                                                mSurveys.add(survey);
+                                                if (survey.isActive()) {
+                                                    // Only get triggers for active surveys.
+                                                    getSurveyTriggers(survey.getId(),
+                                                            survey.getDescription());
+                                                }
                                             }
                                         }
-                                    }
-                                });
+                                    });
+                        }
                     }
                 }
             }

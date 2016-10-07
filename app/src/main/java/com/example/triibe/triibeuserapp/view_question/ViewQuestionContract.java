@@ -1,5 +1,6 @@
 package com.example.triibe.triibeuserapp.view_question;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
@@ -67,6 +68,8 @@ public interface ViewQuestionContract {
         void hideBackButton();
 
         void showViewSurveys();
+
+        void removeNotification(@NonNull String fenceKey);
     }
 
     interface UserActionsListener {
