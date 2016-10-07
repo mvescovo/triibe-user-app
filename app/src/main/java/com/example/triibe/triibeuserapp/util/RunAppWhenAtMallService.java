@@ -20,6 +20,7 @@ import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.SurveyTrigger;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
+import com.example.triibe.triibeuserapp.data.User;
 import com.example.triibe.triibeuserapp.track_location.AddFencesIntentService;
 import com.example.triibe.triibeuserapp.track_location.RemoveFenceIntentService;
 import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
@@ -101,6 +102,28 @@ public class RunAppWhenAtMallService extends Service {
         mBuilder.setContentIntent(resultPendingIntent);
         startForeground(Constants.APP_SERVICE_RUNNING_ID, mBuilder.build());
 
+        // Check if user is enrolled before adding triggers for other surveys.
+        mTriibeRepository.getUser(mUserId, new TriibeRepository.GetUserCallback() {
+            @Override
+            public void onUserLoaded(@Nullable User user) {
+                if (user != null) {
+                    if (user.isEnrolled()) {
+                        getSurveyIds();
+                    }
+                }
+            }
+        });
+
+        /*
+        * Matt's services
+        * */
+//        startService(new Intent(getBaseContext(), IpService.class));
+//        startService(new Intent(getBaseContext(), UsageStatsService.class));
+
+        return START_STICKY;
+    }
+
+    private void getSurveyIds() {
         // Get all surveyIds so we can get triggers for active surveys.
         final String path = "/surveyIds";
         mTriibeRepository.refreshSurveyIds();
@@ -125,7 +148,8 @@ public class RunAppWhenAtMallService extends Service {
                                             mSurveys.add(survey);
                                             if (survey.isActive()) {
                                                 // Only get triggers for active surveys.
-                                                getSurveyTriggers(survey.getId(), survey.getDescription());
+                                                getSurveyTriggers(survey.getId(),
+                                                        survey.getDescription());
                                             }
                                         }
                                     }
@@ -134,14 +158,6 @@ public class RunAppWhenAtMallService extends Service {
                 }
             }
         });
-
-        /*
-        * Matt's services
-        * */
-//        startService(new Intent(getBaseContext(), IpService.class));
-//        startService(new Intent(getBaseContext(), UsageStatsService.class));
-
-        return START_STICKY;
     }
 
     private void getSurveyTriggers(final String surveyId, final String surveyDescription) {
