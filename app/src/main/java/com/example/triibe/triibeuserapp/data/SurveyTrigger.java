@@ -16,6 +16,8 @@ public class SurveyTrigger {
     private String mId;
     private String mLatitude;
     private String mLongitude;
+    private String mRadius;
+    private String mDwell;
     private String mLevel;
     private String mTime;
 
@@ -28,11 +30,23 @@ public class SurveyTrigger {
     }
 
     public SurveyTrigger(String surveyId, String id, String latitude, String longitude,
-                         String level) {
+                         String radius, String dwell) {
         mSurveyId = surveyId;
         mId = id;
         mLatitude = latitude;
         mLongitude = longitude;
+        mRadius = radius;
+        mDwell = dwell;
+    }
+
+    public SurveyTrigger(String surveyId, String id, String latitude, String longitude,
+                         String radius, String dwell, String level) {
+        mSurveyId = surveyId;
+        mId = id;
+        mLatitude = latitude;
+        mLongitude = longitude;
+        mRadius = radius;
+        mDwell = dwell;
         mLevel = level;
     }
 
@@ -43,11 +57,13 @@ public class SurveyTrigger {
     }
 
     public SurveyTrigger(String surveyId, String id, String latitude, String longitude,
-                         String level, String time) {
+                         String radius, String dwell, String level, String time) {
         mSurveyId = surveyId;
         mId = id;
         mLatitude = latitude;
         mLongitude = longitude;
+        mRadius = radius;
+        mDwell = dwell;
         mLevel = level;
         mTime = time;
     }
@@ -90,6 +106,22 @@ public class SurveyTrigger {
         mLongitude = longitude;
     }
 
+    public String getRadius() {
+        return mRadius;
+    }
+
+    public void setRadius(String radius) {
+        mRadius = radius;
+    }
+
+    public String getDwell() {
+        return mDwell;
+    }
+
+    public void setDwell(String dwell) {
+        mDwell = dwell;
+    }
+
     public String getLevel() {
         return mLevel;
     }
@@ -114,6 +146,8 @@ public class SurveyTrigger {
         result.put("id", mId);
         result.put("latitude", mLatitude);
         result.put("longitude", mLongitude);
+        result.put("radius", mRadius);
+        result.put("dwell", mDwell);
         result.put("level", mLevel);
         result.put("time", mTime);
         return result;

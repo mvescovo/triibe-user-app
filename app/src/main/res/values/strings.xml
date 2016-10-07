@@ -88,8 +88,10 @@
     <string name="title_activity_edit_trigger">Edit Trigger</string>
     <string name="edit_trigger_details_title">Trigger Details</string>
     <string name="edit_trigger_id_hint">Trigger ID*</string>
-    <string name="edit_trigger_lat_hint">Latitude</string>
-    <string name="edit_trigger_lon_hint">Longitude</string>
+    <string name="edit_trigger_lat_hint">Latitude*</string>
+    <string name="edit_trigger_lon_hint">Longitude*</string>
+    <string name="edit_trigger_radius_hint">Radius in metres*</string>
+    <string name="edit_trigger_dwell_hint">Dwell in seconds*</string>
     <string name="edit_trigger_level_hint">Level</string>
     <string name="edit_trigger_time_hint">Time</string>
     <string name="delete_trigger">Delete trigger</string>

@@ -86,6 +86,12 @@ public class EditTriggerActivity extends AppCompatActivity
     @BindView(R.id.lon)
     TextInputEditText mLongitude;
 
+    @BindView(R.id.radius)
+    TextInputEditText mRadius;
+
+    @BindView(R.id.dwell)
+    TextInputEditText mDwell;
+
     @BindView(R.id.level)
     TextInputEditText mLevel;
 
@@ -168,6 +174,8 @@ public class EditTriggerActivity extends AppCompatActivity
     public void showTrigger(SurveyTrigger trigger) {
         mLatitude.setText(trigger.getLatitude());
         mLongitude.setText(trigger.getLongitude());
+        mRadius.setText(trigger.getRadius());
+        mDwell.setText(trigger.getDwell());
         mLevel.setText(trigger.getLevel());
         mTime.setText(trigger.getTime());
     }
@@ -251,12 +259,23 @@ public class EditTriggerActivity extends AppCompatActivity
             mTriggerId.setError("Trigger ID must not be empty"); // TODO: 18/09/16 set in strings
             mTriggerId.requestFocus();
             return false;
+        } else if (mLatitude.getText().toString().trim().contentEquals("")) {
+            mLatitude.setError("Latitude must not be empty");
+            mLatitude.requestFocus();
+            return false;
+        } else if (mLongitude.getText().toString().trim().contentEquals("")) {
+            mLongitude.setError("Longitude must not be empty");
+            mLongitude.requestFocus();
+            return false;
+        } else if (mRadius.getText().toString().trim().contentEquals("")) {
+            mRadius.setError("Radius must not be empty");
+            mRadius.requestFocus();
+            return false;
+        } else if (mDwell.getText().toString().trim().contentEquals("")) {
+            mDwell.setError("Dwell must not be empty");
+            mDwell.requestFocus();
+            return false;
         }
-
-        // Need at least lat/lon or time triggers. Can also have both.
-        // TODO: 7/10/16 figure out how to do this? what field show show the error?
-        // For now just save all and check for empty string when reading back in.
-
 
         // If all ok save trigger.
         SurveyTrigger trigger = new SurveyTrigger(
@@ -264,11 +283,17 @@ public class EditTriggerActivity extends AppCompatActivity
                 mTriggerId.getText().toString().trim(),
                 mLatitude.getText().toString().trim(),
                 mLongitude.getText().toString().trim(),
-                mLevel.getText().toString().trim(),
-                mTime.getText().toString().trim()
+                mRadius.getText().toString().trim(),
+                mDwell.getText().toString().trim()
         );
-        mUserActionsListener.saveTrigger(trigger);
 
+        if (!mLevel.getText().toString().trim().contentEquals("")) {
+            trigger.setLevel(mLevel.getText().toString().trim());
+        }
+        if (!mTime.getText().toString().trim().contentEquals("")) {
+            trigger.setLevel(mTime.getText().toString().trim());
+        }
+        mUserActionsListener.saveTrigger(trigger);
         return true;
     }
 
