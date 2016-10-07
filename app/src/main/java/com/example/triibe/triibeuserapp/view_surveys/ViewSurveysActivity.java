@@ -2,6 +2,7 @@ package com.example.triibe.triibeuserapp.view_surveys;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -82,7 +83,11 @@ public class ViewSurveysActivity extends AppCompatActivity
         if (getIntent().getStringExtra(EXTRA_USER_ID) != null) {
             mUserId = getIntent().getStringExtra(EXTRA_USER_ID);
         } else {
-            mUserId = "TestUserId";
+            SharedPreferences sharedPref = getSharedPreferences(
+                    getString(R.string.user_id),
+                    Context.MODE_PRIVATE
+            );
+            mUserId = sharedPref.getString(getString(R.string.user_id), "InvalidUser");
         }
 
         mModifySurveyFab.setOnClickListener(new View.OnClickListener() {
