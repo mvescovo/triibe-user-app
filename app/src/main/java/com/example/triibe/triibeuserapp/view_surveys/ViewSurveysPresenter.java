@@ -64,13 +64,8 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                                         });
                             }
                         } else {
-                            // Add new user survey id's.
-                            Map<String, Boolean> newUserSurveyIds = new HashMap<>();
-                            newUserSurveyIds.put("enrollmentSurvey", true);
-
-                            // Set new ID's in firebase
-                            mTriibeRepository.saveSurveyIds(path, newUserSurveyIds);
-                            loadSurveys(userId, forceUpdate);
+                            mView.showNoSurveysMessage();
+                            mView.setProgressIndicator(false);
                         }
                     }
                 });

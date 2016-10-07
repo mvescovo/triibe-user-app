@@ -1,6 +1,7 @@
 package com.example.triibe.triibeuserapp.data;
 
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.Map;
 /**
  * @author michael.
  */
+@IgnoreExtraProperties
 public class SurveyDetails implements Serializable {
 
     private String mId;
@@ -84,7 +86,6 @@ public class SurveyDetails implements Serializable {
         result.put("points", mPoints);
         result.put("numProtectedQuestions", mNumProtectedQuestions);
         result.put("active", mActive);
-
         return result;
     }
 }

@@ -63,6 +63,7 @@ public interface TriibeRepository {
         void onTriggerLoaded(@Nullable SurveyTrigger trigger);
     }
 
+
     // Answers
     interface GetAnswersCallback {
         void onAnswersLoaded(@Nullable Map<String, Answer> answers);
@@ -70,6 +71,12 @@ public interface TriibeRepository {
 
     interface GetAnswerCallback {
         void onAnswerLoaded(@Nullable AnswerDetails answer);
+    }
+
+
+    // Users
+    interface GetUserCallback {
+        void onUserLoaded(@Nullable User user);
     }
 
 
@@ -147,6 +154,10 @@ public interface TriibeRepository {
     void saveAnswer(@NonNull String surveyId, @NonNull String userId, @NonNull String questionId, @NonNull Answer answer);
 
     // Users
+    void getUser(@NonNull String userId, @NonNull GetUserCallback callback);
+
+    void saveUser(@NonNull User user);
+
     void addUserSurvey(@NonNull String userId, @NonNull String surveyId);
 
     void markUserSurveyDone(@NonNull String userId, @NonNull String surveyId);

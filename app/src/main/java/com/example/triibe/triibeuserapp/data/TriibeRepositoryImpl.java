@@ -354,6 +354,21 @@ public class TriibeRepositoryImpl implements TriibeRepository {
     * Users
     * */
     @Override
+    public void getUser(@NonNull String userId, @NonNull final GetUserCallback callback) {
+        mTriibeServiceApi.getUser(userId, new TriibeServiceApi.GetUserCallback() {
+            @Override
+            public void onUserLoaded(@Nullable User user) {
+                callback.onUserLoaded(user);
+            }
+        });
+    }
+
+    @Override
+    public void saveUser(@NonNull User user) {
+        mTriibeServiceApi.saveUser(user);
+    }
+
+    @Override
     public void addUserSurvey(@NonNull String userId, @NonNull String surveyId) {
         mTriibeServiceApi.addUserSurvey(userId, surveyId);
     }

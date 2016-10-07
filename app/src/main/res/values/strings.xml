@@ -13,6 +13,7 @@
     <string name="sign_in_cancelled">Sign in cancelled</string>
     <string name="unknown_sign_in_response">Unknown response from AuthUI sign-in</string>
     <string name="sign_out_failed">Sign out failed</string>
+    <string name="loading_user">Loading user&#8230;</string>
 
     <!--ViewSurveysActivity-->
     <string name="title_activity_view_surveys">Surveys</string>

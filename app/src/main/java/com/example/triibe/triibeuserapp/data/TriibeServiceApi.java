@@ -77,6 +77,12 @@ public interface TriibeServiceApi {
     }
 
 
+    // Users
+    interface GetUserCallback {
+        void onUserLoaded(@Nullable User user);
+    }
+
+
     // Surveys
     void getSurveyIds(@NonNull String path, @NonNull GetSurveyIdsCallback callback);
 
@@ -135,6 +141,10 @@ public interface TriibeServiceApi {
     void saveAnswer(@NonNull String surveyId, @NonNull String userId, @NonNull String questionId, @NonNull Answer answer);
 
     // Users
+    void getUser(@NonNull String userId, @NonNull GetUserCallback callback);
+
+    void saveUser(@NonNull User user);
+
     void addUserSurvey(@NonNull String userId, @NonNull String surveyId);
 
     void markUserSurveyDone(@NonNull String userId, @NonNull String surveyId);

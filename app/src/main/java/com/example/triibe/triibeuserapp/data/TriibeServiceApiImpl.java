@@ -403,6 +403,33 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
     * Users
     * */
     @Override
+    public void getUser(@NonNull String userId, @NonNull final GetUserCallback callback) {
+        ValueEventListener userDataListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                callback.onUserLoaded(user);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting user data failed, log a message
+                Log.w(TAG, "loadUserData:onCancelled", databaseError.toException());
+            }
+        };
+        mDatabase.child("/users/" + userId)
+                .addListenerForSingleValueEvent(userDataListener);
+    }
+
+    @Override
+    public void saveUser(@NonNull User user) {
+        Map<String, Object> userValues = user.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/users/" + user.getId() + "/", userValues);
+        mDatabase.updateChildren(childUpdates);
+    }
+
+    @Override
     public void addUserSurvey(@NonNull String userId, @NonNull String surveyId) {
         mDatabase.child("users/").child(userId).child("activeSurveyIds").child(surveyId)
                 .setValue(true);
