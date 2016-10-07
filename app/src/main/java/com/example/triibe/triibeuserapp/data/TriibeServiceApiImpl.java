@@ -404,13 +404,21 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
     * */
     @Override
     public void addUserSurvey(@NonNull String userId, @NonNull String surveyId) {
-        mDatabase.child("users/").child(userId).child("surveyIds").child(surveyId)
+        mDatabase.child("users/").child(userId).child("activeSurveyIds").child(surveyId)
+                .setValue(true);
+    }
+
+    @Override
+    public void markUserSurveyDone(@NonNull String userId, @NonNull String surveyId) {
+        mDatabase.child("users/").child(userId).child("activeSurveyIds").child(surveyId)
+                .setValue(null);
+        mDatabase.child("users/").child(userId).child("completedSurveyIds").child(surveyId)
                 .setValue(true);
     }
 
     @Override
     public void removeUserSurvey(@NonNull String userId, @NonNull String surveyId) {
-        mDatabase.child("users/").child(userId).child("surveyIds").child(surveyId)
+        mDatabase.child("users/").child(userId).child("activeSurveyIds").child(surveyId)
                 .setValue(null);
     }
 

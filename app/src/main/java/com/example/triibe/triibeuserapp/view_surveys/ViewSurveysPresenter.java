@@ -29,7 +29,7 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
         mView.setProgressIndicator(true);
 
         final Map<String, SurveyDetails> surveys = new HashMap<>();
-        final String path = "users/" + userId + "/surveyIds";
+        final String path = "users/" + userId + "/activeSurveyIds/";
         if (forceUpdate) {
             mTriibeRepository.refreshSurveyIds();
         }

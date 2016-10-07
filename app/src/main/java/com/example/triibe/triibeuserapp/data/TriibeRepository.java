@@ -149,5 +149,7 @@ public interface TriibeRepository {
     // Users
     void addUserSurvey(@NonNull String userId, @NonNull String surveyId);
 
+    void markUserSurveyDone(@NonNull String userId, @NonNull String surveyId);
+
     void removeUserSurvey(@NonNull String userId, @NonNull String surveyId);
 }

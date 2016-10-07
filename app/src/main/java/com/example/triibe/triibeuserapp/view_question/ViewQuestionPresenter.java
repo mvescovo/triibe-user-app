@@ -606,7 +606,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         // TODO: 17/09/16 remove survey from users list
                         // Also, when adding surveys, check that an answer for the user doesn't already exist.
 
-                        mTriibeRepository.removeUserSurvey(mUserId, mSurveyId);
+                        mTriibeRepository.markUserSurveyDone(mUserId, mSurveyId);
                         mView.showViewSurveys();
                     } else {
                         mCurrentQuestionNum++;

@@ -1,7 +1,6 @@
 package com.example.triibe.triibeuserapp.data;
 
 import android.location.Location;
-import android.support.annotation.NonNull;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
@@ -20,7 +19,8 @@ public class User {
     private String mPhone;
     private String mEmail;
     private DemographicProfile mDemographicProfile;
-    private Map<String, Boolean> mSurveyIds;
+    private Map<String, Boolean> mCompletedSurveyIds;
+    private Map<String, Boolean> mActiveSurveyIds;
     private Map<String, Location> mLocations;
     private Map<String, Answer> mResponses;
     private boolean mEnrolled;
@@ -79,12 +79,20 @@ public class User {
         mDemographicProfile = demographicProfile;
     }
 
-    public Map<String, Boolean> getSurveyIds() {
-        return mSurveyIds;
+    public Map<String, Boolean> getCompletedSurveyIds() {
+        return mCompletedSurveyIds;
     }
 
-    public void setSurveyIds(@NonNull Map<String, Boolean> surveyIds) {
-        mSurveyIds = surveyIds;
+    public void setCompletedSurveyIds(Map<String, Boolean> completedSurveyIds) {
+        mCompletedSurveyIds = completedSurveyIds;
+    }
+
+    public Map<String, Boolean> getActiveSurveyIds() {
+        return mActiveSurveyIds;
+    }
+
+    public void setActiveSurveyIds(Map<String, Boolean> activeSurveyIds) {
+        mActiveSurveyIds = activeSurveyIds;
     }
 
     public Map<String, Location> getLocations() {

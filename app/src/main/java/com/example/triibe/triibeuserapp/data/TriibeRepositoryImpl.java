@@ -359,6 +359,11 @@ public class TriibeRepositoryImpl implements TriibeRepository {
     }
 
     @Override
+    public void markUserSurveyDone(@NonNull String userId, @NonNull String surveyId) {
+        mTriibeServiceApi.markUserSurveyDone(userId, surveyId);
+    }
+
+    @Override
     public void removeUserSurvey(@NonNull String userId, @NonNull String surveyId) {
         mTriibeServiceApi.removeUserSurvey(userId, surveyId);
     }
