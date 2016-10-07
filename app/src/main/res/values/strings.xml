@@ -87,7 +87,7 @@
     <!--EditTriggerActivity-->
     <string name="title_activity_edit_trigger">Edit Trigger</string>
     <string name="edit_trigger_details_title">Trigger Details</string>
-    <string name="edit_trigger_id_hint">Trigger ID</string>
+    <string name="edit_trigger_id_hint">Trigger ID*</string>
     <string name="edit_trigger_lat_hint">Latitude</string>
     <string name="edit_trigger_lon_hint">Longitude</string>
     <string name="edit_trigger_level_hint">Level</string>

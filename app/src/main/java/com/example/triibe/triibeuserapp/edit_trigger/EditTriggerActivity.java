@@ -32,6 +32,11 @@ import com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity;
 import com.example.triibe.triibeuserapp.track_location.GetCurrentLocationIntentService;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 import com.example.triibe.triibeuserapp.util.Globals;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,11 +49,27 @@ public class EditTriggerActivity extends AppCompatActivity
 
     private static final String TAG = "EditTriggerActivity";
     public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
+    private static final int PLACE_PICKER_REQUEST = 1;
     EditTriggerContract.UserActionsListener mUserActionsListener;
-    private String mSurveyId;
     GetCurrentLocationIntentService mGetCurrentLocationIntentService;
     boolean mBound = false;
+    private String mSurveyId;
     private List<String> mTriggerIds;
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            GetCurrentLocationIntentService.GetCurrentLocationBinder binder = (GetCurrentLocationIntentService.GetCurrentLocationBinder) service;
+            mGetCurrentLocationIntentService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
@@ -176,18 +197,26 @@ public class EditTriggerActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.use_current_location:
-                if (mBound) {
-                    setCurrentLocation(
-                            mGetCurrentLocationIntentService.getLat(),
-                            mGetCurrentLocationIntentService.getLon()
-                    );
+            case R.id.get_location_from_map:
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                try {
+                    startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
                 }
                 return true;
             case R.id.done:
                 if (validate()) {
                     hideSoftKeyboard(mRootView);
                     showEditSurey(Activity.RESULT_OK);
+                }
+                return true;
+            case R.id.use_current_location:
+                if (mBound) {
+                    setCurrentLocation(
+                            mGetCurrentLocationIntentService.getLat(),
+                            mGetCurrentLocationIntentService.getLon()
+                    );
                 }
                 return true;
             case R.id.delete_trigger:
@@ -200,12 +229,36 @@ public class EditTriggerActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(this, data);
+                LatLng latLng = place.getLatLng();
+                mLatitude.setText(String.format("%s", latLng.latitude));
+                mLongitude.setText(String.format("%s", latLng.longitude));
+            }
+        }
+    }
+
     public void hideSoftKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     private boolean validate() {
+        if (mTriggerId.getText().toString().trim().contentEquals("")) {
+            mTriggerId.setError("Trigger ID must not be empty"); // TODO: 18/09/16 set in strings
+            mTriggerId.requestFocus();
+            return false;
+        }
+
+        // Need at least lat/lon or time triggers. Can also have both.
+        // TODO: 7/10/16 figure out how to do this? what field show show the error?
+        // For now just save all and check for empty string when reading back in.
+
+
+        // If all ok save trigger.
         SurveyTrigger trigger = new SurveyTrigger(
                 mSurveyId,
                 mTriggerId.getText().toString().trim(),
@@ -218,22 +271,6 @@ public class EditTriggerActivity extends AppCompatActivity
 
         return true;
     }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            GetCurrentLocationIntentService.GetCurrentLocationBinder binder = (GetCurrentLocationIntentService.GetCurrentLocationBinder) service;
-            mGetCurrentLocationIntentService = binder.getService();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
 
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {

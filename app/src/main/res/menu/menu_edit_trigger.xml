@@ -9,16 +9,17 @@
         app:showAsAction="ifRoom"/>
 
     <item
+        android:id="@+id/done"
+        android:icon="@drawable/ic_done_white_24dp"
+        android:title="@string/menu_done"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/use_current_location"
         android:icon="@drawable/ic_my_location_white_24dp"
         android:title="@string/menu_use_current_location"
         app:showAsAction="ifRoom"/>
 
-    <item
-        android:id="@+id/done"
-        android:icon="@drawable/ic_done_white_24dp"
-        android:title="@string/menu_done"
-        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/delete_trigger"
