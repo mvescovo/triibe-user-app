@@ -65,7 +65,7 @@ public class IpService extends Service {
     String timeKey = "";
 
 
-    //dont know what this method does but it is required to have a service
+    //Don't know what this method does but it is required to have a service
     @Override
     public IBinder onBind(Intent arg0) {
         return null;
@@ -253,7 +253,6 @@ public class IpService extends Service {
             /**************************/
             it.remove();
         }
-
         unregisterReceiver(mReceiver);
         //stop the timer so that it dosent continue to run even after you kill the service.
         mTimer.cancel();

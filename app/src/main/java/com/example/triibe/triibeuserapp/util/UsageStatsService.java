@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import com.example.triibe.triibeuserapp.trackData.AppUsageStats;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -64,9 +65,10 @@ public class UsageStatsService extends Service{
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-
+                   // String currentApp = AppUsageStats.getMostCurrentRecentApp();
                     //Method Calls Here
-                    System.out.println("usage stats service");
+
+                  //  System.out.println("usage stats service - Current App:"+ currentApp);
                 }
             });
         }
