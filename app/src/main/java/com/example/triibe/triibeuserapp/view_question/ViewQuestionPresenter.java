@@ -704,6 +704,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 ((mCurrentQuestionNum <= mNumProtectedQuestions) ||
                 (mCurrentQuestionNum >= mNumProtectedQuestions + 2))) {
             mCurrentQuestionNum--;
+            mView.hideSubmitButton();
             if (mCurrentQuestionNum == 1 ||
                     mCurrentQuestionNum == mNumProtectedQuestions + 1) {
                 mView.hideBackButton();
