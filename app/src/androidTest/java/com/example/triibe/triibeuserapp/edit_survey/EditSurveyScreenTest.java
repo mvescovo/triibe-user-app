@@ -54,9 +54,8 @@ public class EditSurveyScreenTest {
     public void enteringAnExistingQuestionIdLoadsSavedQuestionDetails() {
         onView(withId(R.id.survey_id)).perform(typeText(TEST_SURVEY_ID));
         onView(withId(R.id.survey_description)).check(matches(withText(TEST_SURVEY_DESCRIPTION)));
-        onView(withId(R.id.survey_version)).check(matches(withText(TEST_SURVEY_VERSION)));
         onView(withId(R.id.survey_points)).check(matches(withText(TEST_SURVEY_POINTS)));
-        onView(withId(R.id.survey_time_till_expiry)).check(matches(withText(TEST_SURVEY_TIME_TILL_EXPIRY)));
+        //TODO add extra fields in here (more were added)
     }
 
     @After

@@ -40,10 +40,10 @@ public class ViewSurveysPresenterTest {
         SURVEY_IDS.add("Test");
 
         SURVEYS.put("enrollmentSurvey", new SurveyDetails(
-                "enrollmentSurvey", "1", "first required survey", "1", "10", true
+                "s1", "Enrollment Survey", "100", "2", true
         ));
         SURVEYS.put("Test", new SurveyDetails(
-                "Test", "1", "test survey", "1", "1", true
+                "s2", "Test Survey", "10", "0", true
         ));
     }
 
@@ -91,7 +91,7 @@ public class ViewSurveysPresenterTest {
 
     @Test
     public void clickOnSurvey_ShowsQuestionUi() {
-        mViewSurveysPresenter.openSurveyQuestions("enrollmentSurvey");
-        verify(mView).showQuestionUi("enrollmentSurvey", "q1");
+        mViewSurveysPresenter.openSurveyQuestions("s1", 2);
+        verify(mView).showQuestionUi("s1", "q1", 2);
     }
 }

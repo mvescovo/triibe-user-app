@@ -444,6 +444,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 
     @Override
     public void saveAnswer(String phrase, String type, boolean checked) {
+        mView.setIndeterminateProgressIndicator(true);
+
         Question question = mQuestions.get("q" + mCurrentQuestionNum);
         QuestionDetails questionDetails = question.getQuestionDetails();
         String questionId = questionDetails.getId();
@@ -546,6 +548,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                     mTriibeRepository.saveAnswer(mSurveyId, mUserId, "a" + mCurrentQuestionNum, extraTextAnswer);
                 }
         }
+        mView.setIndeterminateProgressIndicator(false);
     }
 
     @Override
@@ -556,10 +559,11 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 mAnswers = answers;
                 checkAnswerToGoNext();
             }
-        }, false);
+        }, true);
     }
 
-    private void checkAnswerToGoNext() {
+    @VisibleForTesting
+    public void checkAnswerToGoNext() {
         if (mQuestions != null && mQuestions.size() >= mCurrentQuestionNum) {
             mView.setIndeterminateProgressIndicator(true);
 
@@ -662,11 +666,11 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         mCurrentQuestionNum++;
                         mView.showBackButton();
 //                    mTextInputEditText.removeTextChangedListener(this);
-                        displayCurrentQuestion();
                         mView.setIndeterminateProgressIndicator(false);
                         if (mCurrentQuestionNum == mQuestions.size()) {
                             mView.showSubmitButton();
                         }
+                        displayCurrentQuestion();
                     }
                 } else {
                     if (incorrectAnswerPhrase != null) {
@@ -696,7 +700,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 mAnswers = answers;
                 checkAnswerToGoPrevious();
             }
-        }, false);
+        }, true);
     }
 
     public void checkAnswerToGoPrevious() {
