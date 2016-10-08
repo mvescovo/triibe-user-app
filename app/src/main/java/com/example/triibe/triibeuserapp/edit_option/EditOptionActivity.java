@@ -176,7 +176,8 @@ public class EditOptionActivity extends AppCompatActivity
         option = new Option(
                 mSurveyId,
                 mQuestionId,
-                mOptionId.getText().toString().trim(),
+                // Save option with "o" prefix. Numerical values will create an array on firebase.
+                "o" + mOptionId.getText().toString().trim(),
                 mOptionPhrase.getText().toString().trim(),
                 false
         );
@@ -234,7 +235,8 @@ public class EditOptionActivity extends AppCompatActivity
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         boolean matched = false;
         for (int i = 0; i < mOptionIds.size(); i++) {
-            if (s.toString().contentEquals(mOptionIds.get(i))) {
+            // Get the substring at index 1 because the real optionId is preceded with "o".
+            if (s.toString().contentEquals(mOptionIds.get(i).substring(1))) {
                 mUserActionsListener.getOption(mOptionIds.get(i));
                 matched = true;
             }

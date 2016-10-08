@@ -76,17 +76,19 @@ public class EditSurveyPresenter implements EditSurveyContract.UserActionsListen
                            String numProtectedQuestions, boolean active) {
         mView.setProgressIndicator(true);
 
-        SurveyDetails surveyDetails = new SurveyDetails(surveyId, description, points,
+        // Save survey with "s" prefix. Numerical values will create an array on firebase.
+        SurveyDetails surveyDetails = new SurveyDetails("s" + surveyId, description, points,
                 numProtectedQuestions, active);
 
-        mTriibeRepository.saveSurvey(surveyId, surveyDetails);
+        mTriibeRepository.saveSurvey(surveyDetails.getId(), surveyDetails);
 
         mView.setProgressIndicator(false);
     }
 
     @Override
     public void deleteSurvey(@NonNull String surveyId) {
-        mTriibeRepository.deleteSurvey(surveyId);
+        // Save survey with "s" prefix. Numerical values will create an array on firebase.
+        mTriibeRepository.deleteSurvey("s" + surveyId);
     }
 
     @Override

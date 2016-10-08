@@ -217,7 +217,8 @@ public class EditQuestionActivity extends AppCompatActivity
     public void showEditOption() {
         Intent intent = new Intent(this, EditOptionActivity.class);
         intent.putExtra(EditOptionActivity.EXTRA_SURVEY_ID, mSurveyId);
-        intent.putExtra(EditOptionActivity.EXTRA_QUESTION_ID, mQuestionId.getText().toString().trim());
+        // Save question with "q" prefix. Numerical values will create an array on firebase.
+        intent.putExtra(EditOptionActivity.EXTRA_QUESTION_ID, "q" + mQuestionId.getText().toString().trim());
         startActivityForResult(intent, REQUEST_EDIT_OPTION);
     }
 
@@ -239,7 +240,8 @@ public class EditQuestionActivity extends AppCompatActivity
         // If all ok, save question.
         QuestionDetails questionDetails = new QuestionDetails(
                 mSurveyId,
-                mQuestionId.getText().toString().trim(),
+                // Save question with "q" prefix. Numerical values will create an array on firebase.
+                "q" + mQuestionId.getText().toString().trim(),
                 mSelectedQuestionType
         );
 
@@ -323,7 +325,8 @@ public class EditQuestionActivity extends AppCompatActivity
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         boolean matched = false;
         for (int i = 0; i < mQuestionIds.size(); i++) {
-            if (s.toString().contentEquals(mQuestionIds.get(i))) {
+            // Get the substring at index 1 because the real questionId is preceded with "q".
+            if (s.toString().contentEquals(mQuestionIds.get(i).substring(1))) {
                 mUserActionsListener.getQuestion(mQuestionIds.get(i));
                 matched = true;
             }

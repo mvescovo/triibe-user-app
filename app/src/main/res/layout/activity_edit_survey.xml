@@ -56,18 +56,12 @@
                     android:layout_marginBottom="16dp"
                     android:text="@string/edit_survey_details_title"/>
 
-                <android.support.design.widget.TextInputLayout
+                <android.support.v7.widget.AppCompatAutoCompleteTextView
+                    android:id="@+id/survey_id"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <android.support.v7.widget.AppCompatAutoCompleteTextView
-                        android:id="@+id/survey_id"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/edit_survey_id_hint"
-                        android:inputType="text"/>
-
-                </android.support.design.widget.TextInputLayout>
+                    android:layout_height="wrap_content"
+                    android:hint="@string/edit_survey_id_hint"
+                    android:inputType="number"/>
 
                 <TextView
                     android:layout_width="wrap_content"

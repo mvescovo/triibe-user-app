@@ -56,6 +56,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 
     @Override
     public void loadCurrentQuestion() {
+        Log.d(TAG, "loadCurrentQuestion: survey: " + mSurveyId);
         mView.setIndeterminateProgressIndicator(true);
 
         // Remove notification for the survey.

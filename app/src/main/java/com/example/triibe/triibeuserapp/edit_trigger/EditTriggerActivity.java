@@ -272,7 +272,8 @@ public class EditTriggerActivity extends AppCompatActivity
         // If all ok save trigger.
         SurveyTrigger trigger = new SurveyTrigger(
                 mSurveyId,
-                mTriggerId.getText().toString().trim(),
+                // Save trigger with "t" prefix. Numerical values will create an array on firebase.
+                "t" + mTriggerId.getText().toString().trim(),
                 mLatitude.getText().toString().trim(),
                 mLongitude.getText().toString().trim(),
                 mRadius.getText().toString().trim(),
@@ -299,7 +300,8 @@ public class EditTriggerActivity extends AppCompatActivity
         boolean matched = false;
         Log.d(TAG, "onTextChanged: CHANGED");
         for (int i = 0; i < mTriggerIds.size(); i++) {
-            if (s.toString().contentEquals(mTriggerIds.get(i))) {
+            // Get the substring at index 1 because the real triggerId is preceded with "t".
+            if (s.toString().contentEquals(mTriggerIds.get(i).substring(1))) {
                 mUserActionsListener.getTrigger(mTriggerIds.get(i));
                 matched = true;
             }

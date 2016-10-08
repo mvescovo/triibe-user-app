@@ -134,7 +134,7 @@ public class AuthUiActivity extends AppCompatActivity {
                         // Create a new user and save to TRIIBE database.
                         Map<String, Boolean> activeSurveyIds = new HashMap<>();
                         // Start a new user with the enrollment survey.
-                        activeSurveyIds.put("enrollmentSurvey", true);
+                        activeSurveyIds.put("s1", true);
                         User newUser = new User(mUserId, activeSurveyIds, false, false, "0");
                         mTriibeRepository.saveUser(newUser);
                     }

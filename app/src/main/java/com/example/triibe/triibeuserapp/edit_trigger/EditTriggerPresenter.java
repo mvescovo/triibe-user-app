@@ -85,6 +85,7 @@ public class EditTriggerPresenter implements EditTriggerContract.UserActionsList
 
     @Override
     public void deleteTrigger(@NonNull String triggerId) {
-        mTriibeRepository.deleteTrigger(mSurveyId, triggerId);
+        // Save trigger with "t" prefix. Numerical values will create an array on firebase.
+        mTriibeRepository.deleteTrigger(mSurveyId, "t" + triggerId);
     }
 }

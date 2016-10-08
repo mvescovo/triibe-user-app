@@ -2,7 +2,6 @@ package com.example.triibe.triibeuserapp.edit_option;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.triibe.triibeuserapp.data.Option;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
@@ -68,10 +67,8 @@ public class EditOptionPresenter implements EditOptionContract.UserActionsListen
             public void onOptionLoaded(@Nullable Option option) {
                 EspressoIdlingResource.decrement();
                 if (option != null) {
-                    Log.d(TAG, "onOptionLoaded: GOT OPTION: " + option.getPhrase());
                     mView.showOption(option);
                 } else {
-                    Log.d(TAG, "onOptionLoaded: OPTION NULL");
                 }
                 mView.setProgressIndicator(false);
             }
@@ -89,6 +86,7 @@ public class EditOptionPresenter implements EditOptionContract.UserActionsListen
 
     @Override
     public void deleteOption(@NonNull String optionId) {
-        mTriibeRepository.deleteOption(mSurveyId, mQuestionId, optionId);
+        // Save option with "o" prefix. Numerical values will create an array on firebase.
+        mTriibeRepository.deleteOption(mSurveyId, mQuestionId, "o" + optionId);
     }
 }

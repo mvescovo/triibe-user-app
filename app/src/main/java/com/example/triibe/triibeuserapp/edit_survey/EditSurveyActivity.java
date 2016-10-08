@@ -203,14 +203,16 @@ public class EditSurveyActivity extends AppCompatActivity
     @Override
     public void showEditQuestion() {
         Intent intent = new Intent(this, EditQuestionActivity.class);
-        intent.putExtra(EditQuestionActivity.EXTRA_SURVEY_ID, mSurveyId.getText().toString().trim());
+        // Save survey with "s" prefix. Numerical values will create an array on firebase.
+        intent.putExtra(EditQuestionActivity.EXTRA_SURVEY_ID, "s" + mSurveyId.getText().toString().trim());
         startActivityForResult(intent, REQUEST_EDIT_QUESTION);
     }
 
     @Override
     public void showEditTrigger() {
         Intent intent = new Intent(this, EditTriggerActivity.class);
-        intent.putExtra(EditTriggerActivity.EXTRA_SURVEY_ID, mSurveyId.getText().toString().trim());
+        // Save survey with "s" prefix. Numerical values will create an array on firebase.
+        intent.putExtra(EditTriggerActivity.EXTRA_SURVEY_ID, "s" + mSurveyId.getText().toString().trim());
         startActivityForResult(intent, REQUEST_EDIT_TRIGGER);
     }
 
@@ -294,7 +296,8 @@ public class EditSurveyActivity extends AppCompatActivity
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         boolean matched = false;
         for (int i = 0; i < mSurveyIds.size(); i++) {
-            if (s.toString().contentEquals(mSurveyIds.get(i))) {
+            // Get the substring at index 1 because the real surveyId is preceded with "s".
+            if (s.toString().contentEquals(mSurveyIds.get(i).substring(1))) {
                 mUserActionsListener.getSurvey(mSurveyIds.get(i));
                 matched = true;
             }

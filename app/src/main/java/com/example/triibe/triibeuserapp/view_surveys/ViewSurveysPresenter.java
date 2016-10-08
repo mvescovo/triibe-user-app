@@ -2,7 +2,6 @@ package com.example.triibe.triibeuserapp.view_surveys;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
@@ -66,15 +65,11 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                                 });
                     }
                 } else {
-                    Log.d(TAG, "onSurveyIdsLoaded: surveyids are null");
                     mTriibeRepository.getUser(userId, new TriibeRepository.GetUserCallback() {
                         @Override
                         public void onUserLoaded(@Nullable User user) {
-                            Log.d(TAG, "onUserLoaded: GOT USER LOADED");
                             if (user != null) {
-                                Log.d(TAG, "onUserLoaded: user not null");
                                 if (!user.isEnrolled()) {
-                                    Log.d(TAG, "onUserLoaded: user not enrolled");
                                     Map<String, Boolean> activeSurveyIds = new HashMap<>();
                                     // User must complete enrollment survey if not enrolled.
                                     activeSurveyIds.put("enrollmentSurvey", true);
@@ -82,12 +77,9 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                                     mTriibeRepository.saveUser(user);
                                     loadSurveys(userId, forceUpdate);
                                 } else {
-                                    Log.d(TAG, "onUserLoaded: user enrolled");
                                     mView.showNoSurveysMessage();
                                     mView.setProgressIndicator(false);
                                 }
-                            } else {
-                                Log.d(TAG, "onUserLoaded: user is NULL");
                             }
                         }
                     });

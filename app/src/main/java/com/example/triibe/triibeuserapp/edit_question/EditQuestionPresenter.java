@@ -79,14 +79,16 @@ public class EditQuestionPresenter implements EditQuestionContract.UserActionsLi
     public void saveQuestion(QuestionDetails questionDetails) {
         mView.setProgressIndicator(true);
 
-        mTriibeRepository.saveQuestion(questionDetails.getSurveyId(), questionDetails.getId(), questionDetails);
+        mTriibeRepository.saveQuestion(questionDetails.getSurveyId(), questionDetails.getId(),
+                questionDetails);
 
         mView.setProgressIndicator(false);
     }
 
     @Override
     public void deleteQuestion(@NonNull String questionId) {
-        mTriibeRepository.deleteQuestion(mSurveyId, questionId);
+        // Save question with "q" prefix. Numerical values will create an array on firebase.
+        mTriibeRepository.deleteQuestion(mSurveyId, "q" + questionId);
     }
 
     @Override
