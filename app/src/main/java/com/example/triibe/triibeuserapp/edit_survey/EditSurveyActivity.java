@@ -72,11 +72,11 @@ public class EditSurveyActivity extends AppCompatActivity
     @BindView(R.id.survey_id)
     AppCompatAutoCompleteTextView mSurveyId;
 
-//    @BindView(R.id.survey_active_yes)
-//    RadioButton mActiveYes;
-//
-//    @BindView(R.id.survey_active_no)
-//    RadioButton mActiveNo;
+    @BindView(R.id.survey_active_yes)
+    RadioButton mActiveYes;
+
+    @BindView(R.id.survey_active_no)
+    RadioButton mActiveNo;
 
     @BindView(R.id.survey_description)
     TextInputEditText mDescription;
@@ -176,6 +176,10 @@ public class EditSurveyActivity extends AppCompatActivity
 
     @Override
     public void showSurveyDetails(SurveyDetails surveyDetails) {
+        if (surveyDetails.isActive()) {
+            mSurveyActive = true;
+            mActiveYes.performClick();
+        }
         mDescription.setText(surveyDetails.getDescription());
         mPoints.setText(surveyDetails.getPoints());
         mNumProtectedQuestions.setText(surveyDetails.getNumProtectedQuestions());
@@ -306,6 +310,8 @@ public class EditSurveyActivity extends AppCompatActivity
     }
 
     private void clearOtherFields() {
+        mSurveyActive = false;
+        mActiveNo.performClick();
         mDescription.setText("");
         mPoints.setText("");
         mNumProtectedQuestions.setText("");
