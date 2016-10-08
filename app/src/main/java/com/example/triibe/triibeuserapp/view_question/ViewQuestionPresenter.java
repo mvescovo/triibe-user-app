@@ -448,115 +448,117 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 
     @Override
     public void saveAnswer(final String phrase, final String type, final boolean checked) {
-        mView.setIndeterminateProgressIndicator(true);
+        Question question = mQuestions.get("q" + mCurrentQuestionNum);
+        QuestionDetails questionDetails = question.getQuestionDetails();
+        String questionId = questionDetails.getId();
+        Map<String, Option> options = question.getOptions();
 
+        switch (type) {
+            case "radio":
+            case "checkbox":
+                for (int i = 1; i <= options.size(); i++) {
+                    Option option = options.get("o" + i);
+                    String optionPhrase = option.getPhrase();
+                    boolean hasExtraInput = option.getHasExtraInput();
+                    if (optionPhrase.contentEquals(phrase)) {
+                        if (hasExtraInput && checked) {
+                            String extraInputHint = option.getExtraInputHint();
+                            String extraInputType = option.getExtraInputType();
+                            mView.showExtraInputTextboxItem(extraInputHint, extraInputType, null);
+                        } else {
+                            mView.hideExtraInputTextboxItem();
+                        }
+                    }
+                }
+
+                if (mAnswers == null) {
+                    mAnswers = new HashMap<>();
+                }
+                Answer answer;
+
+                if (mAnswers.get("a" + mCurrentQuestionNum) != null) {
+                    // Modify existing answer
+                    answer = mAnswers.get("a" + mCurrentQuestionNum);
+                    Map<String, Option> previousOptions = answer.getSelectedOptions();
+                    for (int i = 1; i <= options.size(); i++) {
+                        Option option = options.get("o" + i);
+                        String optionPhrase = option.getPhrase();
+                        if (optionPhrase.contentEquals(phrase) && checked) {
+                            option.setChecked(true);
+                            previousOptions.put("o" + i, option);
+                        } else if (optionPhrase.contentEquals(phrase) && !checked) {
+                            previousOptions.remove("o" + i);
+                        } else if (type.contentEquals("radio")) {
+                            if (previousOptions.containsKey("o" + i)) {
+                                previousOptions.remove("o" + i);
+                            }
+                        }
+                    }
+                    if (previousOptions.size() == 0) {
+                        answer = new Answer();
+                    }
+                } else {
+                    // Create a new answer
+                    Map<String, Option> selectedOptions = new HashMap<>();
+                    for (int i = 1; i <= options.size(); i++) {
+                        Option option = options.get("o" + i);
+                        String optionPhrase = option.getPhrase();
+                        if (optionPhrase.contentEquals(phrase) && checked) {
+                            option.setChecked(true);
+                            selectedOptions.put("o" + i, option);
+                        }
+                    }
+
+                    AnswerDetails answerDetails = new AnswerDetails(questionId, "a" + mCurrentQuestionNum, type);
+                    if (selectedOptions.size() == 0) {
+                        // Don't save an empty answerDetails object. This will make firebase delete the
+                        // current answer options and can lead to a crash when loading the answer.
+                        // Using an empty Answer object resolves this as it will delete the entire answer and
+                        // not just the options.
+                        answer = new Answer();
+                    } else {
+                        answer = new Answer(answerDetails, selectedOptions);
+                    }
+                }
+
+                mTriibeRepository.saveAnswer(mSurveyId, mUserId, "a" + mCurrentQuestionNum, answer);
+                break;
+            case "text":
+                break;
+            case "extraText":
+                Answer extraTextAnswer = mAnswers.get("a" + mCurrentQuestionNum);
+                Map<String, Option> extraTextSelectedOptions;
+                if (extraTextAnswer != null) {
+                    extraTextSelectedOptions = extraTextAnswer.getSelectedOptions();
+                    if (extraTextSelectedOptions != null) {
+                        for (int i = 1; i <= options.size(); i++) {
+                            Option selectedOption = extraTextSelectedOptions.get("o" + i);
+                            if (selectedOption != null) {
+                                boolean hasExtraInput = selectedOption.getHasExtraInput();
+                                if (hasExtraInput) {
+                                    try {
+                                        // There is only one phrase for extraText.
+                                        selectedOption.setExtraInput(phrase);
+                                    } catch (ClassCastException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    mTriibeRepository.saveAnswer(mSurveyId, mUserId, "a" + mCurrentQuestionNum, extraTextAnswer);
+                }
+        }
+
+        // Make sure local answer are now updated with the saved answer.
+        mView.setIndeterminateProgressIndicator(true);
         mTriibeRepository.refreshAnswers();
+        EspressoIdlingResource.increment();
         mTriibeRepository.getAnswers(mSurveyId, mUserId, new TriibeRepository.GetAnswersCallback() {
             @Override
             public void onAnswersLoaded(@Nullable Map<String, Answer> answers) {
+                EspressoIdlingResource.decrement();
                 mAnswers = answers;
-
-                Question question = mQuestions.get("q" + mCurrentQuestionNum);
-                QuestionDetails questionDetails = question.getQuestionDetails();
-                String questionId = questionDetails.getId();
-                Map<String, Option> options = question.getOptions();
-
-                switch (type) {
-                    case "radio":
-                    case "checkbox":
-                        for (int i = 1; i <= options.size(); i++) {
-                            Option option = options.get("o" + i);
-                            String optionPhrase = option.getPhrase();
-                            boolean hasExtraInput = option.getHasExtraInput();
-                            if (optionPhrase.contentEquals(phrase)) {
-                                if (hasExtraInput && checked) {
-                                    String extraInputHint = option.getExtraInputHint();
-                                    String extraInputType = option.getExtraInputType();
-                                    mView.showExtraInputTextboxItem(extraInputHint, extraInputType, null);
-                                } else {
-                                    mView.hideExtraInputTextboxItem();
-                                }
-                            }
-                        }
-
-                        if (mAnswers == null) {
-                            mAnswers = new HashMap<>();
-                        }
-                        Answer answer;
-
-                        if (mAnswers.get("a" + mCurrentQuestionNum) != null) {
-                            // Modify existing answer
-                            answer = mAnswers.get("a" + mCurrentQuestionNum);
-                            Map<String, Option> previousOptions = answer.getSelectedOptions();
-                            for (int i = 1; i <= options.size(); i++) {
-                                Option option = options.get("o" + i);
-                                String optionPhrase = option.getPhrase();
-                                if (optionPhrase.contentEquals(phrase) && checked) {
-                                    option.setChecked(true);
-                                    previousOptions.put("o" + i, option);
-                                } else if (optionPhrase.contentEquals(phrase) && !checked) {
-                                    previousOptions.remove("o" + i);
-                                } else if (type.contentEquals("radio")) {
-                                    if (previousOptions.containsKey("o" + i)) {
-                                        previousOptions.remove("o" + i);
-                                    }
-                                }
-                            }
-                            if (previousOptions.size() == 0) {
-                                answer = new Answer();
-                            }
-                        } else {
-                            // Create a new answer
-                            Map<String, Option> selectedOptions = new HashMap<>();
-                            for (int i = 1; i <= options.size(); i++) {
-                                Option option = options.get("o" + i);
-                                String optionPhrase = option.getPhrase();
-                                if (optionPhrase.contentEquals(phrase) && checked) {
-                                    option.setChecked(true);
-                                    selectedOptions.put("o" + i, option);
-                                }
-                            }
-
-                            AnswerDetails answerDetails = new AnswerDetails(questionId, "a" + mCurrentQuestionNum, type);
-                            if (selectedOptions.size() == 0) {
-                                // Don't save an empty answerDetails object. This will make firebase delete the
-                                // current answer options and can lead to a crash when loading the answer.
-                                // Using an empty Answer object resolves this as it will delete the entire answer and
-                                // not just the options.
-                                answer = new Answer();
-                            } else {
-                                answer = new Answer(answerDetails, selectedOptions);
-                            }
-                        }
-
-                        mTriibeRepository.saveAnswer(mSurveyId, mUserId, "a" + mCurrentQuestionNum, answer);
-                        break;
-                    case "text":
-                        break;
-                    case "extraText":
-                        Answer extraTextAnswer = mAnswers.get("a" + mCurrentQuestionNum);
-                        Map<String, Option> extraTextSelectedOptions;
-                        if (extraTextAnswer != null) {
-                            extraTextSelectedOptions = extraTextAnswer.getSelectedOptions();
-                            if (extraTextSelectedOptions != null) {
-                                for (int i = 1; i <= options.size(); i++) {
-                                    Option selectedOption = extraTextSelectedOptions.get("o" + i);
-                                    if (selectedOption != null) {
-                                        boolean hasExtraInput = selectedOption.getHasExtraInput();
-                                        if (hasExtraInput) {
-                                            try {
-                                                // There is only one phrase for extraText.
-                                                selectedOption.setExtraInput(phrase);
-                                            } catch (ClassCastException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            mTriibeRepository.saveAnswer(mSurveyId, mUserId, "a" + mCurrentQuestionNum, extraTextAnswer);
-                        }
-                }
                 mView.setIndeterminateProgressIndicator(false);
             }
         });
@@ -571,7 +573,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 mAnswers = answers;
                 checkAnswerToGoNext();
             }
-        }, true); // TODO: 8/10/16 set this back to false after turning firebase pushing back on (if I do)
+        }, false);
     }
 
     @VisibleForTesting
@@ -711,7 +713,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 mAnswers = answers;
                 checkAnswerToGoPrevious();
             }
-        }, true); // TODO: 8/10/16 set this back to false after turning firebase pushing back on (if I do)
+        }, false);
     }
 
     public void checkAnswerToGoPrevious() {

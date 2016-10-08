@@ -781,6 +781,7 @@ public class ViewQuestionPresenterTest {
 
         mViewQuestionPresenter.saveAnswer(ANSWER1_OPTION1_PHRASE, ANSWER1_TYPE, ANSWER1_OPTION1_CHECKED);
         verify(mTriibeRepository).saveAnswer(anyString(), anyString(), anyString(), any(Answer.class));
+        verify(mTriibeRepository).getAnswers(anyString(), anyString(), any(TriibeRepository.GetAnswersCallback.class));
     }
 
     @Test
