@@ -76,10 +76,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         if (mAnswers == null) {
                             mAnswers = new HashMap<>();
                         }
-                        if (mAnswers.size() >= mNumProtectedQuestions &&
-                                mCurrentQuestionNum <= mNumProtectedQuestions) {
-                            mCurrentQuestionNum = mAnswers.size() + 1;
-                        }
+                        // Move to the question the user is up to.
+                        mCurrentQuestionNum = mAnswers.size() + 1;
                         displayCurrentQuestion();
                     }
                 }, true);
