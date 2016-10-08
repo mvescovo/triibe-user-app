@@ -16,7 +16,6 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -299,7 +298,6 @@ public class ViewQuestionActivity extends AppCompatActivity
 
     @Override
     public void hideExtraInputTextboxItem() {
-        Log.d(TAG, "hideExtraInputTextboxItem: hiding extra input text box");
         mTextInputEditText.removeTextChangedListener(this);
         mTextInputEditText.setText("");
         mTextInputEditText.setHint("");
