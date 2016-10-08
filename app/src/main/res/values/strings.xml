@@ -72,9 +72,14 @@
     <string name="edit_option_details_title">Option Details</string>
     <string name="edit_option_id_hint">Option ID*</string>
     <string name="edit_option_phrase_hint">Phrase*</string>
-    <string name="edit_option_extra_input_type_hint">Extra input type</string>
-    <string name="edit_option_extra_input_hint_hint">Extra input hint</string>
+    <string name="edit_option_extra_input_hint_hint">Extra input hint*</string>
     <string name="delete_option">Delete option</string>
+    <string name="edit_option_extra_input_type">Extra input type:</string>
+    <string name="edit_option_has_extra_input">Has extra input:</string>
+    <string-array name="option_extra_input_type_array">
+        <item>Text</item>
+        <item>Number</item>
+    </string-array>
 
     <!--EditLocationActivity-->
     <string name="title_activity_edit_location">Edit Location</string>

@@ -51,6 +51,8 @@ public class EditSurveyActivity extends AppCompatActivity
     private static String STATE_SURVEY_IDS = "com.example.triibe.SURVEY_IDS";
     EditSurveyContract.UserActionsListener mUserActionsListener;
     BottomSheetBehavior mBottomSheetBehavior;
+    private List<String> mSurveyIds;
+    private boolean mSurveyActive = false;
 
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
@@ -70,11 +72,11 @@ public class EditSurveyActivity extends AppCompatActivity
     @BindView(R.id.survey_id)
     AppCompatAutoCompleteTextView mSurveyId;
 
-    @BindView(R.id.survey_active_yes)
-    RadioButton mActiveYes;
-
-    @BindView(R.id.survey_active_no)
-    RadioButton mActiveNo;
+//    @BindView(R.id.survey_active_yes)
+//    RadioButton mActiveYes;
+//
+//    @BindView(R.id.survey_active_no)
+//    RadioButton mActiveNo;
 
     @BindView(R.id.survey_description)
     TextInputEditText mDescription;
@@ -84,9 +86,6 @@ public class EditSurveyActivity extends AppCompatActivity
 
     @BindView(R.id.survey_num_protected_questions)
     TextInputEditText mNumProtectedQuestions;
-
-    private List<String> mSurveyIds;
-    private boolean mSurveyActive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

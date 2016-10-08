@@ -339,6 +339,7 @@ public class EditQuestionActivity extends AppCompatActivity
     }
 
     private void clearOtherFields() {
+        mSelectedQuestionType = "radio";
         mImageUrl.setText("");
         mTitle.setText("");
         mIntro.setText("");

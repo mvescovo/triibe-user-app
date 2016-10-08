@@ -69,17 +69,17 @@
                 </android.support.design.widget.TextInputLayout>
 
                 <LinearLayout
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="16dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="16dp"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:textSize="18sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/edit_question_type"/>
+                        android:text="@string/edit_question_type"
+                        android:textSize="18sp"/>
 
                     <android.support.v7.widget.AppCompatSpinner
                         android:id="@+id/question_type"
@@ -91,7 +91,8 @@
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp">
 
                     <android.support.design.widget.TextInputEditText
                         android:id="@+id/question_image_url"
@@ -140,14 +141,6 @@
                         android:inputType="textAutoComplete|textCapSentences|textAutoCorrect"/>
 
                 </android.support.design.widget.TextInputLayout>
-
-
-
-
-
-
-
-
 
 
                 <android.support.design.widget.TextInputLayout

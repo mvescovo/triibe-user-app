@@ -96,6 +96,7 @@
                         android:checked="true"
                         android:onClick="onSurveyActiveRadioButtonClicked"
                         android:text="@string/edit_survey_active_no"/>
+
                 </RadioGroup>
 
                 <android.support.design.widget.TextInputLayout
