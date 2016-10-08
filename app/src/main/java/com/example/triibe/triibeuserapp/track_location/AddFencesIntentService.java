@@ -183,7 +183,7 @@ public class AddFencesIntentService extends IntentService
                 Double.valueOf(lat),
                 Double.valueOf(lon),
                 Double.valueOf(radius),
-                Long.valueOf(dwell)
+                Long.valueOf(dwell) * 1000L // convert seconds to milliseconds
         );
         builder.addFence(fenceKey, location, mPendingIntent).build();
 
