@@ -245,6 +245,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
             String type = questionDetails.getType();
 
             if (mAnswers.size() < mCurrentQuestionNum) {
+                // The current question doesn't yet have an answer
+
                 if (type.contentEquals("text")) {
                     for (int i = 0; i < options.size(); i++) {
 //                    final int viewNumber = i;
@@ -276,8 +278,9 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 //                }
                 }
             } else {
+                // The current question does have an answer; display it.
+
                 Answer answer = mAnswers.get("a" + mCurrentQuestionNum);
-//            Log.d(TAG, "displayCurrentAnswer: size: " + mAnswers.size());
                 AnswerDetails answerDetails = answer.getAnswerDetails();
                 Map<String, Option> selectedOptions = answer.getSelectedOptions();
                 String answerType = answerDetails.getType();
@@ -300,12 +303,14 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             String selectedOptionExtraInput = selectedOption.getExtraInput();
                             String selectedOptionExtraInputHint = selectedOption.getExtraInputHint();
                             String selectedOptionExtraInputType = selectedOption.getExtraInputType();
-                            mView.selectRadioButtonItem(selectedOptionPhrase,
+                            mView.selectRadioButtonItem(
+                                    selectedOptionPhrase,
                                     selectedOptionHasExtraInput,
                                     selectedOptionExtraInputHint,
                                     selectedOptionExtraInputType,
                                     selectedOptionExtraInput,
-                                    options.size());
+                                    options.size()
+                            );
 //                        for (int i = 0; i < options.size(); i++) {
 //                            if (((RadioButton) mRadioGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(0).getPhrase())) {
 //                                ((RadioButton) mRadioGroup.getChildAt(i)).toggle();
@@ -455,10 +460,11 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             String extraInputHint = option.getExtraInputHint();
                             String extraInputType = option.getExtraInputType();
                             mView.showExtraInputTextboxItem(extraInputHint, extraInputType, null);
+                        } else {
+                            mView.hideExtraInputTextboxItem();
                         }
                     }
                 }
-
 
                 // TODO: 19/09/16 get the answer from manswers if it's there. don't delete previous answers if there's options that still need to be there.
                 if (mAnswers == null) {
@@ -512,7 +518,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 }
 
                 mTriibeRepository.saveAnswer(mSurveyId, mUserId, "a" + mCurrentQuestionNum, answer);
-
                 break;
             case "text":
                 break;

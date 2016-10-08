@@ -16,6 +16,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -43,7 +44,7 @@ import butterknife.ButterKnife;
 public class ViewQuestionActivity extends AppCompatActivity
         implements ViewQuestionContract.View, TextWatcher {
 
-    private static final String TAG = "SurveyDetailsActivity";
+    private static final String TAG = "ViewQuestionActivity";
     public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
     public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
     public final static String EXTRA_NUM_PROTECTED_QUESTIONS = "com.example.triibe.NUM_PROTECTED_QUESTIONS";
@@ -268,6 +269,8 @@ public class ViewQuestionActivity extends AppCompatActivity
                 item.toggle();
                 if (hasExtraInput) {
                     showExtraInputTextboxItem(extraInputHint, extraInputType, extraInput);
+                } else {
+                    hideExtraInputTextboxItem();
                 }
                 return;
             }
@@ -296,6 +299,7 @@ public class ViewQuestionActivity extends AppCompatActivity
 
     @Override
     public void hideExtraInputTextboxItem() {
+        Log.d(TAG, "hideExtraInputTextboxItem: hiding extra input text box");
         mTextInputEditText.removeTextChangedListener(this);
         mTextInputEditText.setText("");
         mTextInputEditText.setHint("");
