@@ -18,6 +18,7 @@
     <!--ViewSurveysActivity-->
     <string name="title_activity_view_surveys">Surveys</string>
     <string name="no_surveys">You don\'t currently have any surveys. Try going to the mall to get more surveys.</string>
+    <string name="view_points">View Points</string>
 
     <!--EditSurveyActivity-->
     <string name="title_activity_edit_survey">Edit Survey</string>

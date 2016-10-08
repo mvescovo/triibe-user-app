@@ -27,6 +27,9 @@ public class ViewPointsActivity extends AppCompatActivity implements ViewPointsC
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
 
+    @BindView(R.id.new_points_earned_title)
+    TextView mNewPointsTitle;
+
     @BindView(R.id.new_points_earned_points)
     TextView mNewPoints;
 
@@ -58,7 +61,7 @@ public class ViewPointsActivity extends AppCompatActivity implements ViewPointsC
         if (getIntent().getStringExtra(EXTRA_SURVEY_POINTS) != null) {
             mSurveyPoints = getIntent().getStringExtra(EXTRA_SURVEY_POINTS);
         } else {
-            mSurveyPoints = "Invalid points";
+            mSurveyPoints = "";
         }
     }
 
@@ -78,52 +81,54 @@ public class ViewPointsActivity extends AppCompatActivity implements ViewPointsC
     }
 
     @Override
-    public void showNewPoints(final String points, final String totalPoints) {
-        // Show initial values.
-        mNewPoints.setText("0");
-        int newPointsInt = Integer.parseInt(points);
-        int totalPointsInt = Integer.parseInt(totalPoints);
-        final int previousPoints = totalPointsInt - newPointsInt;
-        showTotalPoints(Integer.toString(previousPoints));
+    public void showPoints(final String points, final String totalPoints) {
+        if (!points.contentEquals("")) {
+            // Show initial values.
+            mNewPointsTitle.setVisibility(View.VISIBLE);
+            mNewPoints.setVisibility(View.VISIBLE);
+            mNewPoints.setText("0");
+            int newPointsInt = Integer.parseInt(points);
+            int totalPointsInt = Integer.parseInt(totalPoints);
+            final int previousPoints = totalPointsInt - newPointsInt;
+            String previousPointsString = Integer.toString(previousPoints);
+            mTotalPoints.setText(previousPointsString);
 
-        // Show animation of points accumulating.
-        new Thread(new Runnable() {
-            public void run() {
-                int newPoints = Integer.valueOf(points);
-                for (int i = 1; i <= newPoints; i++) {
-                    final int finalI = i;
-                    try {
-                        Thread.sleep(20);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    mNewPoints.post(new Runnable() {
-                        public void run() {
-                            String incrementalPoints = Integer.toString(finalI);
-                            mNewPoints.setText(incrementalPoints);
+            // Show animation of points accumulating.
+            new Thread(new Runnable() {
+                public void run() {
+                    int newPoints = Integer.valueOf(points);
+                    for (int i = 1; i <= newPoints; i++) {
+                        final int finalI = i;
+                        try {
+                            Thread.sleep(20);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                    });
-                }
-                for (int i = 1; i <= newPoints; i++) {
-                    final int finalI = i;
-                    try {
-                        Thread.sleep(20);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        mNewPoints.post(new Runnable() {
+                            public void run() {
+                                String incrementalPoints = Integer.toString(finalI);
+                                mNewPoints.setText(incrementalPoints);
+                            }
+                        });
                     }
-                    mTotalPoints.post(new Runnable() {
-                        public void run() {
-                            String incrementalPoints = Integer.toString(finalI + previousPoints);
-                            mTotalPoints.setText(incrementalPoints);
+                    for (int i = 1; i <= newPoints; i++) {
+                        final int finalI = i;
+                        try {
+                            Thread.sleep(20);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                    });
+                        mTotalPoints.post(new Runnable() {
+                            public void run() {
+                                String incrementalPoints = Integer.toString(finalI + previousPoints);
+                                mTotalPoints.setText(incrementalPoints);
+                            }
+                        });
+                    }
                 }
-            }
-        }).start();
-    }
-
-    @Override
-    public void showTotalPoints(String points) {
-        mTotalPoints.setText(points);
+            }).start();
+        } else {
+            mTotalPoints.setText(totalPoints);
+        }
     }
 }

@@ -52,7 +52,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="@string/new_points_earned_title"/>
+                    android:text="@string/new_points_earned_title"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/new_points_earned_points"
@@ -61,7 +62,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="16dp"
-                    android:textColor="@color/colorFabDone"/>
+                    android:textColor="@color/colorFabDone"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/total_points_earned_title"

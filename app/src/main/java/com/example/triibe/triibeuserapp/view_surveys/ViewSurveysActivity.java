@@ -235,8 +235,13 @@ public class ViewSurveysActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.start_data_tracking:
-                Intent intent = new Intent(this, RunAppWhenAtMallService.class);
-                startService(intent);
+                Intent runAppAtMallServiceIntent = new Intent(this, RunAppWhenAtMallService.class);
+                startService(runAppAtMallServiceIntent);
+                return true;
+            case R.id.view_points:
+                Intent viewPointsIntent = new Intent(this, ViewPointsActivity.class);
+                viewPointsIntent.putExtra(ViewPointsActivity.EXTRA_USER_ID, mUserId);
+                startActivity(viewPointsIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

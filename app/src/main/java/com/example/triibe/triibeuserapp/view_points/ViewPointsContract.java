@@ -10,9 +10,7 @@ public interface ViewPointsContract {
 
         void setIndeterminateProgressIndicator(boolean active);
 
-        void showNewPoints(String points, String totalPoints);
-
-        void showTotalPoints(String points);
+        void showPoints(String points, String totalPoints);
     }
 
     interface UserActionsListener {
