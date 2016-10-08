@@ -77,7 +77,13 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             mAnswers = new HashMap<>();
                         }
                         // Move to the question the user is up to.
-                        mCurrentQuestionNum = mAnswers.size() + 1;
+                        if (mAnswers.size() < mQuestions.size()) {
+                            // If they haven't completed all questions move to the next question.
+                            mCurrentQuestionNum = mAnswers.size() + 1;
+                        } else {
+                            // If they have completed all questions, move to the last question.
+                            mCurrentQuestionNum = mAnswers.size();
+                        }
                         displayCurrentQuestion();
                     }
                 }, true);
