@@ -67,6 +67,8 @@ public interface ViewQuestionContract {
 
         void hideBackButton();
 
+        void hideOptions();
+
         void showViewSurveys(@NonNull Integer resultCode, @NonNull Integer surveyPoints,
                              @NonNull Integer totalPoints);
 

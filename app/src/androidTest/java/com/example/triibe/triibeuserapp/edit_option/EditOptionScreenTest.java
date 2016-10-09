@@ -33,7 +33,7 @@ public class EditOptionScreenTest {
     private static String TEST_OPTION_ID = "1";
     private static String TEST_OPTION_PHRASE = "Test";
     private static String TEST_OPTION_EXTRA_INPUT_TYPE = "Text";
-    private static String TEST_OPTION_EXTRA_INPUT_HINT = "Test";
+    private static String TEST_OPTION_EXTRA_INPUT_HINT = "Test extra";
 
     @Rule
     public IntentsTestRule<EditOptionActivity> mEditOptionIntentsTestRule =

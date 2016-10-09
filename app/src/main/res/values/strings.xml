@@ -63,7 +63,7 @@
     <string-array name="question_type_array">
         <item>Radio</item>
         <item>Checkbox</item>
-        <item>Text input</item>
+        <item>Text</item>
     </string-array>
 
     <!--EditOptionActivity-->

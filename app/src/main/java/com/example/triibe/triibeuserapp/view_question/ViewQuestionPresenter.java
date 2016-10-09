@@ -200,8 +200,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         for (int i = 1; i <= options.size(); i++) {
                             Option option = options.get("o" + i);
                             String optionPhrase = option.getPhrase();
-                            String extraInputHint = option.getExtraInputHint();
                             String extraInputType = option.getExtraInputType();
+                            String extraInputHint = option.getExtraInputHint();
                             if (optionPhrase == null) {
                                 Log.d(TAG, "displayCurrentQuestion: NO OPTIONS PHRASE");
                             } else {
@@ -213,13 +213,12 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         mView.showTextboxGroup();
                         for (int i = 1; i <= options.size(); i++) {
                             Option option = options.get("o" + i);
-                            String optionPhrase = option.getPhrase();
-//                    String extraInputType = option.getExtraInputType(); // TODO: 19/09/16 set this for all question options in firebase
-                            String extraInputType = "text";
-                            if (optionPhrase == null) {
-                                Log.d(TAG, "displayCurrentQuestion: NO OPTIONS PHRASE");
+                            String extraInputType = option.getExtraInputType();
+                            String extaInputHint = option.getExtraInputHint();
+                            if (extaInputHint == null) {
+                                Log.d(TAG, "displayCurrentQuestion: NO EXTRA_INPUT_HINT");
                             } else {
-                                mView.showTextboxItem(optionPhrase, extraInputType);
+                                mView.showTextboxItem(extaInputHint, extraInputType);
                             }
                         }
 //                mEditTextGroup.removeAllViews();
@@ -688,6 +687,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         });
                     } else {
                         mCurrentQuestionNum++;
+                        mView.hideOptions();
                         mView.showBackButton();
 //                    mTextInputEditText.removeTextChangedListener(this);
                         mView.setIndeterminateProgressIndicator(false);

@@ -301,6 +301,12 @@ public class ViewQuestionActivity extends AppCompatActivity
             case "number":
                 mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
                 break;
+            case "email":
+                mTextInputEditText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                break;
+            case "phone":
+                mTextInputEditText.setInputType(InputType.TYPE_CLASS_PHONE);
+                break;
         }
         mTextInputEditText.requestFocus();
     }
@@ -358,14 +364,29 @@ public class ViewQuestionActivity extends AppCompatActivity
     }
 
     @Override
-    public void showTextboxItem(String hint, String type) {
-        TextInputEditText textInputEditText = new TextInputEditText(this);
+    public void showTextboxItem(String hint, final String type) {
+        final TextInputEditText textInputEditText = new TextInputEditText(this);
         textInputEditText.setHint(hint);
+
+        switch (type) {
+            case "text": // TODO: 18/09/16 set in constants or something
+                textInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+                break;
+            case "number":
+                textInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                break;
+            case "email":
+                textInputEditText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                break;
+            case "phone":
+                textInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                break;
+        }
         textInputEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mUserActionsListener
-                        .saveAnswer(((TextInputEditText)view).getText().toString(), "text", true);
+                        .saveAnswer(((TextInputEditText)view).getText().toString(), type, true);
             }
         });
         mEditTextGroup.addView(textInputEditText);
@@ -397,6 +418,14 @@ public class ViewQuestionActivity extends AppCompatActivity
     public void hideBackButton() {
         mPreviousButton.setVisibility(View.INVISIBLE);
         mPreviousButtonImage.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void hideOptions() {
+        mRadioGroup.setVisibility(View.GONE);
+        mCheckboxGroup.setVisibility(View.GONE);
+        mEditTextGroup.removeAllViews();
+        mEditTextGroup.setVisibility(View.GONE);
     }
 
     @Override
