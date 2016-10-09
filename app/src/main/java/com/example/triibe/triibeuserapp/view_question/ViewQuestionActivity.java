@@ -7,9 +7,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -30,6 +32,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.triibe.triibeuserapp.R;
+import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
 import com.squareup.picasso.Picasso;
@@ -46,10 +49,12 @@ public class ViewQuestionActivity extends AppCompatActivity
     private static final String TAG = "ViewQuestionActivity";
     public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
     public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
+    public final static String EXTRA_QUESTION_ID = "com.example.triibe.QUESTION_ID";
     public final static String EXTRA_NUM_PROTECTED_QUESTIONS = "com.example.triibe.NUM_PROTECTED_QUESTIONS";
     ViewQuestionContract.UserActionsListener mUserActionsListener;
     private String mSurveyId;
     private String mUserId;
+    private String mQuestionId;
     private int mNumProtectedQuestions;
 
     @BindView(R.id.view_root)
@@ -108,13 +113,16 @@ public class ViewQuestionActivity extends AppCompatActivity
         } else {
             mSurveyId = "-1";
         }
-
         if (getIntent().getStringExtra(EXTRA_USER_ID) != null) {
             mUserId = getIntent().getStringExtra(EXTRA_USER_ID);
         } else {
-            mUserId = "TestUserId";
+            mUserId = "InvalidUser";
         }
-
+        if (getIntent().getStringExtra(EXTRA_QUESTION_ID) != null) {
+            mQuestionId = getIntent().getStringExtra(EXTRA_QUESTION_ID);
+        } else {
+            mQuestionId = "-1";
+        }
         mNumProtectedQuestions = getIntent().getIntExtra(EXTRA_NUM_PROTECTED_QUESTIONS, 0);
 
         mUserActionsListener = new ViewQuestionPresenter(
@@ -122,6 +130,7 @@ public class ViewQuestionActivity extends AppCompatActivity
                 this,
                 mSurveyId,
                 mUserId,
+                mQuestionId,
                 mNumProtectedQuestions
         );
 
@@ -421,5 +430,10 @@ public class ViewQuestionActivity extends AppCompatActivity
     @Override
     public void afterTextChanged(Editable editable) {
 
+    }
+
+    @VisibleForTesting
+    public IdlingResource getCountingIdlingResource() {
+        return EspressoIdlingResource.getIdlingResource();
     }
 }

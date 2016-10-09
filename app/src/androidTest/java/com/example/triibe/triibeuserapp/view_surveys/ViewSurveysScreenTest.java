@@ -42,9 +42,6 @@ import static org.hamcrest.Matchers.allOf;
 @LargeTest
 public class ViewSurveysScreenTest {
 
-    // Passed into intent (use actual id's rather than the user entered version without prefix).
-
-    // Passed in by use (don't include prefix for id's).
     private static String TEST_USER_ID = "EspressoTestUser";
     private static String SURVEY2_DESCRIPTION = "Espresso test survey";
     private static String SURVEY2_POINTS = "100";
@@ -71,7 +68,7 @@ public class ViewSurveysScreenTest {
     }
 
     @Test
-    public void surveysLoad() {
+    public void loadSurveys() {
         // Check surveys are in recycler view.
         onView(withId(R.id.view_surveys_recycler_view)).perform(scrollTo(hasDescendant(withText(SURVEY2_DESCRIPTION))));
         onView(allOf(withId(R.id.survey_description), withText(SURVEY2_DESCRIPTION))).check(matches(isDisplayed()));

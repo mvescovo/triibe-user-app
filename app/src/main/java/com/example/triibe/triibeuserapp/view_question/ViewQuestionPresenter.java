@@ -33,6 +33,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
     ViewQuestionContract.View mView;
     private String mSurveyId;
     private String mUserId;
+    private String mQuestionId;
     private int mNumProtectedQuestions;
     private int mCurrentQuestionNum;
     @VisibleForTesting
@@ -43,11 +44,12 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 
 
     public ViewQuestionPresenter(TriibeRepository triibeRepository, ViewQuestionContract.View view,
-                                 String surveyId, String userId, int numProtectedQuestions) {
+                                 String surveyId, String userId, String questionId, int numProtectedQuestions) {
         mTriibeRepository = triibeRepository;
         mView = view;
         mSurveyId = surveyId;
         mUserId = userId;
+        mQuestionId = questionId;
         mNumProtectedQuestions = numProtectedQuestions;
         mCurrentQuestionNum = 1;
         mQuestions = new HashMap<>();
@@ -76,13 +78,21 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         if (mAnswers == null) {
                             mAnswers = new HashMap<>();
                         }
-                        // Move to the question the user is up to.
-                        if (mAnswers.size() < mQuestions.size()) {
-                            // If they haven't completed all questions move to the next question.
-                            mCurrentQuestionNum = mAnswers.size() + 1;
+
+                        // If the question ID was specified (such as from Espresso), go to the
+                        // requested question. If "-1" is set (invalid question) then just go to
+                        // the current question.
+                        if (!mQuestionId.contentEquals("-1")) {
+                            mCurrentQuestionNum = Integer.valueOf(mQuestionId.substring(1));
                         } else {
-                            // If they have completed all questions, move to the last question.
-                            mCurrentQuestionNum = mAnswers.size();
+                            // Move to the question the user is up to.
+                            if (mAnswers.size() < mQuestions.size()) {
+                                // If they haven't completed all questions move to the next question.
+                                mCurrentQuestionNum = mAnswers.size() + 1;
+                            } else {
+                                // If they have completed all questions, move to the last question.
+                                mCurrentQuestionNum = mAnswers.size();
+                            }
                         }
                         displayCurrentQuestion();
                     }
@@ -163,54 +173,55 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
             * Display question options
             * */
             Map<String, Option> options = question.getOptions();
-            String type = questionDetails.getType();
-            if (type == null) {
-                Log.d(TAG, "displayCurrentQuestion: NO TYPE");
-                return;
-            }
+            if (options != null) {
+                String type = questionDetails.getType();
+                if (type == null) {
+                    Log.d(TAG, "displayCurrentQuestion: NO TYPE");
+                    return;
+                }
 
-            switch (type) {
-                case "radio":
-                    mView.showRadioButtonGroup();
-                    for (int i = 1; i <= options.size(); i++) {
-                        Option option = options.get("o" + i);
-                        String optionPhrase = option.getPhrase();
-                        String extraInputHint = option.getExtraInputHint();
-                        String extraInputType = option.getExtraInputType();
-                        if (optionPhrase == null) {
-                            Log.d(TAG, "displayCurrentQuestion: NO OPTION PHRASE");
-                        } else {
-                            mView.showRadioButtonItem(optionPhrase, extraInputHint, extraInputType);
+                switch (type) {
+                    case "radio":
+                        mView.showRadioButtonGroup();
+                        for (int i = 1; i <= options.size(); i++) {
+                            Option option = options.get("o" + i);
+                            String optionPhrase = option.getPhrase();
+                            String extraInputHint = option.getExtraInputHint();
+                            String extraInputType = option.getExtraInputType();
+                            if (optionPhrase == null) {
+                                Log.d(TAG, "displayCurrentQuestion: NO OPTION PHRASE");
+                            } else {
+                                mView.showRadioButtonItem(optionPhrase, extraInputHint, extraInputType);
+                            }
                         }
-                    }
-                    break;
-                case "checkbox":
-                    mView.showCheckboxGroup();
-                    for (int i = 1; i <= options.size(); i++) {
-                        Option option = options.get("o" + i);
-                        String optionPhrase = option.getPhrase();
-                        String extraInputHint = option.getExtraInputHint();
-                        String extraInputType = option.getExtraInputType();
-                        if (optionPhrase == null) {
-                            Log.d(TAG, "displayCurrentQuestion: NO OPTIONS PHRASE");
-                        } else {
-                            mView.showCheckboxItem(optionPhrase, extraInputHint, extraInputType, options.size());
+                        break;
+                    case "checkbox":
+                        mView.showCheckboxGroup();
+                        for (int i = 1; i <= options.size(); i++) {
+                            Option option = options.get("o" + i);
+                            String optionPhrase = option.getPhrase();
+                            String extraInputHint = option.getExtraInputHint();
+                            String extraInputType = option.getExtraInputType();
+                            if (optionPhrase == null) {
+                                Log.d(TAG, "displayCurrentQuestion: NO OPTIONS PHRASE");
+                            } else {
+                                mView.showCheckboxItem(optionPhrase, extraInputHint, extraInputType, options.size());
+                            }
                         }
-                    }
-                    break;
-                case "text":
-                    mView.showTextboxGroup();
-                    for (int i = 1; i <= options.size(); i++) {
-                        Option option = options.get("o" + i);
-                        String optionPhrase = option.getPhrase();
+                        break;
+                    case "text":
+                        mView.showTextboxGroup();
+                        for (int i = 1; i <= options.size(); i++) {
+                            Option option = options.get("o" + i);
+                            String optionPhrase = option.getPhrase();
 //                    String extraInputType = option.getExtraInputType(); // TODO: 19/09/16 set this for all question options in firebase
-                        String extraInputType = "text";
-                        if (optionPhrase == null) {
-                            Log.d(TAG, "displayCurrentQuestion: NO OPTIONS PHRASE");
-                        } else {
-                            mView.showTextboxItem(optionPhrase, extraInputType);
+                            String extraInputType = "text";
+                            if (optionPhrase == null) {
+                                Log.d(TAG, "displayCurrentQuestion: NO OPTIONS PHRASE");
+                            } else {
+                                mView.showTextboxItem(optionPhrase, extraInputType);
+                            }
                         }
-                    }
 //                mEditTextGroup.removeAllViews();
 //                mEditTextGroup.setVisibility(View.VISIBLE);
 //
@@ -228,7 +239,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 //                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
 //                    }
 //                }
-                    break;
+                        break;
+                }
             }
         }
 
