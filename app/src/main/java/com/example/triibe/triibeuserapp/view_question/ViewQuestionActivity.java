@@ -18,6 +18,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -259,7 +260,7 @@ public class ViewQuestionActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 mUserActionsListener
-                        .saveAnswer(((RadioButton)view).getText().toString(), "radio", true);
+                        .saveAnswer(((RadioButton)view).getText().toString(), null, "radio", true);
             }
         });
         mRadioGroup.addView(radioButton);
@@ -337,7 +338,7 @@ public class ViewQuestionActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 mUserActionsListener
-                        .saveAnswer(((CheckBox)view).getText().toString(), "checkbox",
+                        .saveAnswer(((CheckBox)view).getText().toString(), null, "checkbox",
                                 ((CheckBox)view).isChecked());
             }
         });
@@ -364,32 +365,57 @@ public class ViewQuestionActivity extends AppCompatActivity
     }
 
     @Override
-    public void showTextboxItem(String hint, final String type) {
-        final TextInputEditText textInputEditText = new TextInputEditText(this);
-        textInputEditText.setHint(hint);
+    public void showTextboxItem(final String hint, final String type,
+                                @Nullable final String answerPhrase) {
+        // If answerPhrase is null then we need to add a new textbox while displaying a question.
+        if (answerPhrase == null) {
+            final TextInputEditText textInputEditText = new TextInputEditText(this);
+            textInputEditText.setHint(hint);
 
-        switch (type) {
-            case "text": // TODO: 18/09/16 set in constants or something
-                textInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
-                break;
-            case "number":
-                textInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                break;
-            case "email":
-                textInputEditText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-                break;
-            case "phone":
-                textInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                break;
-        }
-        textInputEditText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mUserActionsListener
-                        .saveAnswer(((TextInputEditText)view).getText().toString(), type, true);
+            switch (type) {
+                case "text": // TODO: 18/09/16 set in constants or something
+                    textInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+                    break;
+                case "number":
+                    textInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    break;
+                case "email":
+                    textInputEditText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                    break;
+                case "phone":
+                    textInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    break;
             }
-        });
-        mEditTextGroup.addView(textInputEditText);
+            textInputEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    Log.d(TAG, "got text changed");
+                    mUserActionsListener
+                            .saveAnswer(hint, s.toString(), "text", true);
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+            mEditTextGroup.addView(textInputEditText);
+        } else {
+            // If answerPhrase is not null then we just need to update an existing textbox with
+            // the anwer.
+            for (int i = 0; i < mEditTextGroup.getChildCount(); i++) {
+                TextInputEditText text = (TextInputEditText) mEditTextGroup.getChildAt(i);
+                if (text.getHint().toString().contentEquals(hint)) {
+                    text.setText(answerPhrase);
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -453,7 +479,7 @@ public class ViewQuestionActivity extends AppCompatActivity
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        mUserActionsListener.saveAnswer(charSequence.toString(), "extraText", true);
+        mUserActionsListener.saveAnswer(charSequence.toString(), null, "extraText", true);
     }
 
     @Override

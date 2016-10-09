@@ -679,7 +679,7 @@ public class ViewQuestionPresenterTest {
     public void setupViewSurveyDetailsPresenter() {
         MockitoAnnotations.initMocks(this);
         mViewQuestionPresenter = new ViewQuestionPresenter(mTriibeRepository, mView, SURVEY_ID,
-                USER_ID, NUM_PROTECTED_QUESTIONS);
+                USER_ID, QUESTION1_ID, NUM_PROTECTED_QUESTIONS);
     }
 
     @Test
@@ -742,7 +742,7 @@ public class ViewQuestionPresenterTest {
                 verify(mView).showTextboxGroup();
                 if (QUESTION1_OPTION1_PHRASE != null) {
                     verify(mView).showTextboxItem(QUESTION1_OPTION1_PHRASE,
-                            QUESTION1_OPTION1_EXTRA_INPUT_TYPE);
+                            QUESTION1_OPTION1_EXTRA_INPUT_TYPE, null);
                 }
                 break;
         }
@@ -766,7 +766,7 @@ public class ViewQuestionPresenterTest {
                                 ANSWER1_OPTION1_CHECKED, ANSWER1_OPTIONS.size());
                         break;
                     case "text":
-                        verify(mView).showTextboxItem(ANSWER1_OPTION1_PHRASE, "text");
+                        verify(mView).showTextboxItem(ANSWER1_OPTION1_EXTRA_INPUT_HINT, "text", ANSWER1_OPTION1_PHRASE);
                         break;
                 }
             }
@@ -779,7 +779,7 @@ public class ViewQuestionPresenterTest {
     public void saveAnswer() {
         mViewQuestionPresenter.mQuestions = QUESTIONS;
 
-        mViewQuestionPresenter.saveAnswer(ANSWER1_OPTION1_PHRASE, ANSWER1_TYPE, ANSWER1_OPTION1_CHECKED);
+        mViewQuestionPresenter.saveAnswer(ANSWER1_OPTION1_PHRASE, null, ANSWER1_TYPE, ANSWER1_OPTION1_CHECKED);
         verify(mTriibeRepository).saveAnswer(anyString(), anyString(), anyString(), any(Answer.class));
         verify(mTriibeRepository).getAnswers(anyString(), anyString(), any(TriibeRepository.GetAnswersCallback.class));
     }
@@ -1009,6 +1009,9 @@ public class ViewQuestionPresenterTest {
         verify(mTriibeRepository).getAnswers(anyString(), anyString(), mAnswersCallbackCaptor.capture());
         mAnswersCallbackCaptor.getValue().onAnswersLoaded(ANSWERS);
 
+        mViewQuestionPresenter.loadCurrentQuestion();
+
+        // TODO: 9/10/16  not sure how to test this after refactoring. However the fucntionality does seem to work even though the test fails.
         // Confirm current question is after protected questions.
         assertThat("Did not move past protected questions", mViewQuestionPresenter.getCurrentQuestionNum(), greaterThan(NUM_PROTECTED_QUESTIONS));
     }

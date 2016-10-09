@@ -55,7 +55,7 @@ public interface ViewQuestionContract {
 
         void showTextboxGroup();
 
-        void showTextboxItem(String hint, String type);
+        void showTextboxItem(String hint, String type, @Nullable String answerPhrase);
 
         void showSnackbar(String text, int duration);
 
@@ -79,7 +79,7 @@ public interface ViewQuestionContract {
 
         void loadCurrentQuestion();
 
-        void saveAnswer(String phrase, String type, boolean checked);
+        void saveAnswer(String phrase, @Nullable String extraInput, String type, boolean checked);
 
         void goToNextQuestion();
 

@@ -31,7 +31,7 @@ public class EditQuestionScreenTest {
     private static String TEST_QUESTION_ID = "1";
     private static String TEST_QUESTION_TYPE = "radio";
     private static String TEST_QUESTION_IMAGE_URL = "Test";
-    private static String TEST_QUESTION_TITLE = "Test";
+    private static String TEST_QUESTION_TITLE = "Question 1";
     private static String TEST_QUESTION_INTRO = "Test";
     private static String TEST_QUESTION_PHRASE = "Test";
     private static String TEST_QUESTION_INTRO_LINK_KEY = "Test";

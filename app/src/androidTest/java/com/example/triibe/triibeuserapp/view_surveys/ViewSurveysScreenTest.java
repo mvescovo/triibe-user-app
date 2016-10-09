@@ -80,8 +80,8 @@ public class ViewSurveysScreenTest {
         onView(withId(R.id.view_surveys_recycler_view)).perform(scrollTo(hasDescendant(withText(SURVEY2_DESCRIPTION))));
         onView(withId(R.id.view_surveys_recycler_view)).perform(RecyclerViewActions.actionOnItem(hasDescendant(withText(SURVEY2_DESCRIPTION)), click()));
 
-        // Check the question logo shows up.
-        onView(withId(R.id.title)).check(matches(withText(QUESTION_TITLE)));
+        // Check the question title shows up.
+        onView(withId(R.id.title)).check(matches(isDisplayed()));
     }
 
     @Test
