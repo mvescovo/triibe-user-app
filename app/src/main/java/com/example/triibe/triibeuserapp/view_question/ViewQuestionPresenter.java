@@ -221,23 +221,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                                 mView.showTextboxItem(extraInputHint, extraInputType, null);
                             }
                         }
-//                mEditTextGroup.removeAllViews();
-//                mEditTextGroup.setVisibility(View.VISIBLE);
-//
-//                for (int i = 0; i < question.getOptions().size(); i++) {
-//                    final TextInputEditText textInputEditText = new TextInputEditText(this);
-//                    textInputEditText.setHint(((Option)question.getOptions().get(Integer.toString(i))).getPhrase());
-//                    mEditTextGroup.addView(textInputEditText, i);
-//                    if (((Option)question.getOptions().get(Integer.toString(i))).getExtraInputType() != null &&
-//                            ((Option)question.getOptions().get(Integer.toString(i))).getExtraInputType().contentEquals("InputType.TYPE_CLASS_PHONE")) {
-//                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_PHONE);
-//                    } else if (((Option)question.getOptions().get(Integer.toString(i))).getExtraInputType() != null &&
-//                            ((Option)question.getOptions().get(Integer.toString(i))).getExtraInputType().contentEquals("TYPE_TEXT_VARIATION_EMAIL_ADDRESS")) {
-//                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-//                    } else {
-//                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
-//                    }
-//                }
                         break;
                 }
             }
@@ -253,48 +236,13 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
     * Unmarshal the current answer and display to the user.
     * */
     private void displayCurrentAnswer() {
-//        mTextInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
         Question question = mQuestions.get("q" + mCurrentQuestionNum);
         if (question != null) {
             QuestionDetails questionDetails = question.getQuestionDetails();
             Map<String, Option> options = question.getOptions();
             String type = questionDetails.getType();
 
-            if (mAnswers.size() < mCurrentQuestionNum) {
-                // The current question doesn't yet have an answer
-
-                if (type.contentEquals("text")) {
-                    for (int i = 0; i < options.size(); i++) {
-//                    final int viewNumber = i;
-//                    Option option = options.get("o" + i);
-//                    String extraInputType = option.getExtraInputType();
-//                    if (extraInputType != null && extraInputType.contentEquals("phone")) {
-//                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_PHONE);
-//                    } else if (extraInputType != null && extraInputType.contentEquals("email")) {
-//                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-//                    } else {
-//                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
-                    }
-//                    ((TextInputEditText) mEditTextGroup.getChildAt(i)).addTextChangedListener(new TextWatcher() {
-//                        @Override
-//                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                            onTextInputEditTextChanged(viewNumber);
-//                        }
-//
-//                        @Override
-//                        public void afterTextChanged(Editable editable) {
-//
-//                        }
-//                    });
-//                }
-                }
-            } else {
-                // The current question does have an answer; display it.
+            if (mAnswers.size() >= mCurrentQuestionNum) {
                 Answer answer = mAnswers.get("a" + mCurrentQuestionNum);
                 AnswerDetails answerDetails = answer.getAnswerDetails();
                 Map<String, Option> selectedOptions = answer.getSelectedOptions();
@@ -326,30 +274,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                                     selectedOptionExtraInput,
                                     options.size()
                             );
-//                        for (int i = 0; i < options.size(); i++) {
-//                            if (((RadioButton) mRadioGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(0).getPhrase())) {
-//                                ((RadioButton) mRadioGroup.getChildAt(i)).toggle();
-//                                if (question.getQuery().getOptions().get(i).getHasExtraInput()) {
-//                                    mTextInputLayout.setVisibility(View.VISIBLE);
-//                                    mTextInputEditText.setVisibility(View.VISIBLE);
-//                                    mTextInputEditText.setText("");
-//                                    if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-//                                            question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
-//                                        mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-//                                    }
-//                                    mTextInputEditText.requestFocus();
-//                                    if (answer.getSelectedOptions().get(0).getExtraInput() != null) {
-//                                        mTextInputEditText.append(answer.getSelectedOptions().get(0).getExtraInput());
-//                                    }
-//                                    mTextInputEditText.setHint(answer.getSelectedOptions().get(0).getExtraInputHint());
-//                                    mTextInputEditText.addTextChangedListener(this);
-//                                } else {
-//                                    mTextInputEditText.setText("");
-//                                    mTextInputEditText.setVisibility(View.GONE);
-//                                    mTextInputEditText.removeTextChangedListener(this);
-//                                }
-//                            }
-//                        }
                         }
                         break;
                     case "checkbox":
@@ -363,35 +287,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                                             selectedOptionChecked,
                                             options.size());
                                 }
-
-//                            for (int j = 0; j < answer.getSelectedOptions().size(); j++) {
-//                                if (((CheckBox) mCheckboxGroup.getChildAt(i)).getText().equals(answer.getSelectedOptions().get(j).getPhrase())) {
-//                                    ((CheckBox) mCheckboxGroup.getChildAt(i)).toggle();
-//                                    if (question.getQuery().getOptions().get(i).getHasExtraInput()) {
-//                                        mTextInputLayout.setVisibility(View.VISIBLE);
-//                                        mTextInputEditText.setVisibility(View.VISIBLE);
-//                                        mTextInputEditText.setText("");
-//                                        if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-//                                                question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_NUMBER")) {
-//                                            mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-//                                        }
-//                                        mTextInputEditText.requestFocus();
-//
-//                                        for (int k = 0; k < mQuestions.get(mCurrentQuestionNum - 1).getQuery().getOptions().size(); k++) {
-//                                            if (mAnswers.get(mCurrentQuestionNum - 1).getSelectedOptions().get(k).getExtraInput() != null) {
-//                                                mTextInputEditText.append(answer.getSelectedOptions().get(k).getExtraInput());
-//                                            }
-//                                        }
-//
-//                                        mTextInputEditText.setHint(answer.getSelectedOptions().get(i).getExtraInputHint());
-//                                        mTextInputEditText.addTextChangedListener(this);
-//                                    } else {
-//                                        mTextInputEditText.setText("");
-//                                        mTextInputEditText.setVisibility(View.GONE);
-//                                        mTextInputEditText.removeTextChangedListener(this);
-//                                    }
-//                                }
-//                            }
                             }
                         }
                         break;
@@ -406,48 +301,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                                 }
                             }
                         }
-
-
-
-
-
-//                    for (int i = 0; i < question.getQuery().getOptions().size(); i++) {
-//                        final int viewNumber = i;
-//
-//                        if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-//                                question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("InputType.TYPE_CLASS_PHONE")) {
-//                            ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_PHONE);
-//                        } else if (question.getQuery().getOptions().get(i).getExtraInputType() != null &&
-//                                question.getQuery().getOptions().get(i).getExtraInputType().contentEquals("TYPE_TEXT_VARIATION_EMAIL_ADDRESS")) {
-//                            ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-//                        } else {
-//                            ((TextInputEditText) mEditTextGroup.getChildAt(i)).setInputType(InputType.TYPE_CLASS_TEXT);
-//                        }
-//                        ((TextInputEditText) mEditTextGroup.getChildAt(i)).addTextChangedListener(new TextWatcher() {
-//                            @Override
-//                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                                onTextInputEditTextChanged(viewNumber);
-//                            }
-//
-//                            @Override
-//                            public void afterTextChanged(Editable editable) {
-//
-//                            }
-//                        });
-//
-//                        if (answer.getSelectedOptions() != null) {
-//                            for (int j = 0; j < answer.getSelectedOptions().size(); j++) {
-//                                if (((TextInputEditText) mEditTextGroup.getChildAt(i)).getHint().equals(answer.getSelectedOptions().get(j).getPhrase())) {
-//                                    ((TextInputEditText) mEditTextGroup.getChildAt(i)).setText(answer.getSelectedOptions().get(j).getExtraInput());
-//                                }
-//                            }
-//                        }
-//                    }
                         break;
                 }
             }
