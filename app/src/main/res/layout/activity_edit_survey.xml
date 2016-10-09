@@ -56,18 +56,42 @@
                     android:layout_marginBottom="16dp"
                     android:text="@string/edit_survey_details_title"/>
 
-                <android.support.design.widget.TextInputLayout
+                <android.support.v7.widget.AppCompatAutoCompleteTextView
+                    android:id="@+id/survey_id"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:hint="@string/edit_survey_id_hint"
+                    android:inputType="number"/>
 
-                    <android.support.v7.widget.AppCompatAutoCompleteTextView
-                        android:id="@+id/survey_id"
-                        android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/edit_survey_active"
+                    android:textSize="18sp"/>
+
+                <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/survey_active_yes"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="@string/edit_survey_id_hint"
-                        android:inputType="text"/>
+                        android:onClick="onSurveyActiveRadioButtonClicked"
+                        android:text="@string/edit_survey_active_yes"/>
 
-                </android.support.design.widget.TextInputLayout>
+                    <RadioButton
+                        android:id="@+id/survey_active_no"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:onClick="onSurveyActiveRadioButtonClicked"
+                        android:text="@string/edit_survey_active_no"/>
+
+                </RadioGroup>
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
@@ -79,19 +103,6 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/edit_description_hint"
                         android:inputType="textAutoComplete|textCapSentences|textAutoCorrect"/>
-
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <android.support.design.widget.TextInputEditText
-                        android:id="@+id/survey_version"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/edit_version_hint"
-                        android:inputType="number"/>
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -113,11 +124,12 @@
                     android:layout_height="wrap_content">
 
                     <android.support.design.widget.TextInputEditText
-                        android:id="@+id/survey_time_till_expiry"
+                        android:id="@+id/survey_num_protected_questions"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/edit_time_till_expiry_hint"
-                        android:inputType="time"/>
+                        android:hint="@string/edit_num_protected_questions_hint"
+                        android:inputType="number"
+                        android:text="@string/edit_survey_default_num_protected_questions"/>
 
                 </android.support.design.widget.TextInputLayout>
 

@@ -24,11 +24,13 @@
         android:paddingTop="8dp">
 
         <ImageButton
+            android:id="@+id/previous_button_image"
             style="@style/Base.Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
-            android:src="@drawable/ic_chevron_left_black_24dp"/>
+            android:src="@drawable/ic_chevron_left_black_24dp"
+            android:visibility="invisible"/>
 
         <Button
             android:id="@+id/previous_button"
@@ -36,7 +38,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
-            android:text="@string/previous_question"/>
+            android:text="@string/previous_question"
+            android:visibility="invisible"/>
 
         <ProgressBar
             android:id="@+id/progress_bar"

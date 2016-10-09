@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">TRIIBE User</string>
+    
+    <!--Preferences-->
+    <string name="user_id">com.example.triibe.triibeuserapp.USER_ID</string>
 
     <!--Boot detection receiver-->
     <string name="foreground_service_started">Foreground service started</string>
@@ -10,19 +13,21 @@
     <string name="sign_in_cancelled">Sign in cancelled</string>
     <string name="unknown_sign_in_response">Unknown response from AuthUI sign-in</string>
     <string name="sign_out_failed">Sign out failed</string>
+    <string name="loading_user">Loading user&#8230;</string>
 
     <!--ViewSurveysActivity-->
     <string name="title_activity_view_surveys">Surveys</string>
     <string name="no_surveys">You don\'t currently have any surveys. Try going to the mall to get more surveys.</string>
+    <string name="view_points">View Points</string>
 
     <!--EditSurveyActivity-->
     <string name="title_activity_edit_survey">Edit Survey</string>
     <string name="edit_survey_details_title">Survey Details</string>
-    <string name="edit_survey_id_hint">Survey ID</string>
-    <string name="edit_description_hint">Description</string>
+    <string name="edit_survey_id_hint">Survey ID*</string>
+    <string name="edit_description_hint">Description*</string>
     <string name="edit_time_till_expiry_hint">Time till expiry</string>
-    <string name="edit_points_hint">Points</string>
-    <string name="edit_version_hint">Version</string>
+    <string name="edit_points_hint">Points*</string>
+    <string name="edit_num_protected_questions_hint">Number of protected question*</string>
     <string name="successfully_saved_survey">Survey saved</string>
     <string name="successfully_deleted_survey">Survey deleted</string>
     <string name="successfully_saved_question">Question saved</string>
@@ -34,25 +39,47 @@
     <string name="edit_survey_bottom_sheet_title">Add</string>
     <string name="edit_survey_add_question">Question</string>
     <string name="edit_survey_add_trigger">Trigger</string>
+    <string name="edit_survey_active">Active:</string>
+    <string name="edit_survey_active_yes">Yes</string>
+    <string name="edit_survey_active_no">No</string>
+    <string name="edit_survey_default_num_protected_questions">0</string>
 
     <!--EditQuestionActivity-->
     <string name="title_activity_edit_question">Edit Question</string>
     <string name="edit_question_details_title">Question Details</string>
-    <string name="edit_question_id_hint">Question ID</string>
-    <string name="edit_title_hint">Title</string>
-    <string name="edit_intro_hint">Intro</string>
+    <string name="edit_question_id_hint">Question ID*</string>
     <string name="edit_image_url_hint">Image url</string>
+    <string name="edit_title_hint">Title*</string>
+    <string name="edit_intro_hint">Intro</string>
+    <string name="edit_question_phrase">Phrase*</string>
     <string name="edit_question_bottom_sheet_title">Add</string>
     <string name="edit_question_add_option">Option</string>
+    <string name="delete_question">Delete question</string>
+    <string name="edit_question_intro_link_key">Intro link key</string>
+    <string name="edit_question_intro_link_url">Intro link URL</string>
+    <string name="edit_question_required_phrase">Required phrase</string>
+    <string name="edit_question_incorrect_answer_phrase">Incorrect answer phrase</string>
+    <string name="edit_question_type">Type:</string>
+    <string-array name="question_type_array">
+        <item>Radio</item>
+        <item>Checkbox</item>
+        <item>Text</item>
+    </string-array>
 
     <!--EditOptionActivity-->
     <string name="title_activity_edit_option">Edit Option</string>
     <string name="successfully_saved_option">Option saved</string>
     <string name="edit_option_details_title">Option Details</string>
-    <string name="edit_option_id_hint">Option ID</string>
-    <string name="edit_option_phrase_hint">Phrase</string>
-    <string name="edit_option_extra_input_type_hint">Extra input type</string>
-    <string name="edit_option_extra_input_hint_hint">Extra input hint</string>
+    <string name="edit_option_id_hint">Option ID*</string>
+    <string name="edit_option_phrase_hint">Phrase*</string>
+    <string name="edit_option_extra_input_hint_hint">Extra input hint*</string>
+    <string name="delete_option">Delete option</string>
+    <string name="edit_option_extra_input_type">Extra input type:</string>
+    <string name="edit_option_has_extra_input">Has extra input:</string>
+    <string-array name="option_extra_input_type_array">
+        <item>Text</item>
+        <item>Number</item>
+    </string-array>
 
     <!--EditLocationActivity-->
     <string name="title_activity_edit_location">Edit Location</string>
@@ -66,12 +93,15 @@
     <!--EditTriggerActivity-->
     <string name="title_activity_edit_trigger">Edit Trigger</string>
     <string name="edit_trigger_details_title">Trigger Details</string>
-    <string name="edit_trigger_id_hint">Trigger ID</string>
-    <string name="edit_trigger_lat_hint">Latitude</string>
-    <string name="edit_trigger_lon_hint">Longitude</string>
+    <string name="edit_trigger_id_hint">Trigger ID*</string>
+    <string name="edit_trigger_lat_hint">Latitude*</string>
+    <string name="edit_trigger_lon_hint">Longitude*</string>
+    <string name="edit_trigger_radius_hint">Radius in metres*</string>
+    <string name="edit_trigger_dwell_hint">Dwell in seconds*</string>
     <string name="edit_trigger_level_hint">Level</string>
     <string name="edit_trigger_time_hint">Time</string>
-
+    <string name="delete_trigger">Delete trigger</string>
+    
     <!--TrackDataActivity-->
     <string name="title_activity_track_data">Track data</string>
     <string name="sign_out">Sign out</string>
@@ -105,5 +135,11 @@
     <string name="finish_survey">Finish</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_test">TestActivity</string>
+    <string name="successfully_completed_survey">Survey Completed</string>
+
+    <!--ViewPointsActivity-->
+    <string name="title_activity_view_points">Points</string>
+    <string name="new_points_earned_title">New Points Earned</string>
+    <string name="total_points_earned_title">Total Points Earned</string>
 
 </resources>

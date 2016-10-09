@@ -32,8 +32,8 @@ public interface EditSurveyContract {
 
         void getSurvey(@NonNull String surveyId);
 
-        void saveSurvey(String surveyId, String description, String version, String points,
-                        String timeTillExpiry);
+        void saveSurvey(String surveyId, String description, String points,
+                        String numProtectedQuestions, boolean active);
 
         void deleteSurvey(@NonNull String surveyId);
 

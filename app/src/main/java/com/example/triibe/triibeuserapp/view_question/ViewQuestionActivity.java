@@ -1,19 +1,29 @@
 package com.example.triibe.triibeuserapp.view_question;
 
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.test.espresso.IdlingResource;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.util.Linkify;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -23,7 +33,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.triibe.triibeuserapp.R;
+import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 import com.example.triibe.triibeuserapp.util.Globals;
+import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.regex.Matcher;
@@ -35,12 +47,16 @@ import butterknife.ButterKnife;
 public class ViewQuestionActivity extends AppCompatActivity
         implements ViewQuestionContract.View, TextWatcher {
 
-    private static final String TAG = "SurveyDetailsActivity";
+    private static final String TAG = "ViewQuestionActivity";
     public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
     public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
+    public final static String EXTRA_QUESTION_ID = "com.example.triibe.QUESTION_ID";
+    public final static String EXTRA_NUM_PROTECTED_QUESTIONS = "com.example.triibe.NUM_PROTECTED_QUESTIONS";
     ViewQuestionContract.UserActionsListener mUserActionsListener;
     private String mSurveyId;
     private String mUserId;
+    private String mQuestionId;
+    private int mNumProtectedQuestions;
 
     @BindView(R.id.view_root)
     RelativeLayout mRootView;
@@ -81,6 +97,9 @@ public class ViewQuestionActivity extends AppCompatActivity
     @BindView(R.id.next_button)
     Button mNextButton;
 
+    @BindView(R.id.previous_button_image)
+    ImageButton mPreviousButtonImage;
+
     @BindView(R.id.previous_button)
     Button mPreviousButton;
 
@@ -95,18 +114,25 @@ public class ViewQuestionActivity extends AppCompatActivity
         } else {
             mSurveyId = "-1";
         }
-
         if (getIntent().getStringExtra(EXTRA_USER_ID) != null) {
             mUserId = getIntent().getStringExtra(EXTRA_USER_ID);
         } else {
-            mUserId = "TestUserId";
+            mUserId = "InvalidUser";
         }
+        if (getIntent().getStringExtra(EXTRA_QUESTION_ID) != null) {
+            mQuestionId = getIntent().getStringExtra(EXTRA_QUESTION_ID);
+        } else {
+            mQuestionId = "-1";
+        }
+        mNumProtectedQuestions = getIntent().getIntExtra(EXTRA_NUM_PROTECTED_QUESTIONS, 0);
 
         mUserActionsListener = new ViewQuestionPresenter(
                 Globals.getInstance().getTriibeRepository(),
                 this,
                 mSurveyId,
-                mUserId
+                mUserId,
+                mQuestionId,
+                mNumProtectedQuestions
         );
 
         mNextButton.setOnClickListener(new View.OnClickListener() {
@@ -128,6 +154,19 @@ public class ViewQuestionActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mUserActionsListener.loadCurrentQuestion();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent upIntent = NavUtils.getParentActivityIntent(this);
+                upIntent.putExtra(ViewSurveysActivity.EXTRA_USER_ID, mUserId);
+                NavUtils.navigateUpTo(this, upIntent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -221,7 +260,7 @@ public class ViewQuestionActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 mUserActionsListener
-                        .saveAnswer(((RadioButton)view).getText().toString(), "radio", true);
+                        .saveAnswer(((RadioButton)view).getText().toString(), null, "radio", true);
             }
         });
         mRadioGroup.addView(radioButton);
@@ -239,6 +278,8 @@ public class ViewQuestionActivity extends AppCompatActivity
                 item.toggle();
                 if (hasExtraInput) {
                     showExtraInputTextboxItem(extraInputHint, extraInputType, extraInput);
+                } else {
+                    hideExtraInputTextboxItem();
                 }
                 return;
             }
@@ -260,6 +301,12 @@ public class ViewQuestionActivity extends AppCompatActivity
                 break;
             case "number":
                 mTextInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                break;
+            case "email":
+                mTextInputEditText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                break;
+            case "phone":
+                mTextInputEditText.setInputType(InputType.TYPE_CLASS_PHONE);
                 break;
         }
         mTextInputEditText.requestFocus();
@@ -291,7 +338,7 @@ public class ViewQuestionActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 mUserActionsListener
-                        .saveAnswer(((CheckBox)view).getText().toString(), "checkbox",
+                        .saveAnswer(((CheckBox)view).getText().toString(), null, "checkbox",
                                 ((CheckBox)view).isChecked());
             }
         });
@@ -318,17 +365,57 @@ public class ViewQuestionActivity extends AppCompatActivity
     }
 
     @Override
-    public void showTextboxItem(String hint, String type) {
-        TextInputEditText textInputEditText = new TextInputEditText(this);
-        textInputEditText.setHint(hint);
-        textInputEditText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mUserActionsListener
-                        .saveAnswer(((TextInputEditText)view).getText().toString(), "text", true);
+    public void showTextboxItem(final String hint, final String type,
+                                @Nullable final String answerPhrase) {
+        // If answerPhrase is null then we need to add a new textbox while displaying a question.
+        if (answerPhrase == null) {
+            final TextInputEditText textInputEditText = new TextInputEditText(this);
+            textInputEditText.setHint(hint);
+
+            switch (type) {
+                case "text": // TODO: 18/09/16 set in constants or something
+                    textInputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+                    break;
+                case "number":
+                    textInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    break;
+                case "email":
+                    textInputEditText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                    break;
+                case "phone":
+                    textInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    break;
             }
-        });
-        mEditTextGroup.addView(textInputEditText);
+            textInputEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    Log.d(TAG, "got text changed");
+                    mUserActionsListener
+                            .saveAnswer(hint, s.toString(), "text", true);
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+            mEditTextGroup.addView(textInputEditText);
+        } else {
+            // If answerPhrase is not null then we just need to update an existing textbox with
+            // the anwer.
+            for (int i = 0; i < mEditTextGroup.getChildCount(); i++) {
+                TextInputEditText text = (TextInputEditText) mEditTextGroup.getChildAt(i);
+                if (text.getHint().toString().contentEquals(hint)) {
+                    text.setText(answerPhrase);
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -348,8 +435,41 @@ public class ViewQuestionActivity extends AppCompatActivity
     }
 
     @Override
-    public void showViewSurveys() {
+    public void showBackButton() {
+        mPreviousButton.setVisibility(View.VISIBLE);
+        mPreviousButtonImage.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideBackButton() {
+        mPreviousButton.setVisibility(View.INVISIBLE);
+        mPreviousButtonImage.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void hideOptions() {
+        mRadioGroup.setVisibility(View.GONE);
+        mCheckboxGroup.setVisibility(View.GONE);
+        mEditTextGroup.removeAllViews();
+        mEditTextGroup.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showViewSurveys(@NonNull Integer resultCode, @NonNull Integer surveyPoints,
+                                @NonNull Integer totalPoints) {
+        Intent data = new Intent();
+        data.putExtra(ViewSurveysActivity.EXTRA_SURVEY_POINTS, surveyPoints);
+        data.putExtra(ViewSurveysActivity.EXTRA_TOTAL_POINTS, totalPoints);
+        setResult(resultCode, data);
         finish();
+    }
+
+    @Override
+    public void removeNotification(@NonNull String fenceKey) {
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        mNotificationManager.cancel(fenceKey, 1);
     }
 
     @Override
@@ -359,11 +479,16 @@ public class ViewQuestionActivity extends AppCompatActivity
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        mUserActionsListener.saveAnswer(charSequence.toString(), "extraText", true);
+        mUserActionsListener.saveAnswer(charSequence.toString(), null, "extraText", true);
     }
 
     @Override
     public void afterTextChanged(Editable editable) {
 
+    }
+
+    @VisibleForTesting
+    public IdlingResource getCountingIdlingResource() {
+        return EspressoIdlingResource.getIdlingResource();
     }
 }

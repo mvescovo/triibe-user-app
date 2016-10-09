@@ -1,6 +1,7 @@
 package com.example.triibe.triibeuserapp.data;
 
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -9,24 +10,25 @@ import java.util.Map;
 /**
  * @author michael.
  */
+@IgnoreExtraProperties
 public class SurveyDetails implements Serializable {
 
     private String mId;
-    private String mVersion;
     private String mDescription;
-    private String mDurationTillExpiry;
     private String mPoints;
+    private String mNumProtectedQuestions;
+    private boolean mActive;
 
     // Empty constructor required for firebase
     public SurveyDetails() {}
 
-    public SurveyDetails(String id, String version, String description, String durationTillExpiry,
-                         String points) {
+    public SurveyDetails(String id, String description, String points,
+                         String numProtectedQuestions, boolean active) {
         mId = id;
-        mVersion = version;
         mDescription = description;
-        mDurationTillExpiry = durationTillExpiry;
         mPoints = points;
+        mNumProtectedQuestions = numProtectedQuestions;
+        mActive = active;
     }
 
     /*
@@ -43,28 +45,12 @@ public class SurveyDetails implements Serializable {
         mId = id;
     }
 
-    public String getVersion() {
-        return mVersion;
-    }
-
-    public void setVersion(String version) {
-        mVersion = version;
-    }
-
     public String getDescription() {
         return mDescription;
     }
 
     public void setDescription(String description) {
         mDescription = description;
-    }
-
-    public String getDurationTillExpiry() {
-        return mDurationTillExpiry;
-    }
-
-    public void setDurationTillExpiry(String durationTillExpiry) {
-        mDurationTillExpiry = durationTillExpiry;
     }
 
     public String getPoints() {
@@ -75,16 +61,31 @@ public class SurveyDetails implements Serializable {
         mPoints = points;
     }
 
+    public String getNumProtectedQuestions() {
+        return mNumProtectedQuestions;
+    }
+
+    public void setNumProtectedQuestions(String numProtectedQuestions) {
+        mNumProtectedQuestions = numProtectedQuestions;
+    }
+
+    public boolean isActive() {
+        return mActive;
+    }
+
+    public void setActive(boolean active) {
+        mActive = active;
+    }
+
     // For firebase map
     @Exclude
     public Map<String, Object> toMap() {
         Map<String, Object> result = new HashMap<>();
         result.put("id", mId);
-        result.put("version", mVersion);
         result.put("description", mDescription);
-        result.put("durationTillExpiry", mDurationTillExpiry);
         result.put("points", mPoints);
-
+        result.put("numProtectedQuestions", mNumProtectedQuestions);
+        result.put("active", mActive);
         return result;
     }
 }

@@ -7,7 +7,6 @@ import android.util.Log;
 import com.example.triibe.triibeuserapp.data.QuestionDetails;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
-import com.example.triibe.triibeuserapp.util.SimpleCountingIdlingResource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,17 +38,11 @@ public class EditQuestionPresenter implements EditQuestionContract.UserActionsLi
         if (forceUpdate) {
             mTriibeRepository.refreshQuestionIds();
         }
-        Log.d(TAG, "getQuestionIds: count: " + ((SimpleCountingIdlingResource)EspressoIdlingResource.getIdlingResource()).getCount());
         EspressoIdlingResource.increment();
-        Log.d(TAG, "getQuestionIds: count: " + ((SimpleCountingIdlingResource)EspressoIdlingResource.getIdlingResource()).getCount());
         mTriibeRepository.getQuestionIds(path, new TriibeRepository.GetQuestionIdsCallback() {
             @Override
             public void onQuestionIdsLoaded(@Nullable Map<String, Boolean> questionIds) {
-                Log.d(TAG, "onQuestionIdsLoaded: GAP");
-                Log.d(TAG, "getQuestionIds: count: " + ((SimpleCountingIdlingResource)EspressoIdlingResource.getIdlingResource()).getCount());
-                Log.d(TAG, "onQuestionIdsLoaded: GOING TO DECREMENT when count is: "+ ((SimpleCountingIdlingResource) EspressoIdlingResource.getIdlingResource()).getCount());
                 EspressoIdlingResource.decrement();
-                Log.d(TAG, "getQuestionIds: count: " + ((SimpleCountingIdlingResource)EspressoIdlingResource.getIdlingResource()).getCount());
                 List<String> questionIdsArray;
                 if (questionIds != null) {
                     questionIdsArray = new ArrayList<>(questionIds.keySet());
@@ -74,10 +67,10 @@ public class EditQuestionPresenter implements EditQuestionContract.UserActionsLi
                 EspressoIdlingResource.decrement();
                 if (question != null) {
                     mView.showQuestionDetails(question);
-                    mView.setProgressIndicator(false);
                 } else {
-                    Log.d(TAG, "onSurveyLoaded: QUESTION NULL");
+                    Log.d(TAG, "onQuestionLoaded: QUESTION NULL");
                 }
+                mView.setProgressIndicator(false);
             }
         });
     }
@@ -86,14 +79,16 @@ public class EditQuestionPresenter implements EditQuestionContract.UserActionsLi
     public void saveQuestion(QuestionDetails questionDetails) {
         mView.setProgressIndicator(true);
 
-        mTriibeRepository.saveQuestion(questionDetails.getSurveyId(), questionDetails.getId(), questionDetails);
+        mTriibeRepository.saveQuestion(questionDetails.getSurveyId(), questionDetails.getId(),
+                questionDetails);
 
         mView.setProgressIndicator(false);
     }
 
     @Override
     public void deleteQuestion(@NonNull String questionId) {
-        // TODO: 25/09/16  
+        // Save question with "q" prefix. Numerical values will create an array on firebase.
+        mTriibeRepository.deleteQuestion(mSurveyId, "q" + questionId);
     }
 
     @Override

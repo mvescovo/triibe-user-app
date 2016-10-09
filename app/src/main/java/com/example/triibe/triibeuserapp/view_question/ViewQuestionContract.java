@@ -1,5 +1,6 @@
 package com.example.triibe.triibeuserapp.view_question;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
@@ -54,7 +55,7 @@ public interface ViewQuestionContract {
 
         void showTextboxGroup();
 
-        void showTextboxItem(String hint, String type);
+        void showTextboxItem(String hint, String type, @Nullable String answerPhrase);
 
         void showSnackbar(String text, int duration);
 
@@ -62,14 +63,23 @@ public interface ViewQuestionContract {
 
         void hideSubmitButton();
 
-        void showViewSurveys();
+        void showBackButton();
+
+        void hideBackButton();
+
+        void hideOptions();
+
+        void showViewSurveys(@NonNull Integer resultCode, @NonNull Integer surveyPoints,
+                             @NonNull Integer totalPoints);
+
+        void removeNotification(@NonNull String fenceKey);
     }
 
     interface UserActionsListener {
 
         void loadCurrentQuestion();
 
-        void saveAnswer(String phrase, String type, boolean checked);
+        void saveAnswer(String phrase, @Nullable String extraInput, String type, boolean checked);
 
         void goToNextQuestion();
 

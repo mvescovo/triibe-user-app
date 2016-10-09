@@ -14,6 +14,7 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Option {
 
+    private String mSurveyId;
     private String mQuestionId;
     private String mId;
     private String mPhrase;
@@ -26,13 +27,21 @@ public class Option {
     // Empty constructor required for firebase
     public Option() {}
 
-    public Option(String phrase, boolean hasExtraInput) {
+    public Option(String surveyId, String questionId, String id, String phrase,
+                  boolean hasExtraInput) {
+        mSurveyId = surveyId;
+        mQuestionId = questionId;
+        mId = id;
         mPhrase = phrase;
         mHasExtraInput = hasExtraInput;
     }
 
 
-    public Option(String phrase, boolean hasExtraInput, boolean checked) {
+    public Option(String surveyId, String questionId, String id, String phrase,
+                  boolean hasExtraInput, boolean checked) {
+        mSurveyId = surveyId;
+        mQuestionId = questionId;
+        mId = id;
         mPhrase = phrase;
         mHasExtraInput = hasExtraInput;
         mChecked = checked;
@@ -44,6 +53,14 @@ public class Option {
     * Note: getters must be of the form "get<parameter name>".
     * Boolean values cannot use "hasExtraValue" for example.
     * */
+    public String getSurveyId() {
+        return mSurveyId;
+    }
+
+    public void setSurveyId(String surveyId) {
+        mSurveyId = surveyId;
+    }
+
     public String getQuestionId() {
         return mQuestionId;
     }
@@ -112,9 +129,15 @@ public class Option {
     @Exclude
     public Map<String, Object> toMap() {
         Map<String, Object> result = new HashMap<>();
+        result.put("surveyId", mSurveyId);
         result.put("questionId", mQuestionId);
         result.put("id", mId);
         result.put("phrase", mPhrase);
+        result.put("checked", mChecked);
+        result.put("hasExtraInput", mHasExtraInput);
+        result.put("extraInput", mExtraInput);
+        result.put("extraInputType", mExtraInputType);
+        result.put("extraInputHint", mExtraInputHint);
         return result;
     }
 }

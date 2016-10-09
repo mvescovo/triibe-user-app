@@ -2,6 +2,7 @@ package com.example.triibe.triibeuserapp.view_surveys;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -31,6 +32,8 @@ import com.example.triibe.triibeuserapp.util.Constants;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.example.triibe.triibeuserapp.util.RunAppWhenAtMallService;
+import com.example.triibe.triibeuserapp.util.SimpleDividerItemDecoration;
+import com.example.triibe.triibeuserapp.view_points.ViewPointsActivity;
 import com.example.triibe.triibeuserapp.view_question.ViewQuestionActivity;
 
 import java.util.HashMap;
@@ -41,14 +44,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class ViewSurveysActivity extends AppCompatActivity implements ViewSurveysContract.View,
-        EasyPermissions.PermissionCallbacks {
+public class ViewSurveysActivity extends AppCompatActivity
+        implements ViewSurveysContract.View, EasyPermissions.PermissionCallbacks {
 
     private static final String TAG = "ViewSurveysActivity";
     public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
+    public final static String EXTRA_SURVEY_POINTS = "com.example.triibe.SURVEY_POINTS";
+    public final static String EXTRA_TOTAL_POINTS = "com.example.triibe.TOTAL_POINTS";
     private static final int REQUEST_EDIT_SURVEY = 1;
-    public static final int RESULT_DELETE = -2;
-    private static final int FINE_LOCAITON = 123;
+    public static final int REQUEST_TAKE_SURVEY = 2;
+    public static final int RESULT_DELETE = 3;
+    private static final int FINE_LOCAITON = 4;
     private String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
     private ViewSurveysContract.UserActionsListener mUserActionsListener;
     private SurveyAdapter mSurveyAdapter;
@@ -81,7 +87,11 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
         if (getIntent().getStringExtra(EXTRA_USER_ID) != null) {
             mUserId = getIntent().getStringExtra(EXTRA_USER_ID);
         } else {
-            mUserId = "TestUserId";
+            SharedPreferences sharedPref = getSharedPreferences(
+                    getString(R.string.user_id),
+                    Context.MODE_PRIVATE
+            );
+            mUserId = sharedPref.getString(getString(R.string.user_id), "InvalidUser");
         }
 
         mModifySurveyFab.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +108,7 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mSurveyAdapter = new SurveyAdapter(mUserActionsListener, new HashMap<String, SurveyDetails>());
         mRecyclerView.setAdapter(mSurveyAdapter);
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         // Add mall fences if not already added (will also be added automatically on boot)
         SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
@@ -118,6 +129,7 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     protected void onResume() {
         super.onResume();
         mUserActionsListener.loadSurveys(mUserId, true);
+        mUserActionsListener.setAdminControls(mUserId);
     }
 
     @Override
@@ -136,18 +148,23 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
 
     @Override
     public void showNoSurveysMessage() {
-        if (mSurveyAdapter.getItemCount() == 0) {
-            mSurveysTextView.setVisibility(View.VISIBLE);
-        } else {
-            mSurveysTextView.setVisibility(View.GONE);
-        }
+        // Refresh adapter.
+        mSurveyAdapter.replaceData(new HashMap<String, SurveyDetails>());
+        mSurveysTextView.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void showQuestionUi(String surveyId, String questionId) {
+    public void showAdminControls() {
+        mModifySurveyFab.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showQuestionUi(String surveyId, String questionId, int numProtectedQuestions) {
         Intent intent = new Intent(this, ViewQuestionActivity.class);
         intent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, surveyId);
-        startActivity(intent);
+        intent.putExtra(ViewQuestionActivity.EXTRA_USER_ID, mUserId);
+        intent.putExtra(ViewQuestionActivity.EXTRA_NUM_PROTECTED_QUESTIONS, numProtectedQuestions);
+        startActivityForResult(intent, REQUEST_TAKE_SURVEY);
     }
 
     public void showCreateSurvey() {
@@ -165,6 +182,17 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
         if (requestCode == REQUEST_EDIT_SURVEY && resultCode == RESULT_DELETE) {
             Snackbar.make(mModifySurveyFab, getString(R.string.successfully_deleted_survey),
                     Snackbar.LENGTH_SHORT).show();
+        }
+        if (requestCode == REQUEST_TAKE_SURVEY && resultCode == Activity.RESULT_OK) {
+            Intent intent = new Intent(this, ViewPointsActivity.class);
+            intent.putExtra(ViewPointsActivity.EXTRA_USER_ID, mUserId);
+            intent.putExtra(ViewPointsActivity.EXTRA_SURVEY_POINTS,
+                    Integer.toString(data.getIntExtra(EXTRA_SURVEY_POINTS, -1)));
+            startActivity(intent);
+//            String message = getString(R.string.successfully_completed_survey) +
+//                    ". " + Integer.toString(data.getIntExtra(EXTRA_SURVEY_POINTS, -1)) + " points added." +
+//                    " " + Integer.toString(data.getIntExtra(EXTRA_TOTAL_POINTS, -1)) + " total points.";
+//            Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -187,18 +215,13 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     }
 
     private void startAddfencesService() {
+        Log.d(TAG, "startAddfencesService: START SERVICE");
         Intent addMallFencesIntent = new Intent(this, AddFencesIntentService.class);
-        addMallFencesIntent.putExtra(AddFencesIntentService.EXTRA_TRIIBE_FENCE_TYPE,
-                AddFencesIntentService.TRIIBE_MALL);
+        addMallFencesIntent.putExtra(
+                AddFencesIntentService.EXTRA_TRIIBE_FENCE_TYPE,
+                AddFencesIntentService.TYPE_MALL
+        );
         startService(addMallFencesIntent);
-
-
-        // This was just for testing. Real landmark fences are added when the app service starts
-        // after it listens for available fences to add, then ideally filters on them before adding
-
-//        Intent addLandmarkFencesIntent = new Intent(this, AddFencesIntentService.class);
-//        addLandmarkFencesIntent.putExtra("type", "landmark");
-//        startService(addLandmarkFencesIntent);
     }
 
     @Override
@@ -212,8 +235,13 @@ public class ViewSurveysActivity extends AppCompatActivity implements ViewSurvey
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.start_data_tracking:
-                Intent intent = new Intent(this, RunAppWhenAtMallService.class);
-                startService(intent);
+                Intent runAppAtMallServiceIntent = new Intent(this, RunAppWhenAtMallService.class);
+                startService(runAppAtMallServiceIntent);
+                return true;
+            case R.id.view_points:
+                Intent viewPointsIntent = new Intent(this, ViewPointsActivity.class);
+                viewPointsIntent.putExtra(ViewPointsActivity.EXTRA_USER_ID, mUserId);
+                startActivity(viewPointsIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

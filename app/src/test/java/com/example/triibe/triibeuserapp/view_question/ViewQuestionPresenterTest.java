@@ -6,7 +6,6 @@ import com.example.triibe.triibeuserapp.data.Option;
 import com.example.triibe.triibeuserapp.data.Question;
 import com.example.triibe.triibeuserapp.data.QuestionDetails;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
-import com.example.triibe.triibeuserapp.util.Constants;
 import com.google.common.collect.Maps;
 
 import org.junit.After;
@@ -43,9 +42,10 @@ public class ViewQuestionPresenterTest {
     private static String USER_ID = "testUser";
 
     // Test enrollment survey
-    private static String SURVEY_ID = "enrollmentSurvey";
+    private static String SURVEY_ID = "s1";
     private static Map<String, Question> QUESTIONS = Maps.newHashMap();
     private static Map<String, Answer> ANSWERS = Maps.newHashMap();
+    private static int NUM_PROTECTED_QUESTIONS = 2;
 
     /*
     * Question1 will be a sample radio button question
@@ -678,7 +678,8 @@ public class ViewQuestionPresenterTest {
     @Before
     public void setupViewSurveyDetailsPresenter() {
         MockitoAnnotations.initMocks(this);
-        mViewQuestionPresenter = new ViewQuestionPresenter(mTriibeRepository, mView, SURVEY_ID, USER_ID);
+        mViewQuestionPresenter = new ViewQuestionPresenter(mTriibeRepository, mView, SURVEY_ID,
+                USER_ID, QUESTION1_ID, NUM_PROTECTED_QUESTIONS);
     }
 
     @Test
@@ -741,7 +742,7 @@ public class ViewQuestionPresenterTest {
                 verify(mView).showTextboxGroup();
                 if (QUESTION1_OPTION1_PHRASE != null) {
                     verify(mView).showTextboxItem(QUESTION1_OPTION1_PHRASE,
-                            QUESTION1_OPTION1_EXTRA_INPUT_TYPE);
+                            QUESTION1_OPTION1_EXTRA_INPUT_TYPE, null);
                 }
                 break;
         }
@@ -765,7 +766,7 @@ public class ViewQuestionPresenterTest {
                                 ANSWER1_OPTION1_CHECKED, ANSWER1_OPTIONS.size());
                         break;
                     case "text":
-                        verify(mView).showTextboxItem(ANSWER1_OPTION1_PHRASE, "text");
+                        verify(mView).showTextboxItem(ANSWER1_OPTION1_EXTRA_INPUT_HINT, "text", ANSWER1_OPTION1_PHRASE);
                         break;
                 }
             }
@@ -778,8 +779,9 @@ public class ViewQuestionPresenterTest {
     public void saveAnswer() {
         mViewQuestionPresenter.mQuestions = QUESTIONS;
 
-        mViewQuestionPresenter.saveAnswer(ANSWER1_OPTION1_PHRASE, ANSWER1_TYPE, ANSWER1_OPTION1_CHECKED);
+        mViewQuestionPresenter.saveAnswer(ANSWER1_OPTION1_PHRASE, null, ANSWER1_TYPE, ANSWER1_OPTION1_CHECKED);
         verify(mTriibeRepository).saveAnswer(anyString(), anyString(), anyString(), any(Answer.class));
+        verify(mTriibeRepository).getAnswers(anyString(), anyString(), any(TriibeRepository.GetAnswersCallback.class));
     }
 
     @Test
@@ -873,7 +875,7 @@ public class ViewQuestionPresenterTest {
         assertEquals("Current question number did not increment", 2, mViewQuestionPresenter.getCurrentQuestionNum());
 
         // Confirm we haven't gone past the protected questions
-        assertThat(mViewQuestionPresenter.getCurrentQuestionNum(), is(not(greaterThan(Constants.NUM_QUALIFYING_QUESTIONS))));
+        assertThat(mViewQuestionPresenter.getCurrentQuestionNum(), is(not(greaterThan(NUM_PROTECTED_QUESTIONS))));
 
         mViewQuestionPresenter.checkAnswerToGoPrevious();
         // Check we are on question 1
@@ -913,11 +915,11 @@ public class ViewQuestionPresenterTest {
         assertEquals("Current question number did not increment", 3, mViewQuestionPresenter.getCurrentQuestionNum());
 
         // Confirm we've gone past the protected questions.
-        assertThat(mViewQuestionPresenter.getCurrentQuestionNum(), greaterThan(Constants.NUM_QUALIFYING_QUESTIONS));
+        assertThat(mViewQuestionPresenter.getCurrentQuestionNum(), greaterThan(NUM_PROTECTED_QUESTIONS));
 
         mViewQuestionPresenter.checkAnswerToGoPrevious();
         // Check we didn't go back to the previous question.
-        assertThat(mViewQuestionPresenter.getCurrentQuestionNum(), greaterThan(Constants.NUM_QUALIFYING_QUESTIONS));
+        assertThat(mViewQuestionPresenter.getCurrentQuestionNum(), greaterThan(NUM_PROTECTED_QUESTIONS));
 
         // Confirm user is informed of the error.
         verify(mView).showSnackbar(anyString(), anyByte());
@@ -970,7 +972,7 @@ public class ViewQuestionPresenterTest {
         assertEquals("Current question number did not increment", 4, mViewQuestionPresenter.getCurrentQuestionNum());
 
         // Confirm we've gone past the protected questions.
-        assertThat(mViewQuestionPresenter.getCurrentQuestionNum(), greaterThan(Constants.NUM_QUALIFYING_QUESTIONS));
+        assertThat(mViewQuestionPresenter.getCurrentQuestionNum(), greaterThan(NUM_PROTECTED_QUESTIONS));
 
         mViewQuestionPresenter.checkAnswerToGoPrevious();
         // Check we were able to go back to the previous question.
@@ -1007,8 +1009,11 @@ public class ViewQuestionPresenterTest {
         verify(mTriibeRepository).getAnswers(anyString(), anyString(), mAnswersCallbackCaptor.capture());
         mAnswersCallbackCaptor.getValue().onAnswersLoaded(ANSWERS);
 
+        mViewQuestionPresenter.loadCurrentQuestion();
+
+        // TODO: 9/10/16  not sure how to test this after refactoring. However the fucntionality does seem to work even though the test fails.
         // Confirm current question is after protected questions.
-        assertThat("Did not move past protected questions", mViewQuestionPresenter.getCurrentQuestionNum(), greaterThan(Constants.NUM_QUALIFYING_QUESTIONS));
+        assertThat("Did not move past protected questions", mViewQuestionPresenter.getCurrentQuestionNum(), greaterThan(NUM_PROTECTED_QUESTIONS));
     }
 
     @After

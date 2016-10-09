@@ -1,12 +1,15 @@
 package com.example.triibe.triibeuserapp.edit_trigger;
 
-import android.location.Location;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.triibe.triibeuserapp.data.SurveyTrigger;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.example.triibe.triibeuserapp.data.TriibeRepository;
+import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,38 +17,75 @@ import java.util.Map;
  */
 public class EditTriggerPresenter implements EditTriggerContract.UserActionsListener {
 
+    private static final String TAG = "EditTriggerPresenter";
+    private TriibeRepository mTriibeRepository;
     EditTriggerContract.View mView;
-    private DatabaseReference mDatabase;
+    private String mSurveyId;
 
-    public EditTriggerPresenter(EditTriggerContract.View view) {
+    public EditTriggerPresenter(TriibeRepository triibeRepository, EditTriggerContract.View view) {
+        mTriibeRepository = triibeRepository;
         mView = view;
-        mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
-    public void editTrigger(String surveyId, String id, Double lat, Double lon, String level,
-                            String time) {
+    public void getTriggerIds(@NonNull String surveyId, @NonNull Boolean forceUpdate) {
+        mSurveyId = surveyId;
+
         mView.setProgressIndicator(true);
 
-        Location location = new Location("");
-        location.setLatitude(lat);
-        location.setLongitude(lon);
-        SurveyTrigger surveyTrigger = new SurveyTrigger(surveyId, id, location, time);
-        Map<String, Object> surveyTriggerValues = surveyTrigger.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/surveys/" + surveyId + "/surveyTriggers/" + id, surveyTriggerValues);
-        childUpdates.put("/triggerIds/" + id, true);
-        mDatabase.updateChildren(childUpdates);
-
-
-//        Question question = new Question(surveyId, id, imageUrl, title, intro, query);
-//        Map<String, Object> questionValues = question.toMap();
-//        Map<String, Object> childUpdates = new HashMap<>();
-//        childUpdates.put("/surveys/" + surveyId + "/questions/" + id + "/questionDetails", questionValues);
-//        mDatabase.updateChildren(childUpdates);
+        final String path = "surveys/" + surveyId + "/triggerIds";
+        if (forceUpdate) {
+            mTriibeRepository.refreshTriggerIds();
+        }
+        EspressoIdlingResource.increment();
+        mTriibeRepository.getTriggerIds(path, new TriibeRepository.GetTriggerIdsCallback() {
+            @Override
+            public void onTriggerIdsLoaded(@Nullable Map<String, Boolean> triggerIds) {
+                EspressoIdlingResource.decrement();
+                List<String> triggerIdsArray;
+                if (triggerIds != null) {
+                    triggerIdsArray = new ArrayList<>(triggerIds.keySet());
+                } else {
+                    triggerIdsArray = new ArrayList<>();
+                }
+                mView.addTriggerIdsToAutoComplete(triggerIdsArray);
+            }
+        });
 
         mView.setProgressIndicator(false);
+    }
 
-        mView.showEditSurvey();
+    @Override
+    public void getTrigger(@NonNull String triggerId) {
+        mView.setProgressIndicator(true);
+
+        EspressoIdlingResource.increment();
+        mTriibeRepository.getTrigger(mSurveyId, triggerId, new TriibeRepository.GetTriggerCallback() {
+            @Override
+            public void onTriggerLoaded(@Nullable SurveyTrigger trigger) {
+                EspressoIdlingResource.decrement();
+                if (trigger != null) {
+                    mView.showTrigger(trigger);
+                } else {
+                    Log.d(TAG, "onTriggerLoaded: TRIGGER NULL");
+                }
+                mView.setProgressIndicator(false);
+            }
+        });
+    }
+
+    @Override
+    public void saveTrigger(SurveyTrigger trigger) {
+        mView.setProgressIndicator(true);
+
+        mTriibeRepository.saveTrigger(trigger.getSurveyId(), trigger.getId(), trigger);
+
+        mView.setProgressIndicator(false);
+    }
+
+    @Override
+    public void deleteTrigger(@NonNull String triggerId) {
+        // Save trigger with "t" prefix. Numerical values will create an array on firebase.
+        mTriibeRepository.deleteTrigger(mSurveyId, "t" + triggerId);
     }
 }

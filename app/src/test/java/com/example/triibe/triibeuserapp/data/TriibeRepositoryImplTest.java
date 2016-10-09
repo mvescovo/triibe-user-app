@@ -62,9 +62,11 @@ public class TriibeRepositoryImplTest {
         SURVEY_IDS.add("Test");
 
         SURVEYS.put("enrollmentSurvey", new SurveyDetails(
-                "enrollmentSurvey", "1", "first required survey", "1", "10"));
+                "s1", "Enrollment Survey", "100", "2", true
+        ));
         SURVEYS.put("Test", new SurveyDetails(
-                "Test", "1", "test survey", "1", "1"));
+                "s2", "Test Survey", "10", "0", true
+        ));
     }
 
 
@@ -363,5 +365,16 @@ public class TriibeRepositoryImplTest {
     public void saveAnswerToRepo() {
         mTriibeRepository.saveAnswer(SURVEY_IDS.get(0), USER_ID, QUESTION1_ID, ANSWER1);
         verify(mTriibeServiceApi).saveAnswer(anyString(), anyString(), anyString(), any(Answer.class));
+    }
+
+    // Users
+    @Test public void addUserSurveyToRepo() {
+        mTriibeRepository.addUserSurvey(USER_ID, SURVEY_IDS.get(0));
+        verify(mTriibeServiceApi).addUserSurvey(anyString(), anyString());
+    }
+
+    @Test public void removeUserSurveyToRepo() {
+        mTriibeRepository.removeUserSurvey(USER_ID, SURVEY_IDS.get(0));
+        verify(mTriibeServiceApi).removeUserSurvey(anyString(), anyString());
     }
 }
