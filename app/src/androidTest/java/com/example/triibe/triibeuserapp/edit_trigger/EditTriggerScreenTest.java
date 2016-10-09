@@ -24,10 +24,17 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 public class EditTriggerScreenTest {
 
-    private static String TEST_SURVEY_ID = "Test";
-    private static String TEST_TRIGGER_ID = "t1";
-    private static String TEST_TRIGGER_LAT = "10.0";
-    private static String TEST_TRIGGER_LON = "10.0";
+    // Passed into intent (use actual id's rather than the user entered version without prefix).
+    private static String TEST_SURVEY_ID = "s2";
+
+    // Passed in by use (don't include prefix for id's).
+    private static String TEST_TRIGGER_ID = "1";
+    private static String TEST_TRIGGER_LAT = "-37.9582";
+    private static String TEST_TRIGGER_LON = "145.0561894";
+    private static String TEST_TRIGGER_RADIUS = "100";
+    private static String TEST_TRIGGER_DWELL = "1";
+    private static String TEST_TRIGGER_LEVEL = "0";
+    private static String TEST_TRIGGER_TIME = "12:00";
 
     @Rule
     public IntentsTestRule<EditTriggerActivity> mEditTriggerIntentsTestRule =
@@ -53,6 +60,10 @@ public class EditTriggerScreenTest {
         onView(withId(R.id.trigger_id)).perform(typeText(TEST_TRIGGER_ID));
         onView(withId(R.id.lat)).check(matches(withText(TEST_TRIGGER_LAT)));
         onView(withId(R.id.lon)).check(matches(withText(TEST_TRIGGER_LON)));
+        onView(withId(R.id.radius)).check(matches(withText(TEST_TRIGGER_RADIUS)));
+        onView(withId(R.id.dwell)).check(matches(withText(TEST_TRIGGER_DWELL)));
+        onView(withId(R.id.level)).check(matches(withText(TEST_TRIGGER_LEVEL)));
+        onView(withId(R.id.time)).check(matches(withText(TEST_TRIGGER_TIME)));
     }
 
     @After

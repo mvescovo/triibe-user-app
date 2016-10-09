@@ -24,12 +24,14 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 public class EditSurveyScreenTest {
 
-    private static String TEST_SURVEY_ID = "Test";
-    private static String TEST_SURVEY_DESCRIPTION = "Test";
-    private static String TEST_SURVEY_VERSION = "Test";
-    private static String TEST_SURVEY_POINTS = "Test";
-    private static String TEST_SURVEY_TIME_TILL_EXPIRY = "Test";
-    private static String TEST_QUESTION_ID = "q1";
+    // Passed into intent (use actual id's rather than the user entered version without prefix).
+    private static String TEST_SURVEY_ID = "s2";
+
+    // Passed in by use (don't include prefix for id's).
+    private static boolean TEST_SURVEY_ACTIVE = true;
+    private static String TEST_SURVEY_DESCRIPTION = "Espresso test survey";
+    private static String TEST_SURVEY_POINTS = "100";
+    private static String TEST_SURVEY_PROTECTED_QUESTIONS = "0";
 
     private IdlingResource mIdlingResource;
 

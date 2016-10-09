@@ -16,6 +16,7 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
@@ -24,13 +25,15 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 public class EditOptionScreenTest {
 
-//    private static String TEST_USER_ID = "TestUserId";
-    private static String TEST_SURVEY_ID = "Test";
+    // Passed into intent (use actual id's rather than the user entered version without prefix).
+    private static String TEST_SURVEY_ID = "s2";
     private static String TEST_QUESTION_ID = "q1";
-    private static String TEST_OPTION_ID = "o1";
-    private static String TEST_OPTION_PHRASE = "test";
-    private static String TEST_OPTION_EXTRA_INPUT_TYPE = "test";
-    private static String TEST_OPTION_EXTRA_INPUT_HINT = "test";
+
+    // Passed in by use (don't include prefix for id's).
+    private static String TEST_OPTION_ID = "1";
+    private static String TEST_OPTION_PHRASE = "Test";
+    private static String TEST_OPTION_EXTRA_INPUT_TYPE = "Text";
+    private static String TEST_OPTION_EXTRA_INPUT_HINT = "Test";
 
     @Rule
     public IntentsTestRule<EditOptionActivity> mEditOptionIntentsTestRule =
@@ -62,7 +65,7 @@ public class EditOptionScreenTest {
     public void enteringAnExistingOptionIdLoadsSavedOptionDetailsWhenHasExtraInput() {
         onView(withId(R.id.option_id)).perform(typeText(TEST_OPTION_ID));
         onView(withId(R.id.option_phrase)).check(matches(withText(TEST_OPTION_PHRASE)));
-        onView(withId(R.id.option_extra_input_type)).check(matches(withText(TEST_OPTION_EXTRA_INPUT_TYPE)));
+        onView(withId(R.id.option_extra_input_type)).check(matches(withSpinnerText(TEST_OPTION_EXTRA_INPUT_TYPE)));
         onView(withId(R.id.option_extra_input_hint)).check(matches(withText(TEST_OPTION_EXTRA_INPUT_HINT)));
     }
 

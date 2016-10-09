@@ -258,11 +258,6 @@ public class EditOptionActivity extends AppCompatActivity
         mOptionExtraInputHint.setText("");
     }
 
-    @VisibleForTesting
-    public IdlingResource getCountingIdlingResource() {
-        return EspressoIdlingResource.getIdlingResource();
-    }
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         mSelectedOptionExtraInputType = parent.getItemAtPosition(position).toString().toLowerCase();
@@ -292,5 +287,10 @@ public class EditOptionActivity extends AppCompatActivity
                 }
                 break;
         }
+    }
+
+    @VisibleForTesting
+    public IdlingResource getCountingIdlingResource() {
+        return EspressoIdlingResource.getIdlingResource();
     }
 }

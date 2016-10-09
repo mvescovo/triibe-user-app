@@ -284,7 +284,7 @@ public class EditTriggerActivity extends AppCompatActivity
             trigger.setLevel(mLevel.getText().toString().trim());
         }
         if (!mTime.getText().toString().trim().contentEquals("")) {
-            trigger.setLevel(mTime.getText().toString().trim());
+            trigger.setTime(mTime.getText().toString().trim());
         }
         mUserActionsListener.saveTrigger(trigger);
         return true;
@@ -319,6 +319,8 @@ public class EditTriggerActivity extends AppCompatActivity
     private void clearOtherFields() {
         mLatitude.setText("");
         mLongitude.setText("");
+        mRadius.setText("");
+        mDwell.setText("");
         mLevel.setText("");
         mTime.setText("");
     }

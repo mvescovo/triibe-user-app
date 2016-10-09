@@ -320,11 +320,6 @@ public class EditSurveyActivity extends AppCompatActivity
         mNumProtectedQuestions.setText("");
     }
 
-    @VisibleForTesting
-    public IdlingResource getCountingIdlingResource() {
-        return EspressoIdlingResource.getIdlingResource();
-    }
-
     public void onSurveyActiveRadioButtonClicked(View view) {
         boolean checked = ((RadioButton) view).isChecked();
 
@@ -338,5 +333,10 @@ public class EditSurveyActivity extends AppCompatActivity
                     mSurveyActive = false;
                 break;
         }
+    }
+
+    @VisibleForTesting
+    public IdlingResource getCountingIdlingResource() {
+        return EspressoIdlingResource.getIdlingResource();
     }
 }

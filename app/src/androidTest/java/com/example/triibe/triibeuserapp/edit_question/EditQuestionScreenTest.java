@@ -24,12 +24,20 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 public class EditQuestionScreenTest {
 
-    private static String TEST_USER_ID = "TestUserId";
-    private static String TEST_SURVEY_ID = "Test";
-    private static String TEST_QUESTION_ID = "q1";
+    // Passed into intent (use actual id's rather than the user entered version without prefix).
+    private static String TEST_SURVEY_ID = "s2";
+
+    // Passed in by use (don't include prefix for id's).
+    private static String TEST_QUESTION_ID = "1";
+    private static String TEST_QUESTION_TYPE = "radio";
+    private static String TEST_QUESTION_IMAGE_URL = "Test";
     private static String TEST_QUESTION_TITLE = "Test";
     private static String TEST_QUESTION_INTRO = "Test";
-    private static String TEST_QUESTION_IMAGE_URL = "Test";
+    private static String TEST_QUESTION_PHRASE = "Test";
+    private static String TEST_QUESTION_INTRO_LINK_KEY = "Test";
+    private static String TEST_QUESTION_INTRO_LINK_URL = "Test";
+    private static String TEST_QUESTION_REQUIRED_PHRASE = "Test";
+    private static String TEST_QUESTION_INCORRECT_ANSWER_PHRASE = "Test";
 
     @Rule
     public IntentsTestRule<EditQuestionActivity> mEditQuestionIntentsTestRule =
