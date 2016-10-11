@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -30,7 +31,7 @@ import java.util.TimerTask;
 
 public class UsageStatsService extends Service{
     //change the CHECK_INTERVAL to manage how often you check for Usage Stats.
-    public static final long CHECK_INTERVAL = 10000;
+    public static final long CHECK_INTERVAL = 5000;
     // run on another Thread to avoid crash
     private Handler mHandler = new Handler();
     // timer handling
@@ -77,6 +78,7 @@ public class UsageStatsService extends Service{
                 @Override
                 public void run() {
                     String currentApp = AppUsageStats.getMostCurrentRecentApp(getApplicationContext());
+                    System.out.println("THE CURRENT APP IS:"+currentApp);
                     Date date = new Date();
                     dateInput = df.format(date);
                     RunningApp app = new RunningApp(currentApp,dateInput);
@@ -120,10 +122,14 @@ public class UsageStatsService extends Service{
                 dateInput = df.format(date);
                 previousAppMap.get(entry.getValue().getForgroundApp()).setEndTime(dateInput);
                 /*********FIREBASE*********/
-                String dataKey = mDatabase.child("data").child("Running App").push().getKey();
+                String dataKey = mDatabase.child("data").child("Running Apps").push().getKey();
                 appValues = previousAppMap.get(entry.getValue().getForgroundApp()).toMap();
-                totalAppMap.put("/data/Running App/"+user.getUid()+"/"+currentDate+"/"+dataKey,appValues);
-
+                totalAppMap.put("/data/Running Apps/"+user.getUid()+"/"+currentDate+"/"+dataKey,appValues);
+                try {
+                    TimeUnit.MILLISECONDS.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 mDatabase.updateChildren(totalAppMap);
                 /**************************/
                 it.remove();

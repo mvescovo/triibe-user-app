@@ -28,8 +28,8 @@ public class RunningApp {
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("App", forgroundApp);
-        result.put("IP Address URL", startTime);
         result.put("End Time", endTime);
+        result.put("Start Time", startTime);
         return result;
     }
 

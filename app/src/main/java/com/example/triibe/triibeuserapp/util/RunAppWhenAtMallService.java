@@ -130,7 +130,7 @@ public class RunAppWhenAtMallService extends Service {
         /**
         * Matt's services
         * */
-       startService(new Intent(getBaseContext(), IpService.class));
+      // startService(new Intent(getBaseContext(), IpService.class));
         startService(new Intent(getBaseContext(), UsageStatsService.class));
 
         return START_STICKY;
@@ -244,7 +244,7 @@ public class RunAppWhenAtMallService extends Service {
 
     @Override
     public void onDestroy() {
-        stopService(new Intent(getBaseContext(), IpService.class));
+        //stopService(new Intent(getBaseContext(), IpService.class));
         stopService(new Intent(getBaseContext(), UsageStatsService.class));
         wakeLock.release();
         Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
