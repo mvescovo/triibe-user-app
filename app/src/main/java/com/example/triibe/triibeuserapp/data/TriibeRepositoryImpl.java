@@ -2,6 +2,7 @@ package com.example.triibe.triibeuserapp.data;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -14,12 +15,15 @@ import java.util.Map;
 public class TriibeRepositoryImpl implements TriibeRepository {
 
     private final TriibeServiceApi mTriibeServiceApi;
+    @VisibleForTesting
     Map<String, Boolean> mCachedSurveyIds;
-    Map<String, Boolean> mCachedQuestionIds;
-    Map<String, Question> mCachedQuestions;
-    Map<String, Boolean> mCachedOptionIds;
-    Map<String, Option> mCachedOptions;
-    Map<String, Answer> mCachedAnswers;
+    private Map<String, Boolean> mCachedQuestionIds;
+    private Map<String, Question> mCachedQuestions;
+    private Map<String, Boolean> mCachedOptionIds;
+    private Map<String, Option> mCachedOptions;
+    private Map<String, Boolean> mCachedTriggerIds;
+    private Map<String, SurveyTrigger> mCachedTriggers;
+    private Map<String, Answer> mCachedAnswers;
 
     public TriibeRepositoryImpl(@NonNull TriibeServiceApi triibeServiceApi) {
         mTriibeServiceApi = triibeServiceApi;
@@ -230,6 +234,75 @@ public class TriibeRepositoryImpl implements TriibeRepository {
     /*
     * Triggers
     * */
+    @Override
+    public void getTriggerIds(@NonNull String path, @NonNull final GetTriggerIdsCallback callback) {
+        if (mCachedTriggerIds == null) {
+            mTriibeServiceApi.getTriggerIds(path, new TriibeServiceApi.GetTriggerIdsCallback() {
+                @Override
+                public void onTriggerIdsLoaded(@Nullable Map<String, Boolean> triggerIds) {
+                    if (triggerIds != null) {
+                        mCachedTriggerIds = ImmutableMap.copyOf(triggerIds);
+                    }
+                    callback.onTriggerIdsLoaded(mCachedTriggerIds);
+                }
+            });
+        } else {
+            callback.onTriggerIdsLoaded(mCachedTriggerIds);
+        }
+    }
+
+    @Override
+    public void refreshTriggerIds() {
+        mCachedTriggerIds = null;
+    }
+
+    @Override
+    public void getTriggers(@NonNull String surveyId, @NonNull final GetTriggersCallback callback) {
+        if (mCachedTriggers == null) {
+            mTriibeServiceApi.getTriggers(surveyId, new TriibeServiceApi.GetTriggersCallback() {
+                @Override
+                public void onTriggersLoaded(@Nullable Map<String, SurveyTrigger> triggers) {
+                    if (triggers != null) {
+                        mCachedTriggers = ImmutableMap.copyOf(triggers);
+                    }
+                    callback.onTriggersLoaded(mCachedTriggers);
+                }
+            });
+        } else {
+            callback.onTriggersLoaded(mCachedTriggers);
+        }
+    }
+
+    @Override
+    public void refreshTriggers() {
+        mCachedTriggers = null;
+    }
+
+    @Override
+    public void saveTriggerIds(@NonNull String path, @NonNull Map<String, Boolean> triggerIds) {
+        mTriibeServiceApi.saveTriggerIds(path, triggerIds);
+    }
+
+    @Override
+    public void getTrigger(@NonNull String surveyId, @NonNull String triggerId, @NonNull final GetTriggerCallback callback) {
+        mTriibeServiceApi.getTrigger(surveyId, triggerId,
+                new TriibeServiceApi.GetTriggerCallback() {
+                    @Override
+                    public void onTriggerLoaded(@Nullable SurveyTrigger trigger) {
+                        callback.onTriggerLoaded(trigger);
+                    }
+                });
+    }
+
+    @Override
+    public void saveTrigger(@NonNull String surveyId, @NonNull String triggerId, @NonNull SurveyTrigger trigger) {
+        mTriibeServiceApi.saveTrigger(surveyId, triggerId, trigger);
+    }
+
+    @Override
+    public void deleteTrigger(@NonNull String surveyId, @NonNull String triggerId) {
+        mTriibeServiceApi.deleteTrigger(surveyId, triggerId);
+    }
 
 
     /*
@@ -274,5 +347,44 @@ public class TriibeRepositoryImpl implements TriibeRepository {
     public void saveAnswer(@NonNull String surveyId, @NonNull String userId,
                            @NonNull String questionId, @NonNull Answer answer) {
         mTriibeServiceApi.saveAnswer(surveyId, userId, questionId, answer);
+    }
+
+
+    /*
+    * Users
+    * */
+    @Override
+    public void getUser(@NonNull String userId, @NonNull final GetUserCallback callback) {
+        mTriibeServiceApi.getUser(userId, new TriibeServiceApi.GetUserCallback() {
+            @Override
+            public void onUserLoaded(@Nullable User user) {
+                callback.onUserLoaded(user);
+            }
+        });
+    }
+
+    @Override
+    public void saveUser(@NonNull User user) {
+        mTriibeServiceApi.saveUser(user);
+    }
+
+    @Override
+    public void addUserSurvey(@NonNull String userId, @NonNull String surveyId) {
+        mTriibeServiceApi.addUserSurvey(userId, surveyId);
+    }
+
+    @Override
+    public void markUserSurveyDone(@NonNull String userId, @NonNull String surveyId) {
+        mTriibeServiceApi.markUserSurveyDone(userId, surveyId);
+    }
+
+    @Override
+    public void addUserPoints(@NonNull String userId, @NonNull String points) {
+        mTriibeServiceApi.addUserPoints(userId, points);
+    }
+
+    @Override
+    public void removeUserSurvey(@NonNull String userId, @NonNull String surveyId) {
+        mTriibeServiceApi.removeUserSurvey(userId, surveyId);
     }
 }

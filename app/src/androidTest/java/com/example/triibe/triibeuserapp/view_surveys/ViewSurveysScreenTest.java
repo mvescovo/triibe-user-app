@@ -1,10 +1,11 @@
 package com.example.triibe.triibeuserapp.view_surveys;
 
+import android.content.Intent;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingResource;
 import android.support.test.espresso.contrib.RecyclerViewActions;
+import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -41,48 +42,46 @@ import static org.hamcrest.Matchers.allOf;
 @LargeTest
 public class ViewSurveysScreenTest {
 
-    private static String TEST_USER_ID = "TestUserId";
-
-    private static String ENROLLMENT_SURVEY_DESCRIPTION = "Enrollment survey";
-    private static String ENROLLMENT_SURVEY_POINTS = "Points: 10";
-    private static String ENROLLMENT_SURVEY_EXPIRY_TIME = "Expiry time: 1hour.";
-
-    private static String TEST_SURVEY_DESCRIPTION = "Test";
-    private static String TEST_SURVEY_POINTS = "Points: 1";
-    private static String TEST_SURVEY_EXPIRY_TIME = "Expiry time: 1hour.";
-
-    private static String TEST_QUESTION_TITLE = "Participant Information Statement";
+    private static String TEST_USER_ID = "EspressoTestUser";
+    private static String SURVEY2_DESCRIPTION = "Espresso test survey";
+    private static String SURVEY2_POINTS = "100";
+    private static String QUESTION_TITLE = "Test";
+    private static String EDIT_SURVEY_TITLE = "Survey Details";
 
     @Rule
-    public ActivityTestRule<ViewSurveysActivity> mViewSurveysActivityTestRule =
-            new ActivityTestRule<>(ViewSurveysActivity.class);
+    public IntentsTestRule<ViewSurveysActivity> mViewSurveysIntentsTestRule =
+            new IntentsTestRule<>(ViewSurveysActivity.class, true, false);
 
     private IdlingResource mIdlingResource;
 
     @Before
     public void registerIdlingResource() {
-        mIdlingResource = mViewSurveysActivityTestRule.getActivity().getCountingIdlingResource();
+        mIdlingResource = mViewSurveysIntentsTestRule.getActivity().getCountingIdlingResource();
         Espresso.registerIdlingResources(mIdlingResource);
     }
 
-    @Test
-    public void surveysLoad() {
-        // Check surveys are in recycler view.
-        onView(withId(R.id.view_surveys_recycler_view)).perform(scrollTo(hasDescendant(withText(ENROLLMENT_SURVEY_DESCRIPTION))));
-        onView(allOf(withId(R.id.survey_description), withText(ENROLLMENT_SURVEY_DESCRIPTION))).check(matches(isDisplayed()));
+    @Before
+    public void setupActivity() {
+        Intent intent = new Intent();
+        intent.putExtra(ViewSurveysActivity.EXTRA_USER_ID, TEST_USER_ID);
+        mViewSurveysIntentsTestRule.launchActivity(intent);
+    }
 
-        onView(withId(R.id.view_surveys_recycler_view)).perform(scrollTo(hasDescendant(withText(TEST_SURVEY_DESCRIPTION))));
-        onView(allOf(withId(R.id.survey_description), withText(TEST_SURVEY_DESCRIPTION))).check(matches(isDisplayed()));
+    @Test
+    public void loadSurveys() {
+        // Check surveys are in recycler view.
+        onView(withId(R.id.view_surveys_recycler_view)).perform(scrollTo(hasDescendant(withText(SURVEY2_DESCRIPTION))));
+        onView(allOf(withId(R.id.survey_description), withText(SURVEY2_DESCRIPTION))).check(matches(isDisplayed()));
     }
 
     @Test
     public void clickingSurveyOpensQuestionUi() throws Exception {
         // Click on enrollment survey.
-        onView(withId(R.id.view_surveys_recycler_view)).perform(scrollTo(hasDescendant(withText(ENROLLMENT_SURVEY_DESCRIPTION))));
-        onView(withId(R.id.view_surveys_recycler_view)).perform(RecyclerViewActions.actionOnItem(hasDescendant(withText(ENROLLMENT_SURVEY_DESCRIPTION)), click()));
+        onView(withId(R.id.view_surveys_recycler_view)).perform(scrollTo(hasDescendant(withText(SURVEY2_DESCRIPTION))));
+        onView(withId(R.id.view_surveys_recycler_view)).perform(RecyclerViewActions.actionOnItem(hasDescendant(withText(SURVEY2_DESCRIPTION)), click()));
 
-        // Check the question logo shows up.
-        onView(withId(R.id.question_logo)).check(matches(isDisplayed()));
+        // Check the question title shows up.
+        onView(withId(R.id.title)).check(matches(isDisplayed()));
     }
 
     @Test
@@ -90,7 +89,7 @@ public class ViewSurveysScreenTest {
         onView(withId(R.id.modify_survey_fab)).perform(click());
 
         // Check if the edit survey screen is displayed
-        onView(withId(R.id.edit_survey_title)).check(matches(isDisplayed()));
+        onView(withId(R.id.edit_survey_title)).check(matches(withText(EDIT_SURVEY_TITLE)));
     }
 
     @After

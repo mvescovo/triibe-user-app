@@ -6,4 +6,9 @@
         android:icon="@drawable/ic_play_arrow_white_24dp"
         android:title="@string/start_data_tracking"
         app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/view_points"
+        android:title="@string/view_points"
+        app:showAsAction="never"/>
 </menu>

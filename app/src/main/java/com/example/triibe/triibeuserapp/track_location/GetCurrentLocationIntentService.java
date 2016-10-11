@@ -30,8 +30,8 @@ public class GetCurrentLocationIntentService extends IntentService
     private static final String TAG = "GetCurrentLocation";
     GoogleApiClient mGoogleApiClient;
     private final IBinder mBinder = new GetCurrentLocationBinder();
-    private double mLat = 10;
-    private double mLon = 10;
+    private double mLat;
+    private double mLon;
 
     public GetCurrentLocationIntentService() {
         super(TAG);

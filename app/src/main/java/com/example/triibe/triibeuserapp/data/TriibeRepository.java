@@ -51,6 +51,17 @@ public interface TriibeRepository {
 
 
     // Triggers
+    interface GetTriggerIdsCallback {
+        void onTriggerIdsLoaded(@Nullable Map<String, Boolean> triggerIds);
+    }
+
+    interface GetTriggersCallback {
+        void onTriggersLoaded(@Nullable Map<String, SurveyTrigger> triggers);
+    }
+
+    interface GetTriggerCallback {
+        void onTriggerLoaded(@Nullable SurveyTrigger trigger);
+    }
 
 
     // Answers
@@ -60,6 +71,12 @@ public interface TriibeRepository {
 
     interface GetAnswerCallback {
         void onAnswerLoaded(@Nullable AnswerDetails answer);
+    }
+
+
+    // Users
+    interface GetUserCallback {
+        void onUserLoaded(@Nullable User user);
     }
 
 
@@ -111,6 +128,21 @@ public interface TriibeRepository {
     void deleteOption(@NonNull String surveyId, @NonNull String questionId, @NonNull String optionId);
 
     // Triggers
+    void getTriggerIds(@NonNull String path, @NonNull GetTriggerIdsCallback callback);
+
+    void refreshTriggerIds();
+
+    void getTriggers(@NonNull String surveyId, @NonNull GetTriggersCallback callback);
+
+    void refreshTriggers();
+
+    void saveTriggerIds(@NonNull String path, @NonNull Map<String, Boolean> triggerIds);
+
+    void getTrigger(@NonNull String surveyId, @NonNull String triggerId, @NonNull GetTriggerCallback callback);
+
+    void saveTrigger(@NonNull String surveyId, @NonNull String triggerId, @NonNull SurveyTrigger trigger);
+
+    void deleteTrigger(@NonNull String surveyId, @NonNull String triggerId);
 
     // Answers
     void getAnswers(@NonNull String surveyId, @NonNull String userId, @NonNull GetAnswersCallback callback);
@@ -120,4 +152,17 @@ public interface TriibeRepository {
     void getAnswer(@NonNull String surveyId, @NonNull String questionId, @NonNull GetAnswerCallback callback);
 
     void saveAnswer(@NonNull String surveyId, @NonNull String userId, @NonNull String questionId, @NonNull Answer answer);
+
+    // Users
+    void getUser(@NonNull String userId, @NonNull GetUserCallback callback);
+
+    void saveUser(@NonNull User user);
+
+    void addUserSurvey(@NonNull String userId, @NonNull String surveyId);
+
+    void markUserSurveyDone(@NonNull String userId, @NonNull String surveyId);
+
+    void addUserPoints(@NonNull String userId, @NonNull String points);
+
+    void removeUserSurvey(@NonNull String userId, @NonNull String surveyId);
 }

@@ -1,6 +1,7 @@
 package com.example.triibe.triibeuserapp.edit_question;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +13,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,14 +22,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.QuestionDetails;
 import com.example.triibe.triibeuserapp.edit_option.EditOptionActivity;
+import com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 import com.example.triibe.triibeuserapp.util.Globals;
 
@@ -38,16 +42,18 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class EditQuestionActivity extends AppCompatActivity
-        implements EditQuestionContract.View, TextWatcher {
+        implements EditQuestionContract.View, TextWatcher, AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "EditQuestionActivity";
 //    public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
     public final static String EXTRA_SURVEY_ID = "com.example.triibe.SURVEY_ID";
     private static final int REQUEST_EDIT_OPTION = 1;
+    public static final int RESULT_DELETE = -2;
     EditQuestionContract.UserActionsListener mUserActionsListener;
     private String mSurveyId;
     BottomSheetBehavior mBottomSheetBehavior;
     private List<String> mQuestionIds;
+    private String mSelectedQuestionType = "radio";
 
     @BindView(R.id.view_root)
     CoordinatorLayout mRootView;
@@ -58,11 +64,14 @@ public class EditQuestionActivity extends AppCompatActivity
     @BindView(R.id.edit_option_button_layout)
     LinearLayout mEditOptionButtonLayout;
 
-    @BindView(R.id.TEST_BUTTON)
-    Button mTestButton;
-
     @BindView(R.id.question_id)
     AppCompatAutoCompleteTextView mQuestionId;
+
+    @BindView(R.id.question_type)
+    AppCompatSpinner mQuestionType;
+
+    @BindView(R.id.question_image_url)
+    TextInputEditText mImageUrl;
 
     @BindView(R.id.question_title)
     TextInputEditText mTitle;
@@ -70,8 +79,20 @@ public class EditQuestionActivity extends AppCompatActivity
     @BindView(R.id.question_intro)
     TextInputEditText mIntro;
 
-    @BindView(R.id.question_image_url)
-    TextInputEditText mImageUrl;
+    @BindView(R.id.question_phrase)
+    TextInputEditText mPhrase;
+
+    @BindView(R.id.question_intro_link_key)
+    TextInputEditText mIntroLinkKey;
+
+    @BindView(R.id.question_intro_link_url)
+    TextInputEditText mIntroLinkUrl;
+
+    @BindView(R.id.question_required_phrase)
+    TextInputEditText mRequiredPhrase;
+
+    @BindView(R.id.question_incorrect_answer_phrase)
+    TextInputEditText mIncorrectAnswerPhrase;
 
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
@@ -99,13 +120,6 @@ public class EditQuestionActivity extends AppCompatActivity
             Log.d(TAG, "onCreate: NO SURVEY ID");
         }
 
-        mTestButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mUserActionsListener.editOption();
-            }
-        });
-
         mEditOptionButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,6 +144,13 @@ public class EditQuestionActivity extends AppCompatActivity
             }
 
         });
+
+        // Setup question type spinner
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.question_type_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mQuestionType.setAdapter(adapter);
+        mQuestionType.setOnItemSelectedListener(this);
 
         mQuestionIds = new ArrayList<>();
         mQuestionId.addTextChangedListener(this);
@@ -165,9 +186,25 @@ public class EditQuestionActivity extends AppCompatActivity
 
     @Override
     public void showQuestionDetails(QuestionDetails questionDetails) {
+        switch (questionDetails.getType()) {
+            case "radio":
+                mQuestionType.setSelection(0);
+                break;
+            case "checkbox":
+                mQuestionType.setSelection(1);
+                break;
+            case "text":
+                mQuestionType.setSelection(2);
+                break;
+        }
+        mImageUrl.setText(questionDetails.getImageUrl());
         mTitle.setText(questionDetails.getTitle());
         mIntro.setText(questionDetails.getIntro());
-        mImageUrl.setText(questionDetails.getImageUrl());
+        mPhrase.setText(questionDetails.getPhrase());
+        mIntroLinkKey.setText(questionDetails.getIntroLinkKey());
+        mIntroLinkUrl.setText(questionDetails.getIntroLinkUrl());
+        mRequiredPhrase.setText(questionDetails.getRequiredPhrase());
+        mIncorrectAnswerPhrase.setText(questionDetails.getIncorrectAnswerPhrase());
     }
 
     @Override
@@ -180,45 +217,60 @@ public class EditQuestionActivity extends AppCompatActivity
     public void showEditOption() {
         Intent intent = new Intent(this, EditOptionActivity.class);
         intent.putExtra(EditOptionActivity.EXTRA_SURVEY_ID, mSurveyId);
-        intent.putExtra(EditOptionActivity.EXTRA_QUESTION_ID, mQuestionId.getText().toString().trim());
+        // Save question with "q" prefix. Numerical values will create an array on firebase.
+        intent.putExtra(EditOptionActivity.EXTRA_QUESTION_ID, "q" + mQuestionId.getText().toString().trim());
         startActivityForResult(intent, REQUEST_EDIT_OPTION);
     }
 
     private boolean validate() {
-
-        if (mTitle.getText().toString().trim().contentEquals("")) {
-            mTitle.setError("Title must not be empty"); // TODO: 18/09/16 set in strings
-            mTitle.requestFocus();
+        if (mQuestionId.getText().toString().trim().contentEquals("")) {
+            mQuestionId.setError("Question ID must not be empty"); // TODO: 18/09/16 set in strings
+            mQuestionId.requestFocus();
             return false;
         } else if (mTitle.getText().toString().trim().contentEquals("")) {
             mTitle.setError("Title must not be empty");
             mTitle.requestFocus();
             return false;
-        } else if (mIntro.getText().toString().trim().contentEquals("")) {
-            mIntro.setError("Intro must not be empty");
-            mIntro.requestFocus();
-            return false;
-        } else if (mImageUrl.getText().toString().trim().contentEquals("")) {
-            mImageUrl.setError("Image url must not be empty");
-            mImageUrl.requestFocus();
+        } else if (mPhrase.getText().toString().trim().contentEquals("")) {
+            mPhrase.setError("Phrase must not be empty");
+            mPhrase.requestFocus();
             return false;
         }
 
+        // If all ok, save question.
         QuestionDetails questionDetails = new QuestionDetails(
                 mSurveyId,
-                mQuestionId.getText().toString().trim(),
-                "",
-                mImageUrl.getText().toString().trim(), // TODO: 18/09/16 FIX THIS WITH REAL VALUES
-                mTitle.getText().toString().trim(),
-                mIntro.getText().toString().trim(),
-                "",
-                "",
-                "",
-                "",
-                ""
+                // Save question with "q" prefix. Numerical values will create an array on firebase.
+                "q" + mQuestionId.getText().toString().trim(),
+                mSelectedQuestionType
         );
-        mUserActionsListener.saveQuestion(questionDetails);
 
+        if (!mImageUrl.getText().toString().contentEquals("")) {
+            questionDetails.setImageUrl(mImageUrl.getText().toString().trim());
+        }
+        if (!mTitle.getText().toString().contentEquals("")) {
+            questionDetails.setTitle(mTitle.getText().toString().trim());
+        }
+        if (!mIntro.getText().toString().contentEquals("")) {
+            questionDetails.setIntro(mIntro.getText().toString().trim());
+        }
+        if (!mPhrase.getText().toString().contentEquals("")) {
+            questionDetails.setPhrase(mPhrase.getText().toString().trim());
+        }
+        if (!mIntroLinkKey.getText().toString().contentEquals("")) {
+            questionDetails.setIntroLinkKey(mIntroLinkKey.getText().toString().trim());
+        }
+        if (!mIntroLinkUrl.getText().toString().contentEquals("")) {
+            questionDetails.setIntroLinkUrl(mIntroLinkUrl.getText().toString().trim());
+        }
+        if (!mRequiredPhrase.getText().toString().contentEquals("")) {
+            questionDetails.setRequiredPhrase(mRequiredPhrase.getText().toString().trim());
+        }
+        if (!mIncorrectAnswerPhrase.getText().toString().contentEquals("")) {
+            questionDetails.setIncorrectAnswerPhrase(mIncorrectAnswerPhrase.getText().toString().trim());
+        }
+
+        mUserActionsListener.saveQuestion(questionDetails);
         return true;
     }
 
@@ -245,12 +297,23 @@ public class EditQuestionActivity extends AppCompatActivity
                 return true;
             case R.id.done:
                 if (validate()) {
+                    hideSoftKeyboard(mRootView);
                     showEditSurvey(Activity.RESULT_OK);
                 }
+                return true;
+            case R.id.delete_question:
+                hideSoftKeyboard(mRootView);
+                mUserActionsListener.deleteQuestion(mQuestionId.getText().toString().trim());
+                showEditSurvey(EditSurveyActivity.RESULT_DELETE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void hideSoftKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     @Override
@@ -260,10 +323,16 @@ public class EditQuestionActivity extends AppCompatActivity
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
+        boolean matched = false;
         for (int i = 0; i < mQuestionIds.size(); i++) {
-            if (s.toString().contentEquals(mQuestionIds.get(i))) {
+            // Get the substring at index 1 because the real questionId is preceded with "q".
+            if (s.toString().contentEquals(mQuestionIds.get(i).substring(1))) {
                 mUserActionsListener.getQuestion(mQuestionIds.get(i));
+                matched = true;
             }
+        }
+        if (!matched) {
+            clearOtherFields();
         }
     }
 
@@ -272,8 +341,30 @@ public class EditQuestionActivity extends AppCompatActivity
 
     }
 
+    private void clearOtherFields() {
+        mQuestionType.setSelection(0);
+        mImageUrl.setText("");
+        mTitle.setText("");
+        mIntro.setText("");
+        mPhrase.setText("");
+        mIntroLinkKey.setText("");
+        mIntroLinkUrl.setText("");
+        mRequiredPhrase.setText("");
+        mIncorrectAnswerPhrase.setText("");
+    }
+
     @VisibleForTesting
     public IdlingResource getCountingIdlingResource() {
         return EspressoIdlingResource.getIdlingResource();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        mSelectedQuestionType = parent.getItemAtPosition(position).toString().toLowerCase();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }
