@@ -28,6 +28,7 @@ import android.view.View;
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.data.User;
+import com.example.triibe.triibeuserapp.util.Constants;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -124,7 +125,7 @@ public class AuthUiActivity extends AppCompatActivity {
                         // Create a new user and save to TRIIBE database.
                         Map<String, Boolean> activeSurveyIds = new HashMap<>();
                         // Start a new user with the enrollment survey.
-                        activeSurveyIds.put("s1", true);
+                        activeSurveyIds.put(Constants.ENROLLMENT_SURVEY_ID, true);
                         User newUser = new User(mUserId, activeSurveyIds, false, false, "0");
                         mTriibeRepository.saveUser(newUser);
                     }

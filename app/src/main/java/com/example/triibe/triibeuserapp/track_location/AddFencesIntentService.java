@@ -170,8 +170,8 @@ public class AddFencesIntentService extends IntentService
 
     public void createLandmarkFence(String fenceKey, String lat, String lon, String radius,
                                     String dwell) {
-        Log.d(TAG, "createLandmarkFence: fenceKey, lat, lon, radius, dwell: " + fenceKey + lat +
-                lon + radius + dwell);
+        Log.d(TAG, "createLandmarkFence: fenceKey, lat, lon, radius, dwell: " + fenceKey + ", " +
+                lat + ", " + lon + ", " + radius + ", " + dwell);
 
         FenceUpdateRequest.Builder builder = new FenceUpdateRequest.Builder();
 
