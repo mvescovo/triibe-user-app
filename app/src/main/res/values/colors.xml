@@ -7,6 +7,6 @@
     <color name="colorSurveyProgressBackground">#e0e0e0</color>
     <color name="colorBottomSheetBackground">#EEEEEE</color>
     <color name="colorFabNormal">#DA4336</color>
-    <color name="colorFabDone">#4CAF50</color>
+    <color name="colorGreen">#4CAF50</color>
     <color name="white">#FFFFFF</color>
 </resources>

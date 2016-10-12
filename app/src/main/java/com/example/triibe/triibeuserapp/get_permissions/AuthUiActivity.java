@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.example.triibe.triibeuserapp.util;
+package com.example.triibe.triibeuserapp.get_permissions;
 
 import android.content.Context;
 import android.content.Intent;
@@ -28,7 +28,7 @@ import android.view.View;
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.data.User;
-import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
+import com.example.triibe.triibeuserapp.util.Globals;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -70,16 +70,6 @@ public class AuthUiActivity extends AppCompatActivity {
                             .build(),
                     RC_SIGN_IN);
         }
-
-        // This code will move to the action of a question that will ask the user if they want
-        // to do this (maybe it puts them on double points). Just leaving commented out for now
-        // until that part is ready. Or maybe not depending on time.
-
-        // Check if UsageStatsManager for app tracking permission enabled
-//        if (AppUsageStats.getUsageStatsList(this).isEmpty()){
-//            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-//            startActivity(intent);
-//        }
     }
 
     @Override
@@ -139,9 +129,9 @@ public class AuthUiActivity extends AppCompatActivity {
                         mTriibeRepository.saveUser(newUser);
                     }
 
-                    // Show the user their surveys.
-                    Intent intent = new Intent(context, ViewSurveysActivity.class);
-                    intent.putExtra(ViewSurveysActivity.EXTRA_USER_ID, mUserId);
+                    // Get required permissions from user
+                    Intent intent = new Intent(context, GetPermissionsActivity.class);
+                    intent.putExtra(GetPermissionsActivity.EXTRA_USER_ID, mUserId);
                     startActivity(intent);
                     finish();
                 }
