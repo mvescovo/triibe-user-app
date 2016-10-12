@@ -1,11 +1,24 @@
 <resources>
     <string name="app_name">TRIIBE User</string>
-    
+
+    <!--Application wide-->
+    <string name="westfield_logo">Westfield logo</string>
+
     <!--Preferences-->
     <string name="user_id">com.example.triibe.triibeuserapp.USER_ID</string>
 
     <!--Boot detection receiver-->
     <string name="foreground_service_started">Foreground service started</string>
+
+    <!--GetPermissionsActivity-->
+    <string name="location">LOCATION</string>
+    <string name="app_usage">APP USAGE</string>
+    <string name="location_permission_description">The TRIIBE User app starts and stops automatically near and within Westfield malls. Surveys may be received based on location within a mall. For this we need permission to access your location.</string>
+    <string name="app_usage_permission_description">Once the app has started, we would like to see the most popular apps you\'re running while at the mall. For this you will need to grant us permission. This is optional and will not prevent you from receiving surveys, but may lead to additional points when enabled.</string>
+    <string name="grant_permission">Grant permission</string>
+    <string name="remove_permission">Remove permission</string>
+    <string name="cancel_permission">Cancel</string>
+    <string name="skip_permission">Skip</string>
 
     <!--AuthUiActivity-->
     <string name="title_activity_auth">Sign in</string>
@@ -101,7 +114,7 @@
     <string name="edit_trigger_level_hint">Level</string>
     <string name="edit_trigger_time_hint">Time</string>
     <string name="delete_trigger">Delete trigger</string>
-    
+
     <!--TrackDataActivity-->
     <string name="title_activity_track_data">Track data</string>
     <string name="sign_out">Sign out</string>

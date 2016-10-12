@@ -21,6 +21,7 @@ import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.SurveyTrigger;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.data.User;
+import com.example.triibe.triibeuserapp.get_permissions.AuthUiActivity;
 import com.example.triibe.triibeuserapp.track_location.AddFencesIntentService;
 import com.example.triibe.triibeuserapp.track_location.RemoveFenceIntentService;
 import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
