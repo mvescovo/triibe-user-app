@@ -114,6 +114,8 @@ public class RunAppWhenAtMallService extends Service {
                     mUser = user;
                     if (user.isEnrolled()) {
                         getSurveyIds();
+                    } else {
+                        Log.d(TAG, "onUserLoaded: user not enrolled.");
                     }
                 }
             }
