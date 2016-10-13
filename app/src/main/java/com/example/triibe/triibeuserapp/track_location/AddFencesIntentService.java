@@ -91,7 +91,8 @@ public class AddFencesIntentService extends IntentService
             surveyDescription = intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION);
             fenceIntent.putExtra(EXTRA_SURVEY_DESCRIPTION, surveyDescription);
         }
-        mPendingIntent = PendingIntent.getBroadcast(this, requestCode, fenceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mPendingIntent = PendingIntent.getBroadcast(this, requestCode, fenceIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (!mGoogleApiClient.isConnected()) {
             mIntents.add(intent);
@@ -104,7 +105,8 @@ public class AddFencesIntentService extends IntentService
 
             if (type.contentEquals(TYPE_MALL)) {
                 SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
-                boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED, false);
+                boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED,
+                        false);
                 if (!mallGeofencesAdded) {
                     createMallFences();
                 }
@@ -142,7 +144,8 @@ public class AddFencesIntentService extends IntentService
     public void createMallFences() {
         FenceUpdateRequest.Builder builder = new FenceUpdateRequest.Builder();
         for (Map.Entry<String, LatLng> entry : Constants.WESTFIELD_MALLS.entrySet()) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "onHandleIntent: NO PERMISSION");
                 return;
             }
@@ -175,7 +178,8 @@ public class AddFencesIntentService extends IntentService
 
         FenceUpdateRequest.Builder builder = new FenceUpdateRequest.Builder();
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "onHandleIntent: NO PERMISSION");
             return;
         }
@@ -198,7 +202,8 @@ public class AddFencesIntentService extends IntentService
         }
     }
 
-    private void addFences(final String fenceKey, final FenceUpdateRequest fenceUpdateRequest, String type) {
+    private void addFences(final String fenceKey, final FenceUpdateRequest fenceUpdateRequest,
+                           String type) {
         if (!mGoogleApiClient.isConnected()) {
             Toast.makeText(this, "Google API client not connected", Toast.LENGTH_SHORT).show();
             return;
@@ -313,17 +318,17 @@ public class AddFencesIntentService extends IntentService
                         break;
                     case FenceState.FALSE:
                         Log.d(TAG, "Not in southland");
-//                        // Remove landmark fences
-//                        List<String> landmarkFences = Globals.getInstance().getLandmarkFences();
-//                        for (int i = 0; i < landmarkFences.size(); i++) {
-//                            Intent removeFenceIntent = new Intent(context, RemoveFenceIntentService.class);
-//                            removeFenceIntent.putExtra(EXTRA_TRIIBE_FENCE_TYPE, TYPE_LANDMARK);
-//                            removeFenceIntent.putExtra(EXTRA_FENCE_KEY, landmarkFences.get(i));
-//                            context.startService(removeFenceIntent);
-//
-//                            // Clear notifications.
-//                            mNotificationManager.cancelAll();
-//                        }
+                        // Remove landmark fences
+                        List<String> landmarkFences = Globals.getInstance().getLandmarkFences();
+                        for (int i = 0; i < landmarkFences.size(); i++) {
+                            Intent removeFenceIntent = new Intent(context, RemoveFenceIntentService.class);
+                            removeFenceIntent.putExtra(EXTRA_TRIIBE_FENCE_TYPE, TYPE_LANDMARK);
+                            removeFenceIntent.putExtra(EXTRA_FENCE_KEY, landmarkFences.get(i));
+                            context.startService(removeFenceIntent);
+
+                            // Clear notifications.
+                            mNotificationManager.cancelAll();
+                        }
 
                         // Stop app
                         context.stopService(AppServiceIntent);
@@ -356,6 +361,8 @@ public class AddFencesIntentService extends IntentService
                         Intent resultIntent = new Intent(context, ViewQuestionActivity.class);
                         resultIntent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, fenceState.getFenceKey());
                         resultIntent.putExtra(ViewQuestionActivity.EXTRA_USER_ID, userId);
+                        resultIntent.putExtra(ViewQuestionActivity.EXTRA_NUM_PROTECTED_QUESTIONS, "0"); // TODO: 13/10/16 fix this with real protected questions
+
                         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
                         stackBuilder.addParentStack(ViewQuestionActivity.class);
                         stackBuilder.addNextIntent(resultIntent);

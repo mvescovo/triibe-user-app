@@ -69,8 +69,7 @@ public interface ViewQuestionContract {
 
         void hideOptions();
 
-        void showViewSurveys(@NonNull Integer resultCode, @NonNull Integer surveyPoints,
-                             @NonNull Integer totalPoints);
+        void showPointsAccumulatorScreen(@NonNull String surveyPoints);
 
         void removeNotification(@NonNull String fenceKey);
     }
