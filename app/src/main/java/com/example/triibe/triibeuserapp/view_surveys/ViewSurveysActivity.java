@@ -172,6 +172,7 @@ public class ViewSurveysActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.start_data_tracking:
                 Intent runAppAtMallServiceIntent = new Intent(this, RunAppWhenAtMallService.class);
+                runAppAtMallServiceIntent.putExtra(RunAppWhenAtMallService.EXTRA_USER_ID, mUserId);
                 startService(runAppAtMallServiceIntent);
                 return true;
             case R.id.view_points:

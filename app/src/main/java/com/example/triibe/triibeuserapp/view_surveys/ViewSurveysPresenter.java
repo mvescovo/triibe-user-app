@@ -2,6 +2,7 @@ package com.example.triibe.triibeuserapp.view_surveys;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
@@ -39,7 +40,12 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
         mTriibeRepository.getSurveyIds(path, new TriibeRepository.GetSurveyIdsCallback() {
             @Override
             public void onSurveyIdsLoaded(@Nullable final Map<String, Boolean> userSurveyIds) {
-                EspressoIdlingResource.decrement();
+                Log.d(TAG, "onSurveyIdsLoaded: got called");
+
+                // Only decrement if not idle. A push change will not be idle.
+                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
+                    EspressoIdlingResource.decrement();
+                }
                 if (userSurveyIds != null) {
                     Object[] surveyIds = userSurveyIds.keySet().toArray();
                     surveys.clear();
@@ -50,7 +56,10 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                                 new TriibeRepository.GetSurveyCallback() {
                                     @Override
                                     public void onSurveyLoaded(SurveyDetails survey) {
-                                        EspressoIdlingResource.decrement();
+                                        // Only decrement if not idle. A push change will not be idle.
+                                        if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
+                                            EspressoIdlingResource.decrement();
+                                        }
                                         surveys.put("" + position, survey);
                                         if (surveys.size() == 0) {
                                             mView.showNoSurveysMessage();
@@ -69,6 +78,7 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                     mTriibeRepository.getUser(userId, new TriibeRepository.GetUserCallback() {
                         @Override
                         public void onUserLoaded(@Nullable User user) {
+                            Log.d(TAG, "onUserLoaded: GOT CALLED");
                             if (user != null) {
                                 if (!user.isEnrolled()) {
                                     Map<String, Boolean> activeSurveyIds = new HashMap<>();

@@ -75,8 +75,6 @@ public class RunAppWhenAtMallService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand: app service starting");
-
         if (intent.getStringExtra(EXTRA_USER_ID) != null) {
             mUserId = intent.getStringExtra(EXTRA_USER_ID);
         } else {
@@ -117,6 +115,8 @@ public class RunAppWhenAtMallService extends Service {
                     } else {
                         Log.d(TAG, "onUserLoaded: user not enrolled.");
                     }
+                } else {
+                    Log.d(TAG, "onUserLoaded: user is NULL");
                 }
             }
         });
@@ -132,6 +132,7 @@ public class RunAppWhenAtMallService extends Service {
 
     private void getSurveyIds() {
         // Get all surveyIds so we can get triggers for active surveys.
+        Log.d(TAG, "getSurveyIds: going to called get surveyids");
         final String path = "/surveyIds";
         mTriibeRepository.refreshSurveyIds();
 
