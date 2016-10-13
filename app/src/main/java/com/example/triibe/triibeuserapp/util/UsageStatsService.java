@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 
 import com.example.triibe.triibeuserapp.trackData.AppUsageStats;
@@ -67,6 +68,13 @@ public class UsageStatsService extends Service{
         mDatabase = FirebaseDatabase.getInstance().getReference();
         user = FirebaseAuth.getInstance().getCurrentUser();
         /**************************/
+
+        // Check if UsageStatsManager for app tracking permission enabled
+        if (AppUsageStats.getUsageStatsList(this).isEmpty()){
+            Intent usageStatsIntent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+            usageStatsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(usageStatsIntent);
+        }
 
     }
 

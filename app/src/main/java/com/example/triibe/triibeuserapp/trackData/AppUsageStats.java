@@ -43,20 +43,20 @@ public class AppUsageStats {
      * Return the most recently opened app.
      */
     public static String getMostRecentApp(List<UsageStats> usageStatsList){
-        int appIndex = 0;
-        boolean found = false;
         String packageName = "";
-        long currentTime = System.currentTimeMillis();
+
+        int appIndex = 0;
+        int mostRecentIndex = 0;
+        long mostRecentTime = 0;
         for (UsageStats usageStats : usageStatsList){
-            if (usageStats.getLastTimeUsed() > currentTime) {
-                found = true;
-                break;
+            if (usageStats.getLastTimeUsed() > mostRecentTime) {
+                mostRecentIndex = appIndex;
+                mostRecentTime = usageStats.getLastTimeUsed();
             }
             appIndex++;
         }
-        if (found == true) {
-            packageName = usageStatsList.get(appIndex).getPackageName();
-        }
+        packageName = usageStatsList.get(mostRecentIndex).getPackageName();
+
         return packageName;
     }
 

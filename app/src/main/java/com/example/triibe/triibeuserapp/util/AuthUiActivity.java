@@ -70,16 +70,6 @@ public class AuthUiActivity extends AppCompatActivity {
                             .build(),
                     RC_SIGN_IN);
         }
-
-        // This code will move to the action of a question that will ask the user if they want
-        // to do this (maybe it puts them on double points). Just leaving commented out for now
-        // until that part is ready. Or maybe not depending on time.
-
-        // Check if UsageStatsManager for app tracking permission enabled
-//        if (AppUsageStats.getUsageStatsList(this).isEmpty()){
-//            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-//            startActivity(intent);
-//        }
     }
 
     @Override
