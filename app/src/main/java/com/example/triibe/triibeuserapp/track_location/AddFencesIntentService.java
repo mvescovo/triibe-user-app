@@ -59,6 +59,7 @@ public class AddFencesIntentService extends IntentService
     public final static String EXTRA_RADIUS = "com.example.triibe.TRIIBE_RADIUS";
     public final static String EXTRA_DWELL = "com.example.triibe.TRIIBE_DWELL";
     public final static String EXTRA_SURVEY_DESCRIPTION = "com.example.triibe.TRIIBE_SURVEY_DESCRIPTION";
+    public final static String EXTRA_NUM_PROTECTED_QUESTIONS = "com.example.triibe.TRIIBE_SURVEY_NUM_PROTECTED_QUESTIONS";
     public final static String EXTRA_REQUEST_CODE = "com.example.triibe.TRIIBE_REQUEST_CODE";
     private GoogleApiClient mGoogleApiClient;
     private PendingIntent mPendingIntent;
@@ -86,7 +87,7 @@ public class AddFencesIntentService extends IntentService
         String surveyDescription = "";
         int requestCode;
         requestCode = intent.getIntExtra(EXTRA_REQUEST_CODE, 0);
-        Intent fenceIntent = new Intent(this, MallFenceReceiver.class);
+        Intent fenceIntent = new Intent(this, fenceReceiver.class);
         if (intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION) != null) {
             surveyDescription = intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION);
             fenceIntent.putExtra(EXTRA_SURVEY_DESCRIPTION, surveyDescription);
@@ -284,7 +285,7 @@ public class AddFencesIntentService extends IntentService
         Log.d(TAG, "onDestroy: add fences service done");
     }
 
-    public static class MallFenceReceiver extends BroadcastReceiver {
+    public static class fenceReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -298,11 +299,14 @@ public class AddFencesIntentService extends IntentService
             if (intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION) != null) {
                 surveyDescription = intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION);
             }
-
-            // Start or stop the app service
-            Intent AppServiceIntent = new Intent(context, RunAppWhenAtMallService.class);
+            String numProtectedQuestions = "0";
+            if (intent.getStringExtra(EXTRA_NUM_PROTECTED_QUESTIONS) != null) {
+                numProtectedQuestions = intent.getStringExtra(EXTRA_NUM_PROTECTED_QUESTIONS);
+            }
 
             if (TextUtils.equals(fenceState.getFenceKey(), "southland")) { // TODO: 18/09/16 add southland and others to constants file
+                Intent AppServiceIntent = new Intent(context, RunAppWhenAtMallService.class);
+
                 switch (fenceState.getCurrentState()) {
                     case FenceState.TRUE:
                         Log.d(TAG, "In southland");
@@ -361,7 +365,7 @@ public class AddFencesIntentService extends IntentService
                         Intent resultIntent = new Intent(context, ViewQuestionActivity.class);
                         resultIntent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, fenceState.getFenceKey());
                         resultIntent.putExtra(ViewQuestionActivity.EXTRA_USER_ID, userId);
-                        resultIntent.putExtra(ViewQuestionActivity.EXTRA_NUM_PROTECTED_QUESTIONS, "0"); // TODO: 13/10/16 fix this with real protected questions
+                        resultIntent.putExtra(EXTRA_NUM_PROTECTED_QUESTIONS, numProtectedQuestions);
 
                         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
                         stackBuilder.addParentStack(ViewQuestionActivity.class);
