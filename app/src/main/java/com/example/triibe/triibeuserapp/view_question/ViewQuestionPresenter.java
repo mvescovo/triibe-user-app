@@ -1,6 +1,5 @@
 package com.example.triibe.triibeuserapp.view_question;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +16,7 @@ import com.example.triibe.triibeuserapp.data.QuestionDetails;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.data.User;
+import com.example.triibe.triibeuserapp.util.Constants;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 
 import java.util.HashMap;
@@ -44,7 +44,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 
 
     public ViewQuestionPresenter(TriibeRepository triibeRepository, ViewQuestionContract.View view,
-                                 String surveyId, String userId, String questionId, int numProtectedQuestions) {
+                                 String surveyId, String userId, String questionId,
+                                 int numProtectedQuestions) {
         mTriibeRepository = triibeRepository;
         mView = view;
         mSurveyId = surveyId;
@@ -87,10 +88,10 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         } else {
                             // Move to the question the user is up to.
                             if (mAnswers.size() < mQuestions.size()) {
-                                // If they haven't completed all questions move to the next question.
+                                // If they haven't completed all questions move to the next one.
                                 mCurrentQuestionNum = mAnswers.size() + 1;
                             } else {
-                                // If they have completed all questions, move to the last question.
+                                // If they have completed all questions, move to the last one.
                                 mCurrentQuestionNum = mAnswers.size();
                             }
                         }
@@ -101,7 +102,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
         }, true);
     }
 
-    private void loadQuestions(@NonNull final LoadQuestionsCallback callback,  @NonNull Boolean forceUpdate) {
+    private void loadQuestions(@NonNull final LoadQuestionsCallback callback,
+                               @NonNull Boolean forceUpdate) {
         if (forceUpdate) {
             mTriibeRepository.refreshQuestions();
         }
@@ -115,7 +117,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
         });
     }
 
-    public void loadAnswers(@NonNull final LoadAnswersCallback callback,  @NonNull Boolean forceUpdate) {
+    public void loadAnswers(@NonNull final LoadAnswersCallback callback,
+                            @NonNull Boolean forceUpdate) {
         if (forceUpdate) {
             mTriibeRepository.refreshAnswers();
         }
@@ -191,7 +194,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             if (optionPhrase == null) {
                                 Log.d(TAG, "displayCurrentQuestion: NO OPTION PHRASE");
                             } else {
-                                mView.showRadioButtonItem(optionPhrase, extraInputHint, extraInputType);
+                                mView.showRadioButtonItem(optionPhrase, extraInputHint,
+                                        extraInputType);
                             }
                         }
                         break;
@@ -205,7 +209,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             if (optionPhrase == null) {
                                 Log.d(TAG, "displayCurrentQuestion: NO OPTION PHRASE");
                             } else {
-                                mView.showCheckboxItem(optionPhrase, extraInputHint, extraInputType, options.size());
+                                mView.showCheckboxItem(optionPhrase, extraInputHint, extraInputType,
+                                        options.size());
                             }
                         }
                         break;
@@ -297,7 +302,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                                 if (selectedOption != null) {
                                     String selectedOptionHint = selectedOption.getExtraInputHint();
                                     String selectedOptionAnswerPhrase = selectedOption.getExtraInput();
-                                    mView.showTextboxItem(selectedOptionHint, "text", selectedOptionAnswerPhrase);
+                                    mView.showTextboxItem(selectedOptionHint, "text",
+                                            selectedOptionAnswerPhrase);
                                 }
                             }
                         }
@@ -325,7 +331,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
     }
 
     @Override
-    public void saveAnswer(final String phrase, final String extraInput, final String type, final boolean checked) {
+    public void saveAnswer(final String phrase, final String extraInput, final String type,
+                           final boolean checked) {
         Question question = mQuestions.get("q" + mCurrentQuestionNum);
         QuestionDetails questionDetails = question.getQuestionDetails();
         String questionId = questionDetails.getId();
@@ -388,7 +395,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         }
                     }
 
-                    AnswerDetails answerDetails = new AnswerDetails(questionId, "a" + mCurrentQuestionNum, type);
+                    AnswerDetails answerDetails = new AnswerDetails(questionId, "a" +
+                            mCurrentQuestionNum, type);
                     if (selectedOptions.size() == 0) {
                         // Don't save an empty answerDetails object. This will make firebase delete the
                         // current answer options and can lead to a crash when loading the answer.
@@ -399,7 +407,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         answer = new Answer(answerDetails, selectedOptions);
                     }
                 }
-                mTriibeRepository.saveAnswer(mSurveyId, mUserId, "a" + mCurrentQuestionNum, answer);
+                mTriibeRepository.saveAnswer(mSurveyId, mUserId, "a" + mCurrentQuestionNum,
+                        answer);
                 break;
             case "text":
                 Log.d(TAG, "saveAnswer: got text answer");
@@ -434,7 +443,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         }
                     }
 
-                    AnswerDetails answerDetails = new AnswerDetails(questionId, "a" + mCurrentQuestionNum, type);
+                    AnswerDetails answerDetails = new AnswerDetails(questionId, "a" +
+                            mCurrentQuestionNum, type);
                     if (selectedOptions.size() == 0) {
                         // Don't save an empty answerDetails object. This will make firebase delete the
                         // current answer options and can lead to a crash when loading the answer.
@@ -468,7 +478,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             }
                         }
                     }
-                    mTriibeRepository.saveAnswer(mSurveyId, mUserId, "a" + mCurrentQuestionNum, extraTextAnswer);
+                    mTriibeRepository.saveAnswer(mSurveyId, mUserId, "a" + mCurrentQuestionNum,
+                            extraTextAnswer);
                 }
         }
 
@@ -546,7 +557,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                                 boolean hasExtraInput = selectedOption.getHasExtraInput();
                                 String extraInput = selectedOption.getExtraInput();
                                 if (!selectedOptionPhrase.contentEquals("")) {
-                                    answerOk = !hasExtraInput || extraInput != null && !extraInput.contentEquals("");
+                                    answerOk = !hasExtraInput || extraInput != null
+                                            && !extraInput.contentEquals("");
                                 }
                             }
                         }
@@ -561,46 +573,12 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 
                         mTriibeRepository.markUserSurveyDone(mUserId, mSurveyId);
 
-                        // Update user points
-                        mTriibeRepository.getSurvey(mSurveyId, new TriibeRepository.GetSurveyCallback() {
-                            @Override
-                            public void onSurveyLoaded(@Nullable SurveyDetails survey) {
-                                if (survey != null) {
-                                    mSurveyPoints = survey.getPoints();
-                                    final int surveyPoints = Integer.parseInt(mSurveyPoints);
-                                    mTriibeRepository.getUser(mUserId, new TriibeRepository.GetUserCallback() {
-                                        @Override
-                                        public void onUserLoaded(@Nullable User user) {
-                                            if (user != null) {
-                                                // To ensure the enrollment survey doesn't come back and the user can get
-                                                // other surveys, mark them as enrolled once they've completed it.
-                                                if (mSurveyId.contentEquals("enrollmentSurvey")) {
-                                                    mTriibeRepository.getUser(mUserId, new TriibeRepository.GetUserCallback() {
-                                                        @Override
-                                                        public void onUserLoaded(@Nullable User user) {
-                                                            if (user != null) {
-                                                                user.setEnrolled(true);
-                                                            }
-                                                        }
-                                                    });
-                                                }
-
-                                                int currentPoints = Integer.parseInt(user.getPoints());
-                                                int newtotalPoints = currentPoints += surveyPoints;
-                                                mTriibeRepository.addUserPoints(mUserId, String.valueOf(newtotalPoints));
-                                                mView.setIndeterminateProgressIndicator(false);
-                                                mView.showViewSurveys(Activity.RESULT_OK, surveyPoints, newtotalPoints);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        });
+                        // Get survey points and then update user points
+                        getSurveyPoints();
                     } else {
                         mCurrentQuestionNum++;
                         mView.hideOptions();
                         mView.showBackButton();
-//                    mTextInputEditText.removeTextChangedListener(this);
                         mView.setIndeterminateProgressIndicator(false);
                         if (mCurrentQuestionNum == mQuestions.size()) {
                             mView.showSubmitButton();
@@ -625,6 +603,44 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 mView.showSnackbar(((Context) mView).getString(R.string.question_incomplete), Snackbar.LENGTH_SHORT);
             }
         }
+    }
+
+    private void getSurveyPoints() {
+        EspressoIdlingResource.increment();
+        mTriibeRepository.getSurvey(mSurveyId, new TriibeRepository.GetSurveyCallback() {
+            @Override
+            public void onSurveyLoaded(@Nullable SurveyDetails survey) {
+                EspressoIdlingResource.decrement();
+                if (survey != null) {
+                    mSurveyPoints = survey.getPoints();
+                    int surveyPoints = Integer.parseInt(mSurveyPoints);
+                    updateUserPoints(surveyPoints);
+
+                }
+            }
+        });
+    }
+
+    private void updateUserPoints(final int surveyPoints) {
+        mTriibeRepository.getUser(mUserId, new TriibeRepository.GetUserCallback() {
+            @Override
+            public void onUserLoaded(@Nullable User user) {
+                if (user != null) {
+                    // To ensure the enrollment survey doesn't come back and the user can get
+                    // other surveys, mark them as enrolled once they've completed it.
+                    if (mSurveyId.contentEquals(Constants.ENROLLMENT_SURVEY_ID)) {
+                        user.setEnrolled(true);
+                        mTriibeRepository.saveUser(user);
+                    }
+
+                    int currentPoints = Integer.parseInt(user.getPoints());
+                    int newtotalPoints = currentPoints + surveyPoints;
+                    mTriibeRepository.addUserPoints(mUserId, String.valueOf(newtotalPoints));
+                    mView.setIndeterminateProgressIndicator(false);
+                    mView.showPointsAccumulatorScreen(Integer.toString(surveyPoints));
+                }
+            }
+        });
     }
 
     @Override

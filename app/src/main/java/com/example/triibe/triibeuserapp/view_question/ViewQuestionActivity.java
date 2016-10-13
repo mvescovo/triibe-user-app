@@ -35,6 +35,7 @@ import android.widget.TextView;
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 import com.example.triibe.triibeuserapp.util.Globals;
+import com.example.triibe.triibeuserapp.view_points.ViewPointsActivity;
 import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
 import com.squareup.picasso.Picasso;
 
@@ -407,7 +408,7 @@ public class ViewQuestionActivity extends AppCompatActivity
             mEditTextGroup.addView(textInputEditText);
         } else {
             // If answerPhrase is not null then we just need to update an existing textbox with
-            // the anwer.
+            // the answer.
             for (int i = 0; i < mEditTextGroup.getChildCount(); i++) {
                 TextInputEditText text = (TextInputEditText) mEditTextGroup.getChildAt(i);
                 if (text.getHint().toString().contentEquals(hint)) {
@@ -455,12 +456,11 @@ public class ViewQuestionActivity extends AppCompatActivity
     }
 
     @Override
-    public void showViewSurveys(@NonNull Integer resultCode, @NonNull Integer surveyPoints,
-                                @NonNull Integer totalPoints) {
-        Intent data = new Intent();
-        data.putExtra(ViewSurveysActivity.EXTRA_SURVEY_POINTS, surveyPoints);
-        data.putExtra(ViewSurveysActivity.EXTRA_TOTAL_POINTS, totalPoints);
-        setResult(resultCode, data);
+    public void showPointsAccumulatorScreen(@NonNull String surveyPoints) {
+        Intent intent = new Intent(this, ViewPointsActivity.class);
+        intent.putExtra(ViewPointsActivity.EXTRA_USER_ID, mUserId);
+        intent.putExtra(ViewPointsActivity.EXTRA_SURVEY_POINTS, surveyPoints);
+        startActivity(intent);
         finish();
     }
 

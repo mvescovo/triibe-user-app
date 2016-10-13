@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.data.User;
+import com.example.triibe.triibeuserapp.util.Constants;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 
 import java.util.HashMap;
@@ -72,7 +73,7 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
                                 if (!user.isEnrolled()) {
                                     Map<String, Boolean> activeSurveyIds = new HashMap<>();
                                     // User must complete enrollment survey if not enrolled.
-                                    activeSurveyIds.put("enrollmentSurvey", true);
+                                    activeSurveyIds.put(Constants.ENROLLMENT_SURVEY_ID, true);
                                     user.setActiveSurveyIds(activeSurveyIds);
                                     mTriibeRepository.saveUser(user);
                                     loadSurveys(userId, forceUpdate);
@@ -104,6 +105,6 @@ public class ViewSurveysPresenter implements ViewSurveysContract.UserActionsList
 
     @Override
     public void openSurveyQuestions(@NonNull String surveyId, @NonNull Integer numProtectedQuestions) {
-        mView.showQuestionUi(surveyId, "q1", numProtectedQuestions);
+        mView.showQuestionUi(surveyId, Constants.FIRST_QUESTION_ID, numProtectedQuestions);
     }
 }

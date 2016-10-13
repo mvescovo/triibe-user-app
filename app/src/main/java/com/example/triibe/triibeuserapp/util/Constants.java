@@ -21,6 +21,8 @@ public final class Constants {
     public static final int APP_SERVICE_RUNNING_ID = 13;
     public static final String ACTIVITY_EXTRA = "activityResult";
     public static final String BROADCAST_ACTION = "activityRecognition";
+    public static final String ENROLLMENT_SURVEY_ID = "s1";
+    public static final String FIRST_QUESTION_ID = "q1";
 
 
     public static final HashMap<String, LatLng> WESTFIELD_MALLS = new HashMap<>();

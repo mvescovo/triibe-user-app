@@ -59,6 +59,7 @@ public class AddFencesIntentService extends IntentService
     public final static String EXTRA_RADIUS = "com.example.triibe.TRIIBE_RADIUS";
     public final static String EXTRA_DWELL = "com.example.triibe.TRIIBE_DWELL";
     public final static String EXTRA_SURVEY_DESCRIPTION = "com.example.triibe.TRIIBE_SURVEY_DESCRIPTION";
+    public final static String EXTRA_NUM_PROTECTED_QUESTIONS = "com.example.triibe.TRIIBE_SURVEY_NUM_PROTECTED_QUESTIONS";
     public final static String EXTRA_REQUEST_CODE = "com.example.triibe.TRIIBE_REQUEST_CODE";
     private GoogleApiClient mGoogleApiClient;
     private PendingIntent mPendingIntent;
@@ -86,12 +87,13 @@ public class AddFencesIntentService extends IntentService
         String surveyDescription = "";
         int requestCode;
         requestCode = intent.getIntExtra(EXTRA_REQUEST_CODE, 0);
-        Intent fenceIntent = new Intent(this, MallFenceReceiver.class);
+        Intent fenceIntent = new Intent(this, fenceReceiver.class);
         if (intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION) != null) {
             surveyDescription = intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION);
             fenceIntent.putExtra(EXTRA_SURVEY_DESCRIPTION, surveyDescription);
         }
-        mPendingIntent = PendingIntent.getBroadcast(this, requestCode, fenceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mPendingIntent = PendingIntent.getBroadcast(this, requestCode, fenceIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (!mGoogleApiClient.isConnected()) {
             mIntents.add(intent);
@@ -104,7 +106,8 @@ public class AddFencesIntentService extends IntentService
 
             if (type.contentEquals(TYPE_MALL)) {
                 SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
-                boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED, false);
+                boolean mallGeofencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED,
+                        false);
                 if (!mallGeofencesAdded) {
                     createMallFences();
                 }
@@ -142,7 +145,8 @@ public class AddFencesIntentService extends IntentService
     public void createMallFences() {
         FenceUpdateRequest.Builder builder = new FenceUpdateRequest.Builder();
         for (Map.Entry<String, LatLng> entry : Constants.WESTFIELD_MALLS.entrySet()) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "onHandleIntent: NO PERMISSION");
                 return;
             }
@@ -170,12 +174,13 @@ public class AddFencesIntentService extends IntentService
 
     public void createLandmarkFence(String fenceKey, String lat, String lon, String radius,
                                     String dwell) {
-        Log.d(TAG, "createLandmarkFence: fenceKey, lat, lon, radius, dwell: " + fenceKey + lat +
-                lon + radius + dwell);
+        Log.d(TAG, "createLandmarkFence: fenceKey, lat, lon, radius, dwell: " + fenceKey + ", " +
+                lat + ", " + lon + ", " + radius + ", " + dwell);
 
         FenceUpdateRequest.Builder builder = new FenceUpdateRequest.Builder();
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "onHandleIntent: NO PERMISSION");
             return;
         }
@@ -198,7 +203,8 @@ public class AddFencesIntentService extends IntentService
         }
     }
 
-    private void addFences(final String fenceKey, final FenceUpdateRequest fenceUpdateRequest, String type) {
+    private void addFences(final String fenceKey, final FenceUpdateRequest fenceUpdateRequest,
+                           String type) {
         if (!mGoogleApiClient.isConnected()) {
             Toast.makeText(this, "Google API client not connected", Toast.LENGTH_SHORT).show();
             return;
@@ -279,7 +285,7 @@ public class AddFencesIntentService extends IntentService
         Log.d(TAG, "onDestroy: add fences service done");
     }
 
-    public static class MallFenceReceiver extends BroadcastReceiver {
+    public static class fenceReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -293,11 +299,14 @@ public class AddFencesIntentService extends IntentService
             if (intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION) != null) {
                 surveyDescription = intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION);
             }
-
-            // Start or stop the app service
-            Intent AppServiceIntent = new Intent(context, RunAppWhenAtMallService.class);
+            String numProtectedQuestions = "0";
+            if (intent.getStringExtra(EXTRA_NUM_PROTECTED_QUESTIONS) != null) {
+                numProtectedQuestions = intent.getStringExtra(EXTRA_NUM_PROTECTED_QUESTIONS);
+            }
 
             if (TextUtils.equals(fenceState.getFenceKey(), "southland")) { // TODO: 18/09/16 add southland and others to constants file
+                Intent AppServiceIntent = new Intent(context, RunAppWhenAtMallService.class);
+
                 switch (fenceState.getCurrentState()) {
                     case FenceState.TRUE:
                         Log.d(TAG, "In southland");
@@ -313,17 +322,17 @@ public class AddFencesIntentService extends IntentService
                         break;
                     case FenceState.FALSE:
                         Log.d(TAG, "Not in southland");
-//                        // Remove landmark fences
-//                        List<String> landmarkFences = Globals.getInstance().getLandmarkFences();
-//                        for (int i = 0; i < landmarkFences.size(); i++) {
-//                            Intent removeFenceIntent = new Intent(context, RemoveFenceIntentService.class);
-//                            removeFenceIntent.putExtra(EXTRA_TRIIBE_FENCE_TYPE, TYPE_LANDMARK);
-//                            removeFenceIntent.putExtra(EXTRA_FENCE_KEY, landmarkFences.get(i));
-//                            context.startService(removeFenceIntent);
-//
-//                            // Clear notifications.
-//                            mNotificationManager.cancelAll();
-//                        }
+                        // Remove landmark fences
+                        List<String> landmarkFences = Globals.getInstance().getLandmarkFences();
+                        for (int i = 0; i < landmarkFences.size(); i++) {
+                            Intent removeFenceIntent = new Intent(context, RemoveFenceIntentService.class);
+                            removeFenceIntent.putExtra(EXTRA_TRIIBE_FENCE_TYPE, TYPE_LANDMARK);
+                            removeFenceIntent.putExtra(EXTRA_FENCE_KEY, landmarkFences.get(i));
+                            context.startService(removeFenceIntent);
+
+                            // Clear notifications.
+                            mNotificationManager.cancelAll();
+                        }
 
                         // Stop app
                         context.stopService(AppServiceIntent);
@@ -356,6 +365,8 @@ public class AddFencesIntentService extends IntentService
                         Intent resultIntent = new Intent(context, ViewQuestionActivity.class);
                         resultIntent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, fenceState.getFenceKey());
                         resultIntent.putExtra(ViewQuestionActivity.EXTRA_USER_ID, userId);
+                        resultIntent.putExtra(EXTRA_NUM_PROTECTED_QUESTIONS, numProtectedQuestions);
+
                         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
                         stackBuilder.addParentStack(ViewQuestionActivity.class);
                         stackBuilder.addNextIntent(resultIntent);
