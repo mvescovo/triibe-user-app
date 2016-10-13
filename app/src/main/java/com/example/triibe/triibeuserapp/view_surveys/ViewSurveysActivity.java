@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
@@ -237,6 +238,10 @@ public class ViewSurveysActivity extends AppCompatActivity
             case R.id.start_data_tracking:
                 Intent runAppAtMallServiceIntent = new Intent(this, RunAppWhenAtMallService.class);
                 startService(runAppAtMallServiceIntent);
+                return true;
+            case R.id.start_web_visualisation:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.url_visualisation)));
+                startActivity(browserIntent);
                 return true;
             case R.id.view_points:
                 Intent viewPointsIntent = new Intent(this, ViewPointsActivity.class);
