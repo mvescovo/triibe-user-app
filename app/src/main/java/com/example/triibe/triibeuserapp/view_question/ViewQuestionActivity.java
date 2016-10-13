@@ -347,11 +347,19 @@ public class ViewQuestionActivity extends AppCompatActivity
     }
 
     @Override
-    public void selectCheckboxItem(String phrase, boolean checked, int size) {
+    public void selectCheckboxItem(String phrase, boolean checked, boolean hasExtraInput,
+                                   @Nullable String extraInputHint,
+                                   @Nullable String extraInputType,
+                                   @Nullable String extraInput, int size) {
         for (int i = 0; i < size; i++) {
             CheckBox item = (CheckBox) mCheckboxGroup.getChildAt(i);
             if (item.getText().toString().contentEquals(phrase)) {
                 item.toggle();
+                if (hasExtraInput) {
+                    showExtraInputTextboxItem(extraInputHint, extraInputType, extraInput);
+                } else {
+                    hideExtraInputTextboxItem();
+                }
                 return;
             }
         }

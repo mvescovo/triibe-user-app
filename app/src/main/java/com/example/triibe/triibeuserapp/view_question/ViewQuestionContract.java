@@ -51,7 +51,11 @@ public interface ViewQuestionContract {
                               @Nullable String extraInputType,
                               int size);
 
-        void selectCheckboxItem(String phrase, boolean checked, int size);
+        void selectCheckboxItem(String phrase, boolean checked, boolean hasExtraInput,
+                                @Nullable String extraInputHint,
+                                @Nullable String extraInputType,
+                                @Nullable String extraInput,
+                                int size);
 
         void showTextboxGroup();
 

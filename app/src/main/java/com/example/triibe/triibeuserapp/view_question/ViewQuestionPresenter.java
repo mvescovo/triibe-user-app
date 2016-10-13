@@ -288,9 +288,19 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                                 if (selectedOption != null) {
                                     String selectedOptionPhrase = selectedOption.getPhrase();
                                     boolean selectedOptionChecked = selectedOption.isChecked();
-                                    mView.selectCheckboxItem(selectedOptionPhrase,
+                                    boolean selectedOptionHasExtraInput = selectedOption.getHasExtraInput();
+                                    String selectedOptionExtraInput = selectedOption.getExtraInput();
+                                    String selectedOptionExtraInputHint = selectedOption.getExtraInputHint();
+                                    String selectedOptionExtraInputType = selectedOption.getExtraInputType();
+                                    mView.selectCheckboxItem(
+                                            selectedOptionPhrase,
                                             selectedOptionChecked,
-                                            options.size());
+                                            selectedOptionHasExtraInput,
+                                            selectedOptionExtraInput,
+                                            selectedOptionExtraInputHint,
+                                            selectedOptionExtraInputType,
+                                            options.size()
+                                    );
                                 }
                             }
                         }
