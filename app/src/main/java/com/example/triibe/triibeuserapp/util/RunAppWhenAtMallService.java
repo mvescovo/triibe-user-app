@@ -23,6 +23,7 @@ import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.data.SurveyTrigger;
 import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.data.User;
+import com.example.triibe.triibeuserapp.get_permissions.AuthUiActivity;
 import com.example.triibe.triibeuserapp.track_location.AddFencesIntentService;
 import com.example.triibe.triibeuserapp.track_location.RemoveFenceIntentService;
 import com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity;
@@ -45,7 +46,7 @@ public class RunAppWhenAtMallService extends Service {
 
     public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
     private static final String TAG = "RunAppWhenAtMallService";
-    private static final int STOP_SERVICE_REQUEST = 9999;
+    private static final int STOP_SERVICE_REQUEST = 1;
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private PendingIntent mStopTrackingPendingIntent;
@@ -75,7 +76,8 @@ public class RunAppWhenAtMallService extends Service {
         mServiceHandler = new ServiceHandler(mServiceLooper);
 
         Intent stopAppServiceIntent = new Intent(this, StopTrackingIntentService.class);
-        mStopTrackingPendingIntent = PendingIntent.getService(this, STOP_SERVICE_REQUEST, stopAppServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mStopTrackingPendingIntent = PendingIntent.getService(this, STOP_SERVICE_REQUEST,
+                stopAppServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mTriibeRepository = Globals.getInstance().getTriibeRepository();
 
@@ -84,12 +86,10 @@ public class RunAppWhenAtMallService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand: app service starting");
-
         if (intent.getStringExtra(EXTRA_USER_ID) != null) {
             mUserId = intent.getStringExtra(EXTRA_USER_ID);
         } else {
-            mUserId = "TestUserId";
+            mUserId = "InvalidUserId";
         }
 
         // For each start request, send a message to start a job and deliver the
@@ -104,7 +104,8 @@ public class RunAppWhenAtMallService extends Service {
                         .setSmallIcon(R.drawable.westfieldicon_transparent)
                         .setContentTitle("At mall") // TODO: 18/09/16 set in strings
                         .setContentText("Tracking data")
-                        .addAction(R.drawable.ic_stop_black_24dp, "Stop", mStopTrackingPendingIntent);
+                        .addAction(R.drawable.ic_stop_black_24dp, "Stop",
+                                mStopTrackingPendingIntent);
         Intent resultIntent = new Intent(this, AuthUiActivity.class);
         final TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(ViewSurveysActivity.class);
@@ -122,7 +123,11 @@ public class RunAppWhenAtMallService extends Service {
                     mUser = user;
                     if (user.isEnrolled()) {
                         getSurveyIds();
+                    } else {
+                        Log.d(TAG, "onUserLoaded: user not enrolled.");
                     }
+                } else {
+                    Log.d(TAG, "onUserLoaded: user is NULL");
                 }
             }
         });
@@ -138,6 +143,7 @@ public class RunAppWhenAtMallService extends Service {
 
     private void getSurveyIds() {
         // Get all surveyIds so we can get triggers for active surveys.
+        Log.d(TAG, "getSurveyIds: going to called get surveyids");
         final String path = "/surveyIds";
         mTriibeRepository.refreshSurveyIds();
 
@@ -147,36 +153,42 @@ public class RunAppWhenAtMallService extends Service {
             public void onSurveyIdsLoaded(@Nullable final Map<String, Boolean> surveyIds) {
                 EspressoIdlingResource.decrement();
                 if (surveyIds != null) {
-                    Object[] surveyIdsKeys = surveyIds.keySet().toArray();
-
-                    // Get each surveyDetails.
-                    for (int i = 0; i < surveyIds.size(); i++) {
-                        // Filter out surveys user has already completed.
-                        if (!mUser.getCompletedSurveyIds().containsKey(surveyIdsKeys[i].toString())) {
-                            EspressoIdlingResource.increment();
-                            mTriibeRepository.getSurvey(surveyIdsKeys[i].toString(),
-                                    new TriibeRepository.GetSurveyCallback() {
-                                        @Override
-                                        public void onSurveyLoaded(SurveyDetails survey) {
-                                            EspressoIdlingResource.decrement();
-                                            if (survey != null) {
-                                                mSurveys.add(survey);
-                                                if (survey.isActive()) {
-                                                    // Only get triggers for active surveys.
-                                                    getSurveyTriggers(survey.getId(),
-                                                            survey.getDescription());
-                                                }
-                                            }
-                                        }
-                                    });
-                        }
-                    }
+                    getSurveyDetails(surveyIds);
                 }
             }
         });
     }
 
-    private void getSurveyTriggers(final String surveyId, final String surveyDescription) {
+    private void getSurveyDetails(Map<String, Boolean> surveyIds) {
+        Object[] surveyIdsKeys = surveyIds.keySet().toArray();
+        // Get each surveyDetails.
+        for (int i = 0; i < surveyIds.size(); i++) {
+            // Filter out surveys user has already completed.
+            if (!mUser.getCompletedSurveyIds().containsKey(surveyIdsKeys[i].toString())) {
+                EspressoIdlingResource.increment();
+                mTriibeRepository.getSurvey(surveyIdsKeys[i].toString(),
+                        new TriibeRepository.GetSurveyCallback() {
+                            @Override
+                            public void onSurveyLoaded(SurveyDetails survey) {
+                                EspressoIdlingResource.decrement();
+                                if (survey != null) {
+                                    mSurveys.add(survey);
+                                    if (survey.isActive()) {
+                                        // Only get triggers for active surveys.
+                                        getSurveyTriggers(survey.getId(),
+                                                survey.getDescription(),
+                                                survey.getNumProtectedQuestions()
+                                        );
+                                    }
+                                }
+                            }
+                        });
+            }
+        }
+    }
+
+    private void getSurveyTriggers(final String surveyId, final String surveyDescription,
+                                   final String numProtectedQuestions) {
         EspressoIdlingResource.increment();
         mTriibeRepository.getTriggers(surveyId, new TriibeRepository.GetTriggersCallback() {
             @Override
@@ -185,14 +197,14 @@ public class RunAppWhenAtMallService extends Service {
                 if (triggers != null) {
                     for (String triggerId : triggers.keySet()) {
                         // Immediately add a fence for this trigger.
-                        addFence(triggers.get(triggerId), surveyDescription);
+                        addFence(triggers.get(triggerId), surveyDescription, numProtectedQuestions);
                     }
                 }
             }
         });
     }
 
-    private void addFence(SurveyTrigger trigger, String surveyDescription) {
+    private void addFence(SurveyTrigger trigger, String surveyDescription, String numProtectedQuestions) {
         // Add a location fence
         if (trigger.getLatitude() != null && trigger.getLongitude() != null) {
             Intent addLocationFencesIntent = new Intent(this, AddFencesIntentService.class);
@@ -224,6 +236,11 @@ public class RunAppWhenAtMallService extends Service {
             addLocationFencesIntent.putExtra(
                     AddFencesIntentService.EXTRA_SURVEY_DESCRIPTION,
                     surveyDescription
+            );
+            // Add numProtectedQuestions so it can be passed to the notification.
+            addLocationFencesIntent.putExtra(
+                    AddFencesIntentService.EXTRA_NUM_PROTECTED_QUESTIONS,
+                    numProtectedQuestions
             );
             // Set requestId so each pendingIntent will be different
             int requestCode = surveyDescription.hashCode();

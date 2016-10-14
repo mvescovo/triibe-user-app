@@ -20,7 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.triibe.triibeuserapp.R;
-import com.example.triibe.triibeuserapp.util.AuthUiActivity;
+import com.example.triibe.triibeuserapp.get_permissions.AuthUiActivity;
 import com.example.triibe.triibeuserapp.util.Constants;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.example.triibe.triibeuserapp.view_question.ViewQuestionActivity;

@@ -22,7 +22,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-
         <!-- Meta data -->
         <meta-data
             android:name="com.google.android.awareness.API_KEY"
@@ -37,15 +36,15 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
 
-
         <!-- Activities -->
-        <activity android:name=".util.AuthUiActivity">
+        <activity android:name=".get_permissions.AuthUiActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".get_permissions.GetPermissionsActivity">
         </activity>
         <activity
             android:name=".trackData.TrackDataActivity"
@@ -93,43 +92,42 @@
         <activity
             android:name=".edit_trigger.EditTriggerActivity"
             android:label="@string/title_activity_edit_trigger"
-            android:parentActivityName=".edit_survey.EditSurveyActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+        android:parentActivityName=".edit_survey.EditSurveyActivity"
+        android:theme="@style/AppTheme.NoActionBar">
             <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity"/>
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity"/>
         </activity>
         <activity
-            android:name=".view_points.ViewPointsActivity"
-            android:label="@string/title_activity_view_points"
-            android:parentActivityName=".view_surveys.ViewSurveysActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+        android:name=".view_points.ViewPointsActivity"
+        android:label="@string/title_activity_view_points"
+        android:parentActivityName=".view_surveys.ViewSurveysActivity"
+        android:theme="@style/AppTheme.NoActionBar">
             <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>
         </activity>
-
 
         <!-- Services -->
         <service
-            android:name=".util.RunAppWhenAtMallService"
-            android:exported="false">
+        android:name=".util.RunAppWhenAtMallService"
+        android:exported="false">
         </service>
         <service
-            android:name=".track_location.AddFencesIntentService"
-            android:exported="false">
+        android:name=".track_location.AddFencesIntentService"
+        android:exported="false">
         </service>
         <service
-            android:name=".track_location.RemoveFenceIntentService"
-            android:exported="false">
+        android:name=".track_location.RemoveFenceIntentService"
+        android:exported="false">
         </service>
         <service
-            android:name=".util.StopTrackingIntentService"
-            android:exported="false">
+        android:name=".util.StopTrackingIntentService"
+        android:exported="false">
         </service>
         <service
-            android:name=".track_location.GetCurrentLocationIntentService"
-            android:exported="false">
+        android:name=".track_location.GetCurrentLocationIntentService"
+        android:exported="false">
         </service>
 
         <service android:name=".util.IpService">
@@ -137,16 +135,14 @@
         <service android:name=".util.UsageStatsService">
         </service>
 
-
         <!-- Receivers -->
         <receiver android:name=".track_location.AddFencesIntentService$BootDetectionBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".track_location.AddFencesIntentService$MallFenceReceiver">
+        <receiver android:name=".track_location.AddFencesIntentService$fenceReceiver">
         </receiver>
-
 
         <!-- <service -->
         <!-- android:name=".util.FirebaseMessagingService" -->
@@ -215,7 +211,7 @@
              Note that the API key is linked to the encryption key used to sign the APK.
              You need a different API key for each encryption key, including the release key that is used to
              sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+             You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
 
 
@@ -250,16 +246,15 @@
         <!-- </intent-filter> -->
         <!-- </activity> -->
 
-        <!--<activity-->
-            <!--android:name=".takeSurvey.TakeSurveyActivity"-->
-            <!--android:label="@string/title_activity_take_survey"-->
-            <!--android:parentActivityName=".view_surveys.ViewSurveysActivity">-->
-            <!--<meta-data-->
-                <!--android:name="android.support.PARENT_ACTIVITY"-->
-                <!--android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/>-->
-        <!--</activity>-->
-        <activity android:name=".edit_survey.TestActivity">
-        </activity>
+
+        <!-- <activity -->
+        <!-- android:name=".takeSurvey.TakeSurveyActivity" -->
+        <!-- android:label="@string/title_activity_take_survey" -->
+        <!-- android:parentActivityName=".view_surveys.ViewSurveysActivity"> -->
+        <!-- <meta-data -->
+        <!-- android:name="android.support.PARENT_ACTIVITY" -->
+        <!-- android:value="com.example.triibe.triibeuserapp.view_surveys.ViewSurveysActivity"/> -->
+        <!-- </activity> -->
     </application>
 
 </manifest>

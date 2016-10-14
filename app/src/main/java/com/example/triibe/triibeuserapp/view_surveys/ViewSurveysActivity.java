@@ -1,6 +1,5 @@
 package com.example.triibe.triibeuserapp.view_surveys;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +16,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,8 +26,6 @@ import android.widget.TextView;
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
 import com.example.triibe.triibeuserapp.edit_survey.EditSurveyActivity;
-import com.example.triibe.triibeuserapp.track_location.AddFencesIntentService;
-import com.example.triibe.triibeuserapp.util.Constants;
 import com.example.triibe.triibeuserapp.util.EspressoIdlingResource;
 import com.example.triibe.triibeuserapp.util.Globals;
 import com.example.triibe.triibeuserapp.util.RunAppWhenAtMallService;
@@ -38,25 +34,18 @@ import com.example.triibe.triibeuserapp.view_points.ViewPointsActivity;
 import com.example.triibe.triibeuserapp.view_question.ViewQuestionActivity;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import pub.devrel.easypermissions.EasyPermissions;
 
 public class ViewSurveysActivity extends AppCompatActivity
-        implements ViewSurveysContract.View, EasyPermissions.PermissionCallbacks {
+        implements ViewSurveysContract.View {
 
     private static final String TAG = "ViewSurveysActivity";
     public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
-    public final static String EXTRA_SURVEY_POINTS = "com.example.triibe.SURVEY_POINTS";
-    public final static String EXTRA_TOTAL_POINTS = "com.example.triibe.TOTAL_POINTS";
-    private static final int REQUEST_EDIT_SURVEY = 1;
-    public static final int REQUEST_TAKE_SURVEY = 2;
+    public static final int REQUEST_EDIT_SURVEY = 1;
     public static final int RESULT_DELETE = 3;
-    private static final int FINE_LOCAITON = 4;
-    private String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
     private ViewSurveysContract.UserActionsListener mUserActionsListener;
     private SurveyAdapter mSurveyAdapter;
     private String mUserId;
@@ -110,20 +99,6 @@ public class ViewSurveysActivity extends AppCompatActivity
         mSurveyAdapter = new SurveyAdapter(mUserActionsListener, new HashMap<String, SurveyDetails>());
         mRecyclerView.setAdapter(mSurveyAdapter);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-
-        // Add mall fences if not already added (will also be added automatically on boot)
-        SharedPreferences preferences = getSharedPreferences(Constants.MALL_FENCES, 0);
-        boolean mallfencesAdded = preferences.getBoolean(Constants.MALL_FENCES_ADDED, false);
-        if (!mallfencesAdded) {
-            if (EasyPermissions.hasPermissions(this, perms)) {
-                // Have permission
-                startAddfencesService();
-            } else {
-                // Do not have permissions, request them now
-                EasyPermissions.requestPermissions(this, "Need location access to monitor location",
-                        FINE_LOCAITON, perms);
-            }
-        }
     }
 
     @Override
@@ -165,7 +140,7 @@ public class ViewSurveysActivity extends AppCompatActivity
         intent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, surveyId);
         intent.putExtra(ViewQuestionActivity.EXTRA_USER_ID, mUserId);
         intent.putExtra(ViewQuestionActivity.EXTRA_NUM_PROTECTED_QUESTIONS, numProtectedQuestions);
-        startActivityForResult(intent, REQUEST_TAKE_SURVEY);
+        startActivity(intent);
     }
 
     public void showCreateSurvey() {
@@ -184,45 +159,6 @@ public class ViewSurveysActivity extends AppCompatActivity
             Snackbar.make(mModifySurveyFab, getString(R.string.successfully_deleted_survey),
                     Snackbar.LENGTH_SHORT).show();
         }
-        if (requestCode == REQUEST_TAKE_SURVEY && resultCode == Activity.RESULT_OK) {
-            Intent intent = new Intent(this, ViewPointsActivity.class);
-            intent.putExtra(ViewPointsActivity.EXTRA_USER_ID, mUserId);
-            intent.putExtra(ViewPointsActivity.EXTRA_SURVEY_POINTS,
-                    Integer.toString(data.getIntExtra(EXTRA_SURVEY_POINTS, -1)));
-            startActivity(intent);
-//            String message = getString(R.string.successfully_completed_survey) +
-//                    ". " + Integer.toString(data.getIntExtra(EXTRA_SURVEY_POINTS, -1)) + " points added." +
-//                    " " + Integer.toString(data.getIntExtra(EXTRA_TOTAL_POINTS, -1)) + " total points.";
-//            Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    public void onPermissionsGranted(int requestCode, List<String> perms) {
-        Log.d(TAG, "onPermissionsGranted: GRANTED");
-        startAddfencesService();
-    }
-
-    @Override
-    public void onPermissionsDenied(int requestCode, List<String> perms) {
-        Log.d(TAG, "onPermissionsDenied: DENIED");
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-    }
-
-    private void startAddfencesService() {
-        Log.d(TAG, "startAddfencesService: START SERVICE");
-        Intent addMallFencesIntent = new Intent(this, AddFencesIntentService.class);
-        addMallFencesIntent.putExtra(
-                AddFencesIntentService.EXTRA_TRIIBE_FENCE_TYPE,
-                AddFencesIntentService.TYPE_MALL
-        );
-        startService(addMallFencesIntent);
     }
 
     @Override
@@ -237,6 +173,7 @@ public class ViewSurveysActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.start_data_tracking:
                 Intent runAppAtMallServiceIntent = new Intent(this, RunAppWhenAtMallService.class);
+                runAppAtMallServiceIntent.putExtra(RunAppWhenAtMallService.EXTRA_USER_ID, mUserId);
                 startService(runAppAtMallServiceIntent);
                 return true;
             case R.id.start_web_visualisation:
