@@ -49,10 +49,15 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
         mUserId = userId;
         mQuestionId = questionId;
         mNumProtectedQuestions = numProtectedQuestions;
-        mCurrentQuestionNum = 1;
         mQuestions = new HashMap<>();
         mAnswers = new HashMap<>();
         mAnswerComplete = false;
+
+        if (!mQuestionId.contentEquals("-1")) {
+            mCurrentQuestionNum = Integer.valueOf(mQuestionId.substring(1));
+        } else {
+            mCurrentQuestionNum = 1;
+        }
     }
 
     @Override
@@ -98,11 +103,17 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                     mAnswers = new HashMap<>();
                 }
 
-                // If the question ID was specified (such as from Espresso), go to the
+                // If the question ID was specified (such as from Espresso or rotation), go to the
                 // requested question. If "-1" is set (invalid question) then just go to
                 // the current question.
                 if (!mQuestionId.contentEquals("-1")) {
-                    mCurrentQuestionNum = Integer.valueOf(mQuestionId.substring(1));
+                    // Already went to the requested question. Adjust based on answers returned.
+                    if (mAnswers.size() >= mNumProtectedQuestions && mCurrentQuestionNum <= mNumProtectedQuestions) {
+                        mCurrentQuestionNum = mNumProtectedQuestions + 1;
+                    }
+                    // Once we've moved to the required question, make sure won't don't go there
+                    // every time we load answers.
+                    mQuestionId = "-1";
                 } else {
                     if (!mSurveyResumed) {
                         // Move to the question the user is up to.
@@ -113,9 +124,9 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             // They have completed all questions, move to the last one.
                             mCurrentQuestionNum = mAnswers.size();
                         }
-                        mSurveyResumed = true;
                     }
                 }
+                mSurveyResumed = true;
                 displayCurrentQuestion();
             }
         });
@@ -276,6 +287,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             }
                         }
                     }
+                    mAnswerComplete = true;
+                    checkMissingAnswer();
                 } else {
                     mAnswerComplete = false;
                 }
@@ -547,6 +560,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
         mView.setIndeterminateProgressIndicator(true);
         mCurrentQuestionNum--;
         mAnswerComplete = true;
+        checkMissingAnswer();
         displayCurrentQuestion();
     }
 
@@ -560,8 +574,25 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
             mCurrentQuestionNum++;
             if (mCurrentQuestionNum > mAnswers.size()) {
                 mAnswerComplete = false;
+            } else {
+                checkMissingAnswer();
             }
             displayCurrentQuestion();
+        }
+    }
+
+    private void checkMissingAnswer() {
+        Answer answer = mAnswers.get("a" + mCurrentQuestionNum);
+        Map<String, Option> answerOptions = answer.getSelectedOptions();
+        if (answerOptions != null) {
+            for (Option option : answerOptions.values()) {
+                if (option.getHasExtraInput()) {
+                    String extraInput = option.getExtraInput();
+                    if (extraInput == null || extraInput.contentEquals("")) {
+                        mAnswerComplete = false;
+                    }
+                }
+            }
         }
     }
 
@@ -576,6 +607,21 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 mCurrentQuestionNum = i;
                 displayCurrentQuestion();
                 mView.showSnackbar("Woops! You missed this question.", Snackbar.LENGTH_SHORT);
+                break;
+            } else {
+                for (Option option : answerOptions.values()) {
+                    if (option.getHasExtraInput()) {
+                        String extraInput = option.getExtraInput();
+                        if (extraInput == null || extraInput.contentEquals("")) {
+                            // Found a missing answer.
+                            surveyOk = false;
+                            mCurrentQuestionNum = i;
+                            displayCurrentQuestion();
+                            mView.showSnackbar("Woops! You missed this question.", Snackbar.LENGTH_SHORT);
+                            break;
+                        }
+                    }
+                }
             }
         }
 
