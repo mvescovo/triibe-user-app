@@ -51,7 +51,11 @@ public interface ViewQuestionContract {
                               @Nullable String extraInputType,
                               int size);
 
-        void selectCheckboxItem(String phrase, boolean checked, int size);
+        void selectCheckboxItem(String phrase, boolean checked, boolean hasExtraInput,
+                                @Nullable String extraInputHint,
+                                @Nullable String extraInputType,
+                                @Nullable String extraInput,
+                                int size);
 
         void showTextboxGroup();
 
@@ -59,13 +63,11 @@ public interface ViewQuestionContract {
 
         void showSnackbar(String text, int duration);
 
-        void showSubmitButton();
+        void setBackButtonEnabled(boolean enabled);
 
-        void hideSubmitButton();
+        void setNextButtonEnabled(boolean enabled);
 
-        void showBackButton();
-
-        void hideBackButton();
+        void setSubmitButtonEnabled(boolean enabled);
 
         void hideOptions();
 
@@ -78,12 +80,10 @@ public interface ViewQuestionContract {
 
         void loadCurrentQuestion();
 
-        void saveAnswer(String phrase, @Nullable String extraInput, String type, boolean checked);
+        void saveAnswer(String answerPhrase, @Nullable String extraInput, String type, boolean checked);
 
         void goToNextQuestion();
 
         void goToPreviousQuestion();
-
-        void submitSurvey();
     }
 }

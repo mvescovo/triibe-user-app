@@ -33,6 +33,32 @@
     <string name="no_surveys">You don\'t currently have any surveys. Try going to the mall to get more surveys.</string>
     <string name="view_points">View Points</string>
 
+    <!--ViewQuestionActivity-->
+    <string name="title_activity_take_survey">Survey</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Questions from section: %1$d</string>
+    <string name="survey_subheading">Participant Information Statement</string>
+    <string name="confirm18">Please confirm you are 18 years old or above:</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="radio_true">Yes</string>
+    <string name="radio_false">No</string>
+    <string name="question_logo">Question logo</string>
+    <string name="title">Title</string>
+    <string name="intro">Intro</string>
+    <string name="phrase">Phrase</string>
+    <string name="response">Answer</string>
+    <string name="image_url">Image url</string>
+    <string name="next_question">NEXT</string>
+    <string name="previous_question">BACK</string>
+    <string name="add_question">Add query</string>
+    <string name="at_first_question">You\'re at the first question.</string>
+    <string name="question_incomplete">Question incomplete</string>
+    <string name="finish_survey">Finish</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="successfully_completed_survey">Survey Completed</string>
+
     <!--EditSurveyActivity-->
     <string name="title_activity_edit_survey">Edit Survey</string>
     <string name="edit_survey_details_title">Survey Details</string>
@@ -72,6 +98,8 @@
     <string name="edit_question_intro_link_url">Intro link URL</string>
     <string name="edit_question_required_phrase">Required phrase</string>
     <string name="edit_question_incorrect_answer_phrase">Incorrect answer phrase</string>
+    <string name="next">Next</string>
+    <string name="finish">Finish</string>
     <string name="edit_question_type">Type:</string>
     <string-array name="question_type_array">
         <item>Radio</item>
@@ -123,32 +151,6 @@
     <string name="stop_data_tracking">Stop Data Tracking</string>
     <string name="started_data_tracking">If it was implemented, data tracking would now be active</string>
     <string name="stopped_data_tracking">If it was implemented, data tracking would now be off</string>
-
-    <!--TakeSurveyActivity-->
-    <string name="title_activity_take_survey">Survey</string>
-    <string name="action_settings">Settings</string>
-    <string name="section_format">Questions from section: %1$d</string>
-    <string name="survey_subheading">Participant Information Statement</string>
-    <string name="confirm18">Please confirm you are 18 years old or above:</string>
-    <string name="male">Male</string>
-    <string name="female">Female</string>
-    <string name="radio_true">Yes</string>
-    <string name="radio_false">No</string>
-    <string name="question_logo">Question logo</string>
-    <string name="title">Title</string>
-    <string name="intro">Intro</string>
-    <string name="phrase">Phrase</string>
-    <string name="response">Answer</string>
-    <string name="image_url">Image url</string>
-    <string name="next_question">NEXT</string>
-    <string name="previous_question">BACK</string>
-    <string name="add_question">Add query</string>
-    <string name="at_first_question">You\'re at the first question.</string>
-    <string name="question_incomplete">Question incomplete</string>
-    <string name="finish_survey">Finish</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="title_activity_test">TestActivity</string>
-    <string name="successfully_completed_survey">Survey Completed</string>
 
     <!--ViewPointsActivity-->
     <string name="title_activity_view_points">Points</string>
