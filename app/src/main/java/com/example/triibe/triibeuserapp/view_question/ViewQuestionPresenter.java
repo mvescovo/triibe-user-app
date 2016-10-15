@@ -49,10 +49,15 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
         mUserId = userId;
         mQuestionId = questionId;
         mNumProtectedQuestions = numProtectedQuestions;
-        mCurrentQuestionNum = 1;
         mQuestions = new HashMap<>();
         mAnswers = new HashMap<>();
         mAnswerComplete = false;
+
+        if (!mQuestionId.contentEquals("-1")) {
+            mCurrentQuestionNum = Integer.valueOf(mQuestionId.substring(1));
+        } else {
+            mCurrentQuestionNum = 1;
+        }
     }
 
     @Override
@@ -102,7 +107,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 // requested question. If "-1" is set (invalid question) then just go to
                 // the current question.
                 if (!mQuestionId.contentEquals("-1")) {
-                    mCurrentQuestionNum = Integer.valueOf(mQuestionId.substring(1));
+                    // Already went to the requested question. Adjust based on answers returned.
                     if (mAnswers.size() >= mNumProtectedQuestions && mCurrentQuestionNum <= mNumProtectedQuestions) {
                         mCurrentQuestionNum = mNumProtectedQuestions + 1;
                     }
