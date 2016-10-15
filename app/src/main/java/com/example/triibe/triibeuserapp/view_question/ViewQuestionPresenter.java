@@ -103,6 +103,9 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 // the current question.
                 if (!mQuestionId.contentEquals("-1")) {
                     mCurrentQuestionNum = Integer.valueOf(mQuestionId.substring(1));
+                    if (mAnswers.size() >= mNumProtectedQuestions && mCurrentQuestionNum <= mNumProtectedQuestions) {
+                        mCurrentQuestionNum = mNumProtectedQuestions + 1;
+                    }
                 } else {
                     if (!mSurveyResumed) {
                         // Move to the question the user is up to.
