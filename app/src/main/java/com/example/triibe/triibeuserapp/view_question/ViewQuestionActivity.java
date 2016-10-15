@@ -18,7 +18,6 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -94,6 +93,9 @@ public class ViewQuestionActivity extends AppCompatActivity
 
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
+
+    @BindView(R.id.next_button_image)
+    ImageButton mNextButtonImage;
 
     @BindView(R.id.next_button)
     Button mNextButton;
@@ -403,7 +405,6 @@ public class ViewQuestionActivity extends AppCompatActivity
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    Log.d(TAG, "got text changed");
                     mUserActionsListener
                             .saveAnswer(hint, s.toString(), "text", true);
                 }
@@ -434,25 +435,38 @@ public class ViewQuestionActivity extends AppCompatActivity
     }
 
     @Override
-    public void showSubmitButton() {
-        mNextButton.setText("Finish"); // TODO: 18/09/16 set in strings
+    public void setBackButtonEnabled(boolean enabled) {
+        if (enabled) {
+            mPreviousButton.setVisibility(View.VISIBLE);
+            mPreviousButtonImage.setVisibility(View.VISIBLE);
+        } else {
+            mPreviousButton.setVisibility(View.INVISIBLE);
+            mPreviousButtonImage.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
-    public void hideSubmitButton() {
-        mNextButton.setText("Next");
+    public void setNextButtonEnabled(boolean enabled) {
+        if (enabled) {
+            mNextButton.setVisibility(View.VISIBLE);
+            mNextButtonImage.setVisibility(View.VISIBLE);
+            mNextButton.setText(getString(R.string.next));
+        } else {
+            mNextButton.setVisibility(View.INVISIBLE);
+            mNextButtonImage.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
-    public void showBackButton() {
-        mPreviousButton.setVisibility(View.VISIBLE);
-        mPreviousButtonImage.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void hideBackButton() {
-        mPreviousButton.setVisibility(View.INVISIBLE);
-        mPreviousButtonImage.setVisibility(View.INVISIBLE);
+    public void setSubmitButtonEnabled(boolean enabled) {
+        if (enabled) {
+            mNextButton.setVisibility(View.VISIBLE);
+            mNextButtonImage.setVisibility(View.VISIBLE);
+            mNextButton.setText(getString(R.string.finish));
+        } else {
+            mNextButton.setVisibility(View.INVISIBLE);
+            mNextButtonImage.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
