@@ -547,6 +547,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
         mView.setIndeterminateProgressIndicator(true);
         mCurrentQuestionNum--;
         mAnswerComplete = true;
+        checkMissingAnswer();
         displayCurrentQuestion();
     }
 
@@ -560,8 +561,25 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
             mCurrentQuestionNum++;
             if (mCurrentQuestionNum > mAnswers.size()) {
                 mAnswerComplete = false;
+            } else {
+                checkMissingAnswer();
             }
             displayCurrentQuestion();
+        }
+    }
+
+    private void checkMissingAnswer() {
+        Answer answer = mAnswers.get("a" + mCurrentQuestionNum);
+        Map<String, Option> answerOptions = answer.getSelectedOptions();
+        if (answerOptions != null) {
+            for (Option option : answerOptions.values()) {
+                if (option.getHasExtraInput()) {
+                    String extraInput = option.getExtraInput();
+                    if (extraInput == null || extraInput.contentEquals("")) {
+                        mAnswerComplete = false;
+                    }
+                }
+            }
         }
     }
 
@@ -576,6 +594,21 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 mCurrentQuestionNum = i;
                 displayCurrentQuestion();
                 mView.showSnackbar("Woops! You missed this question.", Snackbar.LENGTH_SHORT);
+                break;
+            } else {
+                for (Option option : answerOptions.values()) {
+                    if (option.getHasExtraInput()) {
+                        String extraInput = option.getExtraInput();
+                        if (extraInput == null || extraInput.contentEquals("")) {
+                            // Found a missing answer.
+                            surveyOk = false;
+                            mCurrentQuestionNum = i;
+                            displayCurrentQuestion();
+                            mView.showSnackbar("Woops! You missed this question.", Snackbar.LENGTH_SHORT);
+                            break;
+                        }
+                    }
+                }
             }
         }
 
