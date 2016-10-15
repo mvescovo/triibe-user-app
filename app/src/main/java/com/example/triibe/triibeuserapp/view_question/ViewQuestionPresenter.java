@@ -98,7 +98,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                     mAnswers = new HashMap<>();
                 }
 
-                // If the question ID was specified (such as from Espresso), go to the
+                // If the question ID was specified (such as from Espresso or rotation), go to the
                 // requested question. If "-1" is set (invalid question) then just go to
                 // the current question.
                 if (!mQuestionId.contentEquals("-1")) {
@@ -106,6 +106,9 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                     if (mAnswers.size() >= mNumProtectedQuestions && mCurrentQuestionNum <= mNumProtectedQuestions) {
                         mCurrentQuestionNum = mNumProtectedQuestions + 1;
                     }
+                    // Once we've moved to the required question, make sure won't don't go there
+                    // every time we load answers.
+                    mQuestionId = "-1";
                 } else {
                     if (!mSurveyResumed) {
                         // Move to the question the user is up to.
@@ -116,9 +119,9 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             // They have completed all questions, move to the last one.
                             mCurrentQuestionNum = mAnswers.size();
                         }
-                        mSurveyResumed = true;
                     }
                 }
+                mSurveyResumed = true;
                 displayCurrentQuestion();
             }
         });
@@ -279,6 +282,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             }
                         }
                     }
+                    mAnswerComplete = true;
+                    checkMissingAnswer();
                 } else {
                     mAnswerComplete = false;
                 }
