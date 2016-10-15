@@ -3,6 +3,7 @@ package com.example.triibe.triibeuserapp.view_question;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 
 import com.example.triibe.triibeuserapp.data.Answer;
@@ -553,15 +554,34 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
     public void goToNextQuestion() {
         mView.setIndeterminateProgressIndicator(true);
         if (mCurrentQuestionNum == mQuestions.size()) {
-            // We're at the last question and the survey is complete.
-            mTriibeRepository.markUserSurveyDone(mUserId, mSurveyId);
-            getSurveyPoints();
+            // We're at the last question and the survey might be complete.
+            checkMissingAnswers();
         } else {
             mCurrentQuestionNum++;
             if (mCurrentQuestionNum > mAnswers.size()) {
                 mAnswerComplete = false;
             }
             displayCurrentQuestion();
+        }
+    }
+
+    private void checkMissingAnswers() {
+        boolean surveyOk = true;
+        for (int i = 1; i <= mAnswers.size(); i++) {
+            Answer answer = mAnswers.get("a" + i);
+            Map<String, Option> answerOptions = answer.getSelectedOptions();
+            if (answerOptions == null) {
+                // Found a missing answer.
+                surveyOk = false;
+                mCurrentQuestionNum = i;
+                displayCurrentQuestion();
+                mView.showSnackbar("Woops! You missed this question.", Snackbar.LENGTH_SHORT);
+            }
+        }
+
+        if (surveyOk) {
+            mTriibeRepository.markUserSurveyDone(mUserId, mSurveyId);
+            getSurveyPoints();
         }
     }
 
