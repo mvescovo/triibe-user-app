@@ -5,6 +5,7 @@
 .DS_Store
 /build
 /captures
+.idea
 
 # so we can have different debug keys
 google-services.json
