@@ -124,6 +124,8 @@ public class ViewQuestionActivity extends AppCompatActivity
         }
         if (getIntent().getStringExtra(EXTRA_QUESTION_ID) != null) {
             mQuestionId = getIntent().getStringExtra(EXTRA_QUESTION_ID);
+        } else if (savedInstanceState != null && savedInstanceState.get(EXTRA_QUESTION_ID) != null) {
+            mQuestionId = savedInstanceState.getString(EXTRA_QUESTION_ID);
         } else {
             mQuestionId = "-1";
         }
@@ -157,6 +159,13 @@ public class ViewQuestionActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mUserActionsListener.loadCurrentQuestion();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(EXTRA_QUESTION_ID,
+                "q" + ((ViewQuestionPresenter)mUserActionsListener).getCurrentQuestionNum());
     }
 
     @Override
