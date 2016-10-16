@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author michael.
  */
-public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener {
+class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener {
 
     private static final String TAG = "ViewQuestionPresenter";
     private Map<String, Question> mQuestions;
@@ -37,12 +37,11 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
     private int mCurrentQuestionNum;
     private String mSurveyPoints;
     private boolean mAnswerComplete;
-    private boolean mSurveyResumed = false;
+    private boolean mSurveyResumed;
 
-
-    public ViewQuestionPresenter(TriibeRepository triibeRepository, ViewQuestionContract.View view,
-                                 String surveyId, String userId, String questionId,
-                                 int numProtectedQuestions) {
+    ViewQuestionPresenter(TriibeRepository triibeRepository, ViewQuestionContract.View view,
+                          String surveyId, String userId, String questionId,
+                          int numProtectedQuestions) {
         mTriibeRepository = triibeRepository;
         mView = view;
         mSurveyId = surveyId;
@@ -51,13 +50,9 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
         mNumProtectedQuestions = numProtectedQuestions;
         mQuestions = new HashMap<>();
         mAnswers = new HashMap<>();
+        mCurrentQuestionNum = 1;
         mAnswerComplete = false;
-
-        if (!mQuestionId.contentEquals("-1")) {
-            mCurrentQuestionNum = Integer.valueOf(mQuestionId.substring(1));
-        } else {
-            mCurrentQuestionNum = 1;
-        }
+        mSurveyResumed = false;
     }
 
     @Override
@@ -98,38 +93,43 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
             @Override
             public void onAnswersLoaded(@Nullable Map<String, Answer> answers) {
                 EspressoIdlingResource.decrement();
-                mAnswers = answers;
-                if (mAnswers == null) {
+                if (answers != null) {
+                    mAnswers = answers;
+                } else {
                     mAnswers = new HashMap<>();
                 }
-
-                // If the question ID was specified (such as from Espresso or rotation), go to the
-                // requested question. If "-1" is set (invalid question) then just go to
-                // the current question.
-                if (!mQuestionId.contentEquals("-1")) {
-                    // Already went to the requested question. Adjust based on answers returned.
-                    if (mAnswers.size() >= mNumProtectedQuestions && mCurrentQuestionNum <= mNumProtectedQuestions) {
-                        mCurrentQuestionNum = mNumProtectedQuestions + 1;
-                    }
-                    // Once we've moved to the required question, make sure won't don't go there
-                    // every time we load answers.
-                    mQuestionId = "-1";
-                } else {
-                    if (!mSurveyResumed) {
-                        // Move to the question the user is up to.
-                        if (mAnswers.size() < mQuestions.size()) {
-                            // They haven't completed all questions so move to the next one.
-                            mCurrentQuestionNum = mAnswers.size() + 1;
-                        } else {
-                            // They have completed all questions, move to the last one.
-                            mCurrentQuestionNum = mAnswers.size();
-                        }
-                    }
-                }
-                mSurveyResumed = true;
-                displayCurrentQuestion();
+                moveToAppropriateQuestion();
             }
         });
+    }
+
+    private void moveToAppropriateQuestion() {
+        // Resume question after rotation
+        if (!mSurveyResumed) {
+            if (!mQuestionId.contentEquals("-1")) {
+                // Move to questionId passed in (savedState)
+                mCurrentQuestionNum = Integer.valueOf(mQuestionId.substring(1));
+
+                // Make sure to move past protected questions if current answer ok
+                if (mAnswers.size() > mNumProtectedQuestions && mCurrentQuestionNum <= mNumProtectedQuestions) {
+                    if (answerOk(mAnswers.get("a" + mCurrentQuestionNum))) {
+                        mCurrentQuestionNum = mNumProtectedQuestions + 1;
+                    }
+                }
+            } else {
+                // Move to the question the user is up to.
+                if (mAnswers.size() < mQuestions.size()) {
+                    // They haven't completed all questions so move to the next one.
+                    mCurrentQuestionNum = mAnswers.size() + 1;
+                } else {
+                    // They have completed all questions, move to the last one.
+                    mCurrentQuestionNum = mAnswers.size();
+                }
+            }
+            mSurveyResumed = true;
+        }
+
+        displayCurrentQuestion();
     }
 
     private void displayCurrentQuestion() {
@@ -287,10 +287,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             }
                         }
                     }
-                    mAnswerComplete = true;
-                    checkMissingAnswer();
-                } else {
-                    mAnswerComplete = false;
                 }
             }
             updateBackwardNav();
@@ -316,6 +312,20 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
 
     private void updateForwardNav() {
         boolean atLastQuestion = (mCurrentQuestionNum == mQuestions.size());
+        mAnswerComplete = answerOk(mAnswers.get("a" + mCurrentQuestionNum));
+
+
+        Log.d(TAG, "updateForwardNav: answers size: " + mAnswers.size());
+        Answer answer = mAnswers.get("a" + mCurrentQuestionNum);
+        if (answer == null) {
+            Log.d(TAG, "updateForwardNav: answer null");
+        } else {
+            Log.d(TAG, "updateForwardNav: answer not null");
+            Log.d(TAG, "updateForwardNav: answer ok: " + answerOk(answer));
+        }
+
+
+
 
         if (mAnswerComplete && !atLastQuestion) {
             mView.setNextButtonEnabled(true);
@@ -329,6 +339,31 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
         mView.setIndeterminateProgressIndicator(false);
     }
 
+
+    @Override
+    public void goToPreviousQuestion() {
+        mView.setIndeterminateProgressIndicator(true);
+        mCurrentQuestionNum--;
+        displayCurrentQuestion();
+    }
+
+    @Override
+    public void goToNextQuestion() {
+        mView.setIndeterminateProgressIndicator(true);
+        if (mCurrentQuestionNum == mQuestions.size()) {
+            // We're at the last question and the survey might be complete.
+            if (allAnswersOk()) {
+                mTriibeRepository.markUserSurveyDone(mUserId, mSurveyId);
+                getSurveyPoints();
+            } else {
+                mView.showSnackbar("Oops! You missed this question.", Snackbar.LENGTH_SHORT);
+            }
+        } else {
+            mCurrentQuestionNum++;
+            displayCurrentQuestion();
+        }
+    }
+
     @Override
     public void saveAnswer(final String answerPhrase, final String extraInput, final String type,
                            final boolean checked) {
@@ -337,7 +372,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
         Question question = mQuestions.get("q" + mCurrentQuestionNum);
         QuestionDetails questionDetails = question.getQuestionDetails();
         String questionId = questionDetails.getId();
-        String requiredPhrase = questionDetails.getRequiredPhrase();
         Map<String, Option> questionOptions = question.getOptions();
         Option option;
         Answer answer;
@@ -354,15 +388,12 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                     boolean hasExtraInput = option.getHasExtraInput();
                     if (optionPhrase.contentEquals(answerPhrase)) {
                         if (hasExtraInput) {
-                            mAnswerComplete = false;
-
                             // User must fill out extra input. Show the extra input box.
                             String extraInputHint = option.getExtraInputHint();
                             String extraInputType = option.getExtraInputType();
                             mView.showExtraInputTextboxItem(extraInputHint, extraInputType, null);
                         } else {
                             mView.hideExtraInputTextboxItem();
-                            mAnswerComplete = requiredPhrase == null || requiredPhrase.contentEquals(answerPhrase);
                         }
                         // Save a new answer
                         answerOptions.put("o" + i, option);
@@ -383,8 +414,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                     boolean hasExtraInput = option.getHasExtraInput();
                     if (optionPhrase.contentEquals(answerPhrase)) {
                         if (hasExtraInput) {
-                            mAnswerComplete = false;
-
                             // User must fill out extra input. Show the extra input box.
                             String extraInputHint = option.getExtraInputHint();
                             String extraInputType = option.getExtraInputType();
@@ -416,22 +445,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                                         "a" + mCurrentQuestionNum,
                                         answer
                                 );
-                                mAnswerComplete = requiredPhrase == null || requiredPhrase.contentEquals(answerPhrase);
-
-                                if (checked && hasExtraInput) {
-                                    mAnswerComplete = false;
-                                }
-
-                                // Check missing extra input answers for other answers.
-                                for (Option previousOption : previousOptions.values()) {
-                                    if (previousOption.getHasExtraInput()) {
-                                        String previousExtraInput = previousOption.getExtraInput();
-                                        if (previousExtraInput == null
-                                                || previousExtraInput.contentEquals("")) {
-                                            mAnswerComplete = false;
-                                        }
-                                    }
-                                }
                             }
                         } else {
                             // Create a new answer
@@ -444,7 +457,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                                         "a" + mCurrentQuestionNum,
                                         answer
                                 );
-                                mAnswerComplete = requiredPhrase == null || requiredPhrase.contentEquals(answerPhrase);
                             }
                         }
                     }
@@ -461,6 +473,7 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                         if (extraInputHint.contentEquals(answerPhrase)) {
                             option.setExtraInput(extraInput);
                             previousOptions.put("o" + i, option);
+                            answer.setSelectedOptions(previousOptions);
 
                             mTriibeRepository.saveAnswer(
                                     mSurveyId,
@@ -470,22 +483,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             );
                             // Don't reload back into a textchanged listener box.
                             reload = false;
-                            if (extraInput.contentEquals("")) {
-                                mAnswerComplete = false;
-                            } else {
-                                mAnswerComplete = true;
-                                // Check missing answers for other options.
-                                if (previousOptions.size() == questionOptions.size()) {
-                                    for (int j = 1; j <= previousOptions.size(); j++) {
-                                        Option previousOption = previousOptions.get("o" + j);
-                                        String previousExtraInput = previousOption.getExtraInput();
-                                        if (previousExtraInput.contentEquals("")) {
-                                            mAnswerComplete = false;
-                                        }
-                                    }
-                                }
-                            }
-                            updateBackwardNav();
                         }
                     }
                 } else {
@@ -506,12 +503,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                             );
                             // Don't reload back into a textchanged listener box.
                             reload = false;
-                            if (extraInput.contentEquals("")) {
-                                mAnswerComplete = false;
-                            } else if (questionOptions.size() == 1) {
-                                mAnswerComplete = true;
-                            }
-                            updateBackwardNav();
                         }
                     }
                 }
@@ -536,8 +527,6 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                                     );
                                     // Don't reload back into a textchanged listener box.
                                     reload = false;
-                                    mAnswerComplete = !answerPhrase.contentEquals("");
-                                    updateBackwardNav();
                                 }
                             }
                         }
@@ -551,83 +540,8 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
             mView.setIndeterminateProgressIndicator(true);
             loadAnswers(true);
         } else {
+            updateBackwardNav();
             mView.setIndeterminateProgressIndicator(false);
-        }
-    }
-
-    @Override
-    public void goToPreviousQuestion() {
-        mView.setIndeterminateProgressIndicator(true);
-        mCurrentQuestionNum--;
-        mAnswerComplete = true;
-        checkMissingAnswer();
-        displayCurrentQuestion();
-    }
-
-    @Override
-    public void goToNextQuestion() {
-        mView.setIndeterminateProgressIndicator(true);
-        if (mCurrentQuestionNum == mQuestions.size()) {
-            // We're at the last question and the survey might be complete.
-            checkMissingAnswers();
-        } else {
-            mCurrentQuestionNum++;
-            if (mCurrentQuestionNum > mAnswers.size()) {
-                mAnswerComplete = false;
-            } else {
-                checkMissingAnswer();
-            }
-            displayCurrentQuestion();
-        }
-    }
-
-    private void checkMissingAnswer() {
-        Answer answer = mAnswers.get("a" + mCurrentQuestionNum);
-        Map<String, Option> answerOptions = answer.getSelectedOptions();
-        if (answerOptions != null) {
-            for (Option option : answerOptions.values()) {
-                if (option.getHasExtraInput()) {
-                    String extraInput = option.getExtraInput();
-                    if (extraInput == null || extraInput.contentEquals("")) {
-                        mAnswerComplete = false;
-                    }
-                }
-            }
-        }
-    }
-
-    private void checkMissingAnswers() {
-        boolean surveyOk = true;
-        for (int i = 1; i <= mAnswers.size(); i++) {
-            Answer answer = mAnswers.get("a" + i);
-            Map<String, Option> answerOptions = answer.getSelectedOptions();
-            if (answerOptions == null) {
-                // Found a missing answer.
-                surveyOk = false;
-                mCurrentQuestionNum = i;
-                displayCurrentQuestion();
-                mView.showSnackbar("Woops! You missed this question.", Snackbar.LENGTH_SHORT);
-                break;
-            } else {
-                for (Option option : answerOptions.values()) {
-                    if (option.getHasExtraInput()) {
-                        String extraInput = option.getExtraInput();
-                        if (extraInput == null || extraInput.contentEquals("")) {
-                            // Found a missing answer.
-                            surveyOk = false;
-                            mCurrentQuestionNum = i;
-                            displayCurrentQuestion();
-                            mView.showSnackbar("Woops! You missed this question.", Snackbar.LENGTH_SHORT);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (surveyOk) {
-            mTriibeRepository.markUserSurveyDone(mUserId, mSurveyId);
-            getSurveyPoints();
         }
     }
 
@@ -667,6 +581,105 @@ public class ViewQuestionPresenter implements ViewQuestionContract.UserActionsLi
                 }
             }
         });
+    }
+
+    private boolean allAnswersOk() {
+        boolean answersOk = true;
+
+        for (int i = 1; i <= mAnswers.size(); i++) {
+            Answer answer = mAnswers.get("a" + i);
+            if (!answerOk(answer)) {
+                answersOk = false;
+                mCurrentQuestionNum = i;
+            }
+        }
+
+        return answersOk;
+    }
+
+    private boolean answerOk(Answer answer) {
+        boolean answerOk = true;
+
+        if (missingAnswer(answer)) {
+            Log.d(TAG, "answerOk: missingAnswer");
+            answerOk = false;
+        } else if (missingOption(answer)) {
+            Log.d(TAG, "answerOk: missingOption");
+            answerOk = false;
+        } else if (missingExtraInput(answer)) {
+            Log.d(TAG, "answerOk: missingExtraInput");
+            answerOk = false;
+        } else if (requiredAnswerIncorrect(answer)) {
+            Log.d(TAG, "answerOk: requiredAnswerIncorrect");
+            answerOk = false;
+        }
+
+        return answerOk;
+    }
+
+    private boolean missingAnswer(Answer answer) {
+        boolean missingAnswer = false;
+
+        if (answer == null) {
+            missingAnswer = true;
+        }
+
+        return missingAnswer;
+    }
+
+    private boolean missingOption(Answer answer) {
+        boolean missingOption = false;
+
+        Map<String, Option> options = answer.getSelectedOptions();
+        if (options == null || options.size() == 0) {
+            missingOption = true;
+        }
+
+        return missingOption;
+    }
+
+    private boolean missingExtraInput(Answer answer) {
+        boolean missingExtraInput = false;
+
+        Map<String, Option> options = answer.getSelectedOptions();
+        for (Option option :
+                options.values()) {
+            boolean hasExtraInput = option.getHasExtraInput();
+            if (hasExtraInput) {
+                String extraInput = option.getExtraInput();
+                if (extraInput == null || extraInput.contentEquals("")) {
+                    missingExtraInput = true;
+                    break;
+                }
+            }
+        }
+
+        return missingExtraInput;
+    }
+
+    private boolean requiredAnswerIncorrect(Answer answer) {
+        boolean requiredAnswerIncorrect = false;
+
+        Question question = mQuestions.get(answer.getAnswerDetails().getQuestionId());
+
+        QuestionDetails questionDetails = question.getQuestionDetails();
+        String requiredPhrase = questionDetails.getRequiredPhrase();
+
+        if (requiredPhrase != null && !requiredPhrase.contentEquals("")) {
+            requiredAnswerIncorrect = true;
+
+            Map<String, Option> options = answer.getSelectedOptions();
+            for (Option option :
+                    options.values()) {
+                String phrase = option.getPhrase();
+                if (phrase.contentEquals(requiredPhrase)) {
+                    requiredAnswerIncorrect = false;
+                    break;
+                }
+            }
+        }
+
+        return requiredAnswerIncorrect;
     }
 
     @VisibleForTesting
