@@ -13,6 +13,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
@@ -446,35 +447,41 @@ public class ViewQuestionActivity extends AppCompatActivity
     @Override
     public void setBackButtonEnabled(boolean enabled) {
         if (enabled) {
-            mPreviousButton.setVisibility(View.VISIBLE);
-            mPreviousButtonImage.setVisibility(View.VISIBLE);
+            mPreviousButton.setEnabled(true);
+            mPreviousButtonImage.setEnabled(true);
+            mPreviousButtonImage.setColorFilter(ContextCompat.getColor(this, R.color.black));
         } else {
-            mPreviousButton.setVisibility(View.INVISIBLE);
-            mPreviousButtonImage.setVisibility(View.INVISIBLE);
+            mPreviousButton.setEnabled(false);
+            mPreviousButtonImage.setEnabled(false);
+            mPreviousButtonImage.setColorFilter(ContextCompat.getColor(this, R.color.disabled));
         }
     }
 
     @Override
     public void setNextButtonEnabled(boolean enabled) {
         if (enabled) {
-            mNextButton.setVisibility(View.VISIBLE);
-            mNextButtonImage.setVisibility(View.VISIBLE);
+            mNextButton.setEnabled(true);
+            mNextButtonImage.setEnabled(true);
+            mNextButtonImage.setColorFilter(ContextCompat.getColor(this, R.color.black));
             mNextButton.setText(getString(R.string.next));
         } else {
-            mNextButton.setVisibility(View.INVISIBLE);
-            mNextButtonImage.setVisibility(View.INVISIBLE);
+            mNextButton.setEnabled(false);
+            mNextButtonImage.setEnabled(false);
+            mNextButtonImage.setColorFilter(ContextCompat.getColor(this, R.color.disabled));
         }
     }
 
     @Override
     public void setSubmitButtonEnabled(boolean enabled) {
         if (enabled) {
-            mNextButton.setVisibility(View.VISIBLE);
-            mNextButtonImage.setVisibility(View.VISIBLE);
+            mNextButton.setEnabled(true);
+            mNextButtonImage.setEnabled(true);
+            mNextButtonImage.setColorFilter(ContextCompat.getColor(this, R.color.black));
             mNextButton.setText(getString(R.string.finish));
         } else {
-            mNextButton.setVisibility(View.INVISIBLE);
-            mNextButtonImage.setVisibility(View.INVISIBLE);
+            mNextButton.setEnabled(false);
+            mNextButtonImage.setEnabled(false);
+            mNextButtonImage.setColorFilter(ContextCompat.getColor(this, R.color.disabled));
         }
     }
 

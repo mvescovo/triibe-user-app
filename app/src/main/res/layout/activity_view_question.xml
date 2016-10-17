@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:src="@drawable/ic_chevron_left_black_24dp"
-            android:visibility="invisible"/>
+            android:visibility="visible"/>
 
         <Button
             android:id="@+id/previous_button"
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
             android:text="@string/previous_question"
-            android:visibility="invisible"/>
+            android:visibility="visible"/>
 
         <Button
             android:id="@+id/next_button"
@@ -57,7 +57,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="30dp"
             android:text="@string/next_question"
-            android:visibility="invisible"/>
+            android:visibility="visible"/>
 
         <ImageButton
             android:id="@+id/next_button_image"
@@ -67,7 +67,7 @@
             android:layout_alignParentEnd="true"
             android:clickable="false"
             android:src="@drawable/ic_chevron_right_black_24dp"
-            android:visibility="invisible"/>
+            android:visibility="visible"/>
 
     </RelativeLayout>
 
