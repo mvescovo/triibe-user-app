@@ -367,8 +367,6 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
     @Override
     public void saveAnswer(final String answerPhrase, final String extraInput, final String type,
                            final boolean checked) {
-        mView.setIndeterminateProgressIndicator(true);
-
         Question question = mQuestions.get("q" + mCurrentQuestionNum);
         QuestionDetails questionDetails = question.getQuestionDetails();
         String questionId = questionDetails.getId();
@@ -537,11 +535,9 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
 
         if (reload) {
             // Make sure local answers are now updated with the saved answer.
-            mView.setIndeterminateProgressIndicator(true);
             loadAnswers(true);
         } else {
             updateBackwardNav();
-            mView.setIndeterminateProgressIndicator(false);
         }
     }
 
