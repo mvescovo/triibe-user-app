@@ -140,7 +140,7 @@ public class GetPermissionsActivity extends AppCompatActivity
 
     private boolean getAppUsagePermission() {
         boolean hasAppUsagePermission = false;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (!AppUsageStats.getUsageStatsList(this).isEmpty()) {
                 hasAppUsagePermission = true;
                 mGrantAppUsagePermissionButton.setText(R.string.remove_permission);

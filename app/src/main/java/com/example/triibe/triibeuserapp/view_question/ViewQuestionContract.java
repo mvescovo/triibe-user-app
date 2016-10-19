@@ -69,7 +69,7 @@ public interface ViewQuestionContract {
 
         void setSubmitButtonEnabled(boolean enabled);
 
-        void hideOptions();
+//        void hideOptions();
 
         void showPointsAccumulatorScreen(@NonNull String surveyPoints);
 

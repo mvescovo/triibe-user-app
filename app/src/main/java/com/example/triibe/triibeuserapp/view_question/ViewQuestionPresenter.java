@@ -79,12 +79,12 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
                 } else {
                     mQuestions = new HashMap<>();
                 }
-                loadAnswers(true);
+                loadAnswers(true, true);
             }
         });
     }
 
-    private void loadAnswers(@NonNull Boolean forceUpdate) {
+    private void loadAnswers(@NonNull final Boolean forceUpdate, @NonNull final Boolean displayAnswer) {
         if (forceUpdate) {
             mTriibeRepository.refreshAnswers();
         }
@@ -98,7 +98,14 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
                 } else {
                     mAnswers = new HashMap<>();
                 }
-                moveToAppropriateQuestion();
+                if (displayAnswer) {
+                    // Move to the appropriate question and then also display the qestion and answer.
+                    moveToAppropriateQuestion();
+                } else {
+                    // No need to display the question. Don't want to display the answer again as
+                    // it will cause textchanged listeners to trigger a save and result in a loop.
+                    updateBackwardNav();
+                }
             }
         });
     }
@@ -314,19 +321,6 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
         boolean atLastQuestion = (mCurrentQuestionNum == mQuestions.size());
         mAnswerComplete = answerOk(mAnswers.get("a" + mCurrentQuestionNum));
 
-
-        Log.d(TAG, "updateForwardNav: answers size: " + mAnswers.size());
-        Answer answer = mAnswers.get("a" + mCurrentQuestionNum);
-        if (answer == null) {
-            Log.d(TAG, "updateForwardNav: answer null");
-        } else {
-            Log.d(TAG, "updateForwardNav: answer not null");
-            Log.d(TAG, "updateForwardNav: answer ok: " + answerOk(answer));
-        }
-
-
-
-
         if (mAnswerComplete && !atLastQuestion) {
             mView.setNextButtonEnabled(true);
         } else {
@@ -376,7 +370,6 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
         AnswerDetails answerDetails = new AnswerDetails(questionId, "a" +
                 mCurrentQuestionNum, type);
         Map<String, Option> answerOptions = new HashMap<>();
-        boolean reload = true;
 
         switch (type) {
             case "radio":
@@ -472,15 +465,12 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
                             option.setExtraInput(extraInput);
                             previousOptions.put("o" + i, option);
                             answer.setSelectedOptions(previousOptions);
-
                             mTriibeRepository.saveAnswer(
                                     mSurveyId,
                                     mUserId,
                                     "a" + mCurrentQuestionNum,
                                     answer
                             );
-                            // Don't reload back into a textchanged listener box.
-                            reload = false;
                         }
                     }
                 } else {
@@ -499,8 +489,6 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
                                     "a" + mCurrentQuestionNum,
                                     answer
                             );
-                            // Don't reload back into a textchanged listener box.
-                            reload = false;
                         }
                     }
                 }
@@ -523,8 +511,6 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
                                             "a" + mCurrentQuestionNum,
                                             extraTextAnswer
                                     );
-                                    // Don't reload back into a textchanged listener box.
-                                    reload = false;
                                 }
                             }
                         }
@@ -533,12 +519,9 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
                 break;
         }
 
-        if (reload) {
-            // Make sure local answers are now updated with the saved answer.
-            loadAnswers(true);
-        } else {
-            updateBackwardNav();
-        }
+        // Don't redisplay answer after saving otherwise the textchanged listener will cause a loop.
+        // However we need to load the new version of the answers so the local cache is updated.
+        loadAnswers(true, false);
     }
 
     private void getSurveyPoints() {
@@ -580,6 +563,8 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
     }
 
     private boolean allAnswersOk() {
+        mView.setIndeterminateProgressIndicator(true);
+
         boolean answersOk = true;
 
         for (int i = 1; i <= mAnswers.size(); i++) {
@@ -587,8 +572,11 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
             if (!answerOk(answer)) {
                 answersOk = false;
                 mCurrentQuestionNum = i;
+                displayCurrentQuestion();
             }
         }
+
+        mView.setIndeterminateProgressIndicator(false);
 
         return answersOk;
     }
@@ -626,9 +614,16 @@ class ViewQuestionPresenter implements ViewQuestionContract.UserActionsListener 
     private boolean missingOption(Answer answer) {
         boolean missingOption = false;
 
-        Map<String, Option> options = answer.getSelectedOptions();
-        if (options == null || options.size() == 0) {
+        Map<String, Option> answerOptions = answer.getSelectedOptions();
+        if (answerOptions == null || answerOptions.size() == 0) {
             missingOption = true;
+        } else if (answer.getAnswerDetails().getType().contentEquals("text")) {
+            // Need to have all options answered for text questions.
+            Question question = mQuestions.get(answer.getAnswerDetails().getQuestionId());
+            Map<String, Option> questionOptions = question.getOptions();
+            if (questionOptions.size() != answerOptions.size()) {
+                missingOption = true;
+            }
         }
 
         return missingOption;
