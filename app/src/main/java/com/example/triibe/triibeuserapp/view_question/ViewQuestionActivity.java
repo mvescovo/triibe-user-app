@@ -13,6 +13,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
@@ -57,6 +58,8 @@ public class ViewQuestionActivity extends AppCompatActivity
     private String mUserId;
     private String mQuestionId;
     private int mNumProtectedQuestions;
+    private TextWatcher mTextAnswerTextWatcher;
+    private TextWatcher mExtraTextAnswerTextWatcher;
 
     @BindView(R.id.view_root)
     RelativeLayout mRootView;
@@ -380,6 +383,10 @@ public class ViewQuestionActivity extends AppCompatActivity
     public void showTextboxGroup() {
         mRadioGroup.setVisibility(View.GONE);
         mCheckboxGroup.setVisibility(View.GONE);
+        for (int i = 0; i < mEditTextGroup.getChildCount(); i++) {
+            TextInputEditText editText = (TextInputEditText) mEditTextGroup.getChildAt(i);
+            editText.removeTextChangedListener(mTextAnswerTextWatcher);
+        }
         mEditTextGroup.removeAllViews();
         mEditTextGroup.setVisibility(View.VISIBLE);
     }
@@ -406,11 +413,9 @@ public class ViewQuestionActivity extends AppCompatActivity
                     textInputEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
                     break;
             }
-            textInputEditText.addTextChangedListener(new TextWatcher() {
+            mTextAnswerTextWatcher = new TextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                }
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -419,10 +424,9 @@ public class ViewQuestionActivity extends AppCompatActivity
                 }
 
                 @Override
-                public void afterTextChanged(Editable s) {
-
-                }
-            });
+                public void afterTextChanged(Editable s) {}
+            };
+            textInputEditText.addTextChangedListener(mTextAnswerTextWatcher);
             mEditTextGroup.addView(textInputEditText);
         } else {
             // If answerPhrase is not null then we just need to update an existing textbox with
@@ -446,45 +450,51 @@ public class ViewQuestionActivity extends AppCompatActivity
     @Override
     public void setBackButtonEnabled(boolean enabled) {
         if (enabled) {
-            mPreviousButton.setVisibility(View.VISIBLE);
-            mPreviousButtonImage.setVisibility(View.VISIBLE);
+            mPreviousButton.setEnabled(true);
+            mPreviousButtonImage.setEnabled(true);
+            mPreviousButtonImage.setColorFilter(ContextCompat.getColor(this, R.color.black));
         } else {
-            mPreviousButton.setVisibility(View.INVISIBLE);
-            mPreviousButtonImage.setVisibility(View.INVISIBLE);
+            mPreviousButton.setEnabled(false);
+            mPreviousButtonImage.setEnabled(false);
+            mPreviousButtonImage.setColorFilter(ContextCompat.getColor(this, R.color.disabled));
         }
     }
 
     @Override
     public void setNextButtonEnabled(boolean enabled) {
         if (enabled) {
-            mNextButton.setVisibility(View.VISIBLE);
-            mNextButtonImage.setVisibility(View.VISIBLE);
+            mNextButton.setEnabled(true);
+            mNextButtonImage.setEnabled(true);
+            mNextButtonImage.setColorFilter(ContextCompat.getColor(this, R.color.black));
             mNextButton.setText(getString(R.string.next));
         } else {
-            mNextButton.setVisibility(View.INVISIBLE);
-            mNextButtonImage.setVisibility(View.INVISIBLE);
+            mNextButton.setEnabled(false);
+            mNextButtonImage.setEnabled(false);
+            mNextButtonImage.setColorFilter(ContextCompat.getColor(this, R.color.disabled));
         }
     }
 
     @Override
     public void setSubmitButtonEnabled(boolean enabled) {
         if (enabled) {
-            mNextButton.setVisibility(View.VISIBLE);
-            mNextButtonImage.setVisibility(View.VISIBLE);
+            mNextButton.setEnabled(true);
+            mNextButtonImage.setEnabled(true);
+            mNextButtonImage.setColorFilter(ContextCompat.getColor(this, R.color.black));
             mNextButton.setText(getString(R.string.finish));
         } else {
-            mNextButton.setVisibility(View.INVISIBLE);
-            mNextButtonImage.setVisibility(View.INVISIBLE);
+            mNextButton.setEnabled(false);
+            mNextButtonImage.setEnabled(false);
+            mNextButtonImage.setColorFilter(ContextCompat.getColor(this, R.color.disabled));
         }
     }
 
-    @Override
-    public void hideOptions() {
-        mRadioGroup.setVisibility(View.GONE);
-        mCheckboxGroup.setVisibility(View.GONE);
-        mEditTextGroup.removeAllViews();
-        mEditTextGroup.setVisibility(View.GONE);
-    }
+//    @Override
+//    public void hideOptions() {
+//        mRadioGroup.setVisibility(View.GONE);
+//        mCheckboxGroup.setVisibility(View.GONE);
+//        mEditTextGroup.removeAllViews();
+//        mEditTextGroup.setVisibility(View.GONE);
+//    }
 
     @Override
     public void showPointsAccumulatorScreen(@NonNull String surveyPoints) {

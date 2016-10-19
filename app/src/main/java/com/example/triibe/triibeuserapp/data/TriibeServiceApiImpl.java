@@ -24,6 +24,7 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
     public TriibeServiceApiImpl() {
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mDatabase = FirebaseDatabase.getInstance().getReference();
+//        mDatabase.keepSynced(true);
     }
 
     

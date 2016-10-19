@@ -9,4 +9,6 @@
     <color name="colorFabNormal">#DA4336</color>
     <color name="colorGreen">#4CAF50</color>
     <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="disabled">#cccccc</color>
 </resources>
