@@ -3,6 +3,7 @@ package com.example.triibe.triibeuserapp.util;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author michael.
@@ -23,9 +24,10 @@ public final class Constants {
     public static final String BROADCAST_ACTION = "activityRecognition";
     public static final String ENROLLMENT_SURVEY_ID = "s1";
     public static final String FIRST_QUESTION_ID = "q1";
+    public static final int AP_LEVEL_DISTANCE = 15;
+    public static final Map<String, String> SOUTHLAND_APS = new HashMap<>();
 
-
-    public static final HashMap<String, LatLng> WESTFIELD_MALLS = new HashMap<>();
+    public static final Map<String, LatLng> WESTFIELD_MALLS = new HashMap<>();
     static {
         WESTFIELD_MALLS.put("southland", new LatLng(-37.958388, 145.052658));
     }

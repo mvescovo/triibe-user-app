@@ -1,4 +1,4 @@
-//package com.example.triibe.triibeuserapp.trackLocation;
+//package com.example.triibe.triibeuserapp.track_location;
 //
 //import android.app.Service;
 //import android.content.Context;
@@ -29,8 +29,6 @@
 //        }
 //        @Override
 //        public void handleMessage(Message msg) {
-//            // Normally we would do some work here, like download a file.
-//            // For our sample, we just sleep for 5 seconds.
 //            try {
 //                WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 //
