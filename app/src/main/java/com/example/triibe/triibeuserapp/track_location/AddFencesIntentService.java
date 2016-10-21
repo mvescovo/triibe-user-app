@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -37,9 +39,13 @@ import com.google.android.gms.common.api.ResultCallbacks;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * @author michael.
@@ -49,7 +55,6 @@ public class AddFencesIntentService extends IntentService
         GoogleApiClient.OnConnectionFailedListener,
         ResultCallback<Status> {
 
-    private static final String TAG = "AddFences";
     public final static String EXTRA_TRIIBE_FENCE_TYPE = "com.example.triibe.TRIIBE_FENCE_TYPE";
     public final static String TYPE_MALL = "com.example.triibe.TYPE_MALL";
     public final static String TYPE_LANDMARK = "com.example.triibe.TYPE_LANDMARK";
@@ -58,15 +63,22 @@ public class AddFencesIntentService extends IntentService
     public final static String EXTRA_LONGITUDE = "com.example.triibe.TRIIBE_LONGITUDE";
     public final static String EXTRA_RADIUS = "com.example.triibe.TRIIBE_RADIUS";
     public final static String EXTRA_DWELL = "com.example.triibe.TRIIBE_DWELL";
+    public final static String EXTRA_LEVEL = "com.example.triibe.TRIIBE_LEVEL";
     public final static String EXTRA_SURVEY_DESCRIPTION = "com.example.triibe.TRIIBE_SURVEY_DESCRIPTION";
     public final static String EXTRA_NUM_PROTECTED_QUESTIONS = "com.example.triibe.TRIIBE_SURVEY_NUM_PROTECTED_QUESTIONS";
     public final static String EXTRA_REQUEST_CODE = "com.example.triibe.TRIIBE_REQUEST_CODE";
+    private static final String TAG = "AddFences";
     private GoogleApiClient mGoogleApiClient;
     private PendingIntent mPendingIntent;
     private volatile List<Intent> mIntents;
 
     public AddFencesIntentService() {
         super(TAG);
+    }
+
+    public static double calculateDistance(double signalLevelInDb, double freqInMHz) {
+        double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(signalLevelInDb)) / 20.0;
+        return Math.pow(10.0, exp);
     }
 
     @Override
@@ -85,12 +97,17 @@ public class AddFencesIntentService extends IntentService
     @Override
     protected void onHandleIntent(Intent intent) {
         String surveyDescription = "";
+        String triggerLevel = "";
         int requestCode;
         requestCode = intent.getIntExtra(EXTRA_REQUEST_CODE, 0);
         Intent fenceIntent = new Intent(this, fenceReceiver.class);
         if (intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION) != null) {
             surveyDescription = intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION);
             fenceIntent.putExtra(EXTRA_SURVEY_DESCRIPTION, surveyDescription);
+        }
+        if (intent.getStringExtra(EXTRA_LEVEL) != null) {
+            triggerLevel = intent.getStringExtra(EXTRA_LEVEL);
+            fenceIntent.putExtra(EXTRA_LEVEL, triggerLevel);
         }
         mPendingIntent = PendingIntent.getBroadcast(this, requestCode, fenceIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -125,13 +142,13 @@ public class AddFencesIntentService extends IntentService
                 if (intent.getStringExtra(EXTRA_LATITUDE) != null) {
                     lat = intent.getStringExtra(EXTRA_LATITUDE);
                 }
-                if (intent.getStringExtra(EXTRA_LONGITUDE )!= null) {
+                if (intent.getStringExtra(EXTRA_LONGITUDE) != null) {
                     lon = intent.getStringExtra(EXTRA_LONGITUDE);
                 }
-                if (intent.getStringExtra(EXTRA_RADIUS )!= null) {
+                if (intent.getStringExtra(EXTRA_RADIUS) != null) {
                     radius = intent.getStringExtra(EXTRA_RADIUS);
                 }
-                if (intent.getStringExtra(EXTRA_DWELL )!= null) {
+                if (intent.getStringExtra(EXTRA_DWELL) != null) {
                     dwell = intent.getStringExtra(EXTRA_DWELL);
                 }
                 if (!key.contentEquals("") && !lat.contentEquals("") && !lon.contentEquals("")
@@ -295,6 +312,12 @@ public class AddFencesIntentService extends IntentService
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
             FenceState fenceState = FenceState.extract(intent);
+            String triggerLevel = "0";
+            if (intent.getStringExtra(EXTRA_LEVEL) != null) {
+                triggerLevel = intent.getStringExtra(EXTRA_LEVEL);
+            } else {
+                Log.d(TAG, "onReceive: trigger level is NULL");
+            }
             String surveyDescription = "No description.";
             if (intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION) != null) {
                 surveyDescription = intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION);
@@ -346,34 +369,85 @@ public class AddFencesIntentService extends IntentService
                     case FenceState.TRUE:
                         Log.d(TAG, "In non mall fence");
 
-                        SharedPreferences sharedPref = context.getSharedPreferences(
-                                context.getString(R.string.user_id),
-                                Context.MODE_PRIVATE
-                        );
-                        String userId = sharedPref.getString(context.getString(R.string.user_id), "testUser");
+                        // In the fence but need to check what level we're on before issuing notification.
 
-                        // Add survey to user's survey list
-                        mTriibeRepository.addUserSurvey(userId, fenceState.getFenceKey());
+                        // Add AP levels.
+                        if (Constants.SOUTHLAND_APS.size() == 0) {
+                            InputStreamReader inputStreamReader = null;
+                            try {
+                                inputStreamReader = new InputStreamReader(context.getAssets().open("southlandApAddressData.csv"));
+                                BufferedReader reader = new BufferedReader(inputStreamReader);
+                                reader.readLine();
+                                String line;
+                                StringTokenizer stringTokenizer;
+                                while ((line = reader.readLine()) != null) {
+                                    stringTokenizer = new StringTokenizer(line, ",");
+                                    stringTokenizer.nextToken();
+                                    String macAddress = stringTokenizer.nextToken();
+                                    String level = stringTokenizer.nextToken().substring(1);
+                                    Constants.SOUTHLAND_APS.put(macAddress, level);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
 
-                        // Show survey notification
-                        NotificationCompat.Builder mBuilder =
-                                new NotificationCompat.Builder(context)
-                                        .setSmallIcon(R.drawable.westfieldicon_transparent)
-                                        .setContentTitle("New Survey Available")
-                                        .setContentText(surveyDescription)
-                                        .setAutoCancel(true);
-                        Intent resultIntent = new Intent(context, ViewQuestionActivity.class);
-                        resultIntent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, fenceState.getFenceKey());
-                        resultIntent.putExtra(ViewQuestionActivity.EXTRA_USER_ID, userId);
-                        resultIntent.putExtra(EXTRA_NUM_PROTECTED_QUESTIONS, numProtectedQuestions);
+                        // Level of a Scan Result
+                        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                        List<ScanResult> wifiList = wifiManager.getScanResults();
+                        boolean showSurvey = false;
+                        for (ScanResult scanResult : wifiList) {
+                            String ssid = scanResult.SSID;
+                            int rssi = scanResult.level;
+                            int frequency = scanResult.frequency;
+                            double distance = calculateDistance(rssi, frequency);
+                            String macAddress = scanResult.BSSID;
 
-                        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-                        stackBuilder.addParentStack(ViewQuestionActivity.class);
-                        stackBuilder.addNextIntent(resultIntent);
-                        PendingIntent resultPendingIntent =
-                                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-                        mBuilder.setContentIntent(resultPendingIntent);
-                        mNotificationManager.notify(fenceState.getFenceKey(), 1, mBuilder.build());
+                            if (distance <= Constants.AP_LEVEL_DISTANCE) {
+                                for (String southLandmacAddress :
+                                        Constants.SOUTHLAND_APS.keySet()) {
+                                    if (southLandmacAddress.contentEquals(macAddress)
+                                            && Constants.SOUTHLAND_APS
+                                            .get(southLandmacAddress)
+                                            .contentEquals(triggerLevel)) {
+                                        showSurvey = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (showSurvey) {
+                            // Get current user id
+                            SharedPreferences sharedPref = context.getSharedPreferences(
+                                    context.getString(R.string.user_id),
+                                    Context.MODE_PRIVATE
+                            );
+                            String userId = sharedPref.getString(context.getString(R.string.user_id), "testUser");
+
+                            // Add survey to user's survey list
+                            mTriibeRepository.addUserSurvey(userId, fenceState.getFenceKey());
+
+                            // Show survey notification
+                            NotificationCompat.Builder mBuilder =
+                                    new NotificationCompat.Builder(context)
+                                            .setSmallIcon(R.drawable.westfieldicon_transparent)
+                                            .setContentTitle("New Survey Available")
+                                            .setContentText(surveyDescription)
+                                            .setAutoCancel(true);
+                            Intent resultIntent = new Intent(context, ViewQuestionActivity.class);
+                            resultIntent.putExtra(ViewQuestionActivity.EXTRA_SURVEY_ID, fenceState.getFenceKey());
+                            resultIntent.putExtra(ViewQuestionActivity.EXTRA_USER_ID, userId);
+                            resultIntent.putExtra(EXTRA_NUM_PROTECTED_QUESTIONS, numProtectedQuestions);
+
+                            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+                            stackBuilder.addParentStack(ViewQuestionActivity.class);
+                            stackBuilder.addNextIntent(resultIntent);
+                            PendingIntent resultPendingIntent =
+                                    stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                            mBuilder.setContentIntent(resultPendingIntent);
+                            mNotificationManager.notify(fenceState.getFenceKey(), 1, mBuilder.build());
+                        }
 
                         break;
                     case FenceState.FALSE:
