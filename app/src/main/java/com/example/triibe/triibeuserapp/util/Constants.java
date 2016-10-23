@@ -24,7 +24,7 @@ public final class Constants {
     public static final String BROADCAST_ACTION = "activityRecognition";
     public static final String ENROLLMENT_SURVEY_ID = "s1";
     public static final String FIRST_QUESTION_ID = "q1";
-    public static final int AP_LEVEL_DISTANCE = 15;
+    public static final int AP_LEVEL_DISTANCE_DEFAULT = 10;
     public static final Map<String, String> SOUTHLAND_APS = new HashMap<>();
 
     public static final Map<String, LatLng> WESTFIELD_MALLS = new HashMap<>();

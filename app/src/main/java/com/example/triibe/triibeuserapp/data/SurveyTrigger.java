@@ -19,6 +19,7 @@ public class SurveyTrigger {
     private String mRadius;
     private String mDwell;
     private String mLevel;
+    private String mLevelDistance;
     private String mTime;
 
     // Empty constructor required for firebase
@@ -40,7 +41,7 @@ public class SurveyTrigger {
     }
 
     public SurveyTrigger(String surveyId, String id, String latitude, String longitude,
-                         String radius, String dwell, String level) {
+                         String radius, String dwell, String level, String levelDistance) {
         mSurveyId = surveyId;
         mId = id;
         mLatitude = latitude;
@@ -48,6 +49,7 @@ public class SurveyTrigger {
         mRadius = radius;
         mDwell = dwell;
         mLevel = level;
+        mLevelDistance = levelDistance;
     }
 
     public SurveyTrigger(String surveyId, String id, String time) {
@@ -57,7 +59,7 @@ public class SurveyTrigger {
     }
 
     public SurveyTrigger(String surveyId, String id, String latitude, String longitude,
-                         String radius, String dwell, String level, String time) {
+                         String radius, String dwell, String level, String levelDistance, String time) {
         mSurveyId = surveyId;
         mId = id;
         mLatitude = latitude;
@@ -65,6 +67,7 @@ public class SurveyTrigger {
         mRadius = radius;
         mDwell = dwell;
         mLevel = level;
+        mLevelDistance = levelDistance;
         mTime = time;
     }
 
@@ -130,6 +133,14 @@ public class SurveyTrigger {
         mLevel = level;
     }
 
+    public String getLevelDistance() {
+        return mLevelDistance;
+    }
+
+    public void setLevelDistance(String levelDistance) {
+        mLevelDistance = levelDistance;
+    }
+
     public String getTime() {
         return mTime;
     }
@@ -149,6 +160,7 @@ public class SurveyTrigger {
         result.put("radius", mRadius);
         result.put("dwell", mDwell);
         result.put("level", mLevel);
+        result.put("levelDistance", mLevelDistance);
         result.put("time", mTime);
         return result;
     }

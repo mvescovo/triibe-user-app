@@ -221,12 +221,18 @@ public class RunAppWhenAtMallService extends Service {
                     AddFencesIntentService.EXTRA_DWELL,
                     trigger.getDwell()
             );
-            Log.d(TAG, "addFence: going to add trigger level of: " + trigger.getLevel());
             // Add floor level so it can be validated when the fence is triggered.
             addLocationFencesIntent.putExtra(
                     AddFencesIntentService.EXTRA_LEVEL,
                     trigger.getLevel()
             );
+            // Add floor level distance so it can be used when the fence is triggered.
+            if (trigger.getLevelDistance() != null) {
+                addLocationFencesIntent.putExtra(
+                        AddFencesIntentService.EXTRA_LEVEL_DISTANCE,
+                        trigger.getLevelDistance()
+                );
+            }
             // Add survey description so it can be shown on the notification.
             addLocationFencesIntent.putExtra(
                     AddFencesIntentService.EXTRA_SURVEY_DESCRIPTION,

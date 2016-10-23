@@ -95,6 +95,9 @@ public class EditTriggerActivity extends AppCompatActivity
     @BindView(R.id.level)
     TextInputEditText mLevel;
 
+    @BindView(R.id.level_distance)
+    TextInputEditText mLevelDistance;
+
     @BindView(R.id.time)
     TextInputEditText mTime;
 
@@ -177,6 +180,7 @@ public class EditTriggerActivity extends AppCompatActivity
         mRadius.setText(trigger.getRadius());
         mDwell.setText(trigger.getDwell());
         mLevel.setText(trigger.getLevel());
+        mLevelDistance.setText(trigger.getLevelDistance());
         mTime.setText(trigger.getTime());
     }
 
@@ -283,6 +287,9 @@ public class EditTriggerActivity extends AppCompatActivity
         if (!mLevel.getText().toString().trim().contentEquals("")) {
             trigger.setLevel(mLevel.getText().toString().trim());
         }
+        if (!mLevelDistance.getText().toString().trim().contentEquals("")) {
+            trigger.setLevelDistance(mLevelDistance.getText().toString().trim());
+        }
         if (!mTime.getText().toString().trim().contentEquals("")) {
             trigger.setTime(mTime.getText().toString().trim());
         }
@@ -322,6 +329,7 @@ public class EditTriggerActivity extends AppCompatActivity
         mRadius.setText("");
         mDwell.setText("");
         mLevel.setText("");
+        mLevelDistance.setText("");
         mTime.setText("");
     }
 

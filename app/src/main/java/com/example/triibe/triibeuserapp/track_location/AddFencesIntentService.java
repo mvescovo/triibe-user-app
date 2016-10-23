@@ -64,6 +64,7 @@ public class AddFencesIntentService extends IntentService
     public final static String EXTRA_RADIUS = "com.example.triibe.TRIIBE_RADIUS";
     public final static String EXTRA_DWELL = "com.example.triibe.TRIIBE_DWELL";
     public final static String EXTRA_LEVEL = "com.example.triibe.TRIIBE_LEVEL";
+    public final static String EXTRA_LEVEL_DISTANCE = "com.example.triibe.TRIIBE_LEVEL_DISTANCE";
     public final static String EXTRA_SURVEY_DESCRIPTION = "com.example.triibe.TRIIBE_SURVEY_DESCRIPTION";
     public final static String EXTRA_NUM_PROTECTED_QUESTIONS = "com.example.triibe.TRIIBE_SURVEY_NUM_PROTECTED_QUESTIONS";
     public final static String EXTRA_REQUEST_CODE = "com.example.triibe.TRIIBE_REQUEST_CODE";
@@ -315,8 +316,10 @@ public class AddFencesIntentService extends IntentService
             String triggerLevel = "0";
             if (intent.getStringExtra(EXTRA_LEVEL) != null) {
                 triggerLevel = intent.getStringExtra(EXTRA_LEVEL);
-            } else {
-                Log.d(TAG, "onReceive: trigger level is NULL");
+            }
+            int triggerLevelDistance = Constants.AP_LEVEL_DISTANCE_DEFAULT;
+            if (intent.getStringExtra(EXTRA_LEVEL_DISTANCE) != null) {
+                triggerLevelDistance = Integer.valueOf(intent.getStringExtra(EXTRA_LEVEL_DISTANCE));
             }
             String surveyDescription = "No description.";
             if (intent.getStringExtra(EXTRA_SURVEY_DESCRIPTION) != null) {
@@ -403,7 +406,7 @@ public class AddFencesIntentService extends IntentService
                             double distance = calculateDistance(rssi, frequency);
                             String macAddress = scanResult.BSSID;
 
-                            if (distance <= Constants.AP_LEVEL_DISTANCE) {
+                            if (distance <= triggerLevelDistance) {
                                 for (String southLandmacAddress :
                                         Constants.SOUTHLAND_APS.keySet()) {
                                     if (southLandmacAddress.contentEquals(macAddress)
