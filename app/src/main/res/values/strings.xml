@@ -140,6 +140,7 @@
     <string name="edit_trigger_radius_hint">Radius in metres*</string>
     <string name="edit_trigger_dwell_hint">Dwell in seconds*</string>
     <string name="edit_trigger_level_hint">Level</string>
+    <string name="edit_trigger_level_distance">Level distance in metres</string>
     <string name="edit_trigger_time_hint">Time</string>
     <string name="delete_trigger">Delete trigger</string>
 

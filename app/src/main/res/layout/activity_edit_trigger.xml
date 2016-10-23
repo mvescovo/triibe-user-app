@@ -132,6 +132,20 @@
                     android:layout_height="wrap_content">
 
                     <android.support.design.widget.TextInputEditText
+                        android:id="@+id/level_distance"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/edit_trigger_level_distance"
+                        android:inputType="time"/>
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <android.support.design.widget.TextInputEditText
                         android:id="@+id/time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
