@@ -10,11 +10,13 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.Process;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.triibe.triibeuserapp.R;
 import com.example.triibe.triibeuserapp.data.SurveyDetails;
@@ -38,6 +40,9 @@ import static com.example.triibe.triibeuserapp.track_location.AddFencesIntentSer
  * @author michael.
  */
 public class RunAppWhenAtMallService extends Service {
+    //code to allow the service to run while the screen is switched off.
+    PowerManager mgr;
+    PowerManager.WakeLock wakeLock;
 
     public final static String EXTRA_USER_ID = "com.example.triibe.USER_ID";
     private static final String TAG = "RunAppWhenAtMallService";
@@ -59,6 +64,12 @@ public class RunAppWhenAtMallService extends Service {
         HandlerThread thread = new HandlerThread("ServiceStartArguments",
                 Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
+
+        //power manegment.
+        mgr = (PowerManager)this.getSystemService(Context.POWER_SERVICE);
+        wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
+        wakeLock.acquire();
+
 
         // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();
@@ -121,11 +132,17 @@ public class RunAppWhenAtMallService extends Service {
             }
         });
 
-        /*
+        /**
         * Matt's services
         * */
-//        startService(new Intent(getBaseContext(), IpService.class));
-//        startService(new Intent(getBaseContext(), UsageStatsService.class));
+
+        Intent ipService = new Intent(this, IpService.class);
+        ipService.putExtra("USERID", mUserId);
+        startService(ipService);
+
+        Intent usageService = new Intent(this, UsageStatsService.class);
+        usageService.putExtra("USERID", mUserId);
+        startService(usageService);
 
         return START_STICKY;
     }
@@ -256,8 +273,12 @@ public class RunAppWhenAtMallService extends Service {
 
     @Override
     public void onDestroy() {
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        stopService(new Intent(getBaseContext(), IpService.class));
+        stopService(new Intent(getBaseContext(), UsageStatsService.class));
+        wakeLock.release();
+        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
+
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // Remove landmark fences
         List<String> landmarkFences = Globals.getInstance().getLandmarkFences();
@@ -270,7 +291,6 @@ public class RunAppWhenAtMallService extends Service {
             // Clear notifications.
             mNotificationManager.cancelAll();
         }
-
         // Remove surveys from users list
         for (int i = 0; i < mSurveys.size(); i++) {
             mTriibeRepository.removeUserSurvey(mUserId, mSurveys.get(i).getId());

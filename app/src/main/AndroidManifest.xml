@@ -130,6 +130,11 @@
         android:exported="false">
         </service>
 
+        <service android:name=".util.IpService">
+        </service>
+        <service android:name=".util.UsageStatsService">
+        </service>
+
         <!-- Receivers -->
         <receiver android:name=".track_location.AddFencesIntentService$BootDetectionBroadcastReceiver">
             <intent-filter>

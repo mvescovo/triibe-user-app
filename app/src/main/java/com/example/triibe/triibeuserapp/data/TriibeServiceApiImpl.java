@@ -456,5 +456,41 @@ public class TriibeServiceApiImpl implements TriibeServiceApi {
                 .setValue(null);
     }
 
-    // TODO: 25/09/16 maybe put a method to detach listeners when the activity is destroyed? Not sure if it's necessary.
+
+    /********Service Functions********/
+    @Override
+    public void getDataKey(@NonNull final GetDataKeyCallback callback) {
+        String key =  mDatabase.child("data").child("Total Connections").push().getKey();
+        callback.onDataKeyLoaded(key);
+
+    }
+
+    @Override
+    public void getTimeKey(@NonNull String userId,@NonNull String currentTime, @NonNull GetTimeKeyCallback callback) {
+        String key = mDatabase.child("data").child("Total Connections").child(userId).child(currentTime).push().getKey();
+        callback.onTimeKeyLoaded(key);
+    }
+
+    @Override
+    public void getUsageKey(@NonNull GetUsageKeyCallback callback) {
+        String key = mDatabase.child("data").child("Running Apps").push().getKey();
+        callback.onUsageKeyLoaded(key);
+    }
+
+    @Override
+    public void saveConnection(@NonNull Map<String, Object> totalConMap) {
+        mDatabase.updateChildren(totalConMap);
+    }
+
+    @Override
+    public void saveScreenTime(@NonNull Map<String, Object> timeMap) {
+        mDatabase.updateChildren(timeMap);
+    }
+
+    @Override
+    public void saveUsageStats(@NonNull Map<String, Object> totalAppMap) {
+        mDatabase.updateChildren(totalAppMap);
+    }
+    /**********************************/
+// TODO: 25/09/16 maybe put a method to detach listeners when the activity is destroyed? Not sure if it's necessary.
 }
