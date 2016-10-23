@@ -165,4 +165,30 @@ public interface TriibeRepository {
     void addUserPoints(@NonNull String userId, @NonNull String points);
 
     void removeUserSurvey(@NonNull String userId, @NonNull String surveyId);
+
+    /********Service Functions********/
+
+    interface GetDataKeyCallback {
+        void onDataKeyLoaded(@Nullable String key);
+    }
+    void getDataKey(@NonNull GetDataKeyCallback callback);
+
+    interface GetTimeKeyCallback {
+        void onTimeKeyLoaded(@Nullable String key);
+    }
+    void getTimeKey(@NonNull String userId,@NonNull String currentTime,@NonNull GetTimeKeyCallback callback);
+
+    interface GetUsageKeyCallback {
+        void onUsageKeyLoaded(@Nullable String key);
+    }
+    void getUsageKey(@NonNull GetUsageKeyCallback callback);
+
+
+    void saveConnection(@NonNull Map<String, Object> totalConMap);
+
+    void saveScreenTime(@NonNull Map<String, Object> timeMap);
+
+    void saveUsageStats(@NonNull Map<String, Object> totalAppMap);
+
+    /**********************************/
 }

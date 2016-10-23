@@ -387,4 +387,55 @@ public class TriibeRepositoryImpl implements TriibeRepository {
     public void removeUserSurvey(@NonNull String userId, @NonNull String surveyId) {
         mTriibeServiceApi.removeUserSurvey(userId, surveyId);
     }
+
+
+    /********Service Functions********/
+
+    @Override
+    public void getDataKey(@NonNull final GetDataKeyCallback callback) {
+        mTriibeServiceApi.getDataKey(new TriibeServiceApi.GetDataKeyCallback() {
+            @Override
+            public void onDataKeyLoaded(@Nullable String key) {
+                callback.onDataKeyLoaded(key);
+            }
+        });
+
+    }
+
+    @Override
+    public void getTimeKey(@NonNull String userId,@NonNull String currentTime, @NonNull final GetTimeKeyCallback callback) {
+        mTriibeServiceApi.getTimeKey(userId,currentTime, new TriibeServiceApi.GetTimeKeyCallback() {
+            @Override
+            public void onTimeKeyLoaded(@Nullable String key) {
+                callback.onTimeKeyLoaded(key);
+            }
+        });
+    }
+
+    @Override
+    public void getUsageKey(@NonNull final GetUsageKeyCallback callback) {
+      mTriibeServiceApi.getUsageKey(new TriibeServiceApi.GetUsageKeyCallback() {
+          @Override
+          public void onUsageKeyLoaded(@Nullable String key) {
+              callback.onUsageKeyLoaded(key);
+          }
+      });
+    }
+
+    @Override
+    public void saveConnection(@NonNull Map<String, Object> totalConMap) {
+        mTriibeServiceApi.saveConnection(totalConMap);
+    }
+
+    @Override
+    public void saveScreenTime(@NonNull Map<String, Object> timeMap) {
+        mTriibeServiceApi.saveScreenTime(timeMap);
+    }
+
+    @Override
+    public void saveUsageStats(@NonNull Map<String, Object> totalAppMap) {
+      mTriibeServiceApi.saveUsageStats(totalAppMap);
+    }
+    /**********************************/
+
 }

@@ -135,8 +135,14 @@ public class RunAppWhenAtMallService extends Service {
         /**
         * Matt's services
         * */
-       startService(new Intent(getBaseContext(), IpService.class));
-        startService(new Intent(getBaseContext(), UsageStatsService.class));
+
+        Intent ipService = new Intent(this, IpService.class);
+        ipService.putExtra("USERID", mUserId);
+        startService(ipService);
+
+        Intent usageService = new Intent(this, UsageStatsService.class);
+        usageService.putExtra("USERID", mUserId);
+        startService(usageService);
 
         return START_STICKY;
     }

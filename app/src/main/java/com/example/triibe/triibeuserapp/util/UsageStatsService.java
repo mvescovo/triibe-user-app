@@ -6,7 +6,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
+import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.trackData.AppUsageStats;
 import com.example.triibe.triibeuserapp.trackData.RunningApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,8 +41,8 @@ public class UsageStatsService extends Service{
     private Timer mTimer = null;
 
     /*********FIREBASE*********/
-    private DatabaseReference mDatabase;
-    private FirebaseUser user;
+    private TriibeRepository mTriibeRepository;
+    private String mUserId = null;
     /**************************/
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     DateFormat date = new SimpleDateFormat("dd-MM-yyyy");
@@ -65,8 +67,7 @@ public class UsageStatsService extends Service{
         mTimer.scheduleAtFixedRate(new UsageStatsService.TimeDisplayTimerTask(), 0, CHECK_INTERVAL);
         currentDate = date.format(new Date());
         /*********FIREBASE*********/
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        user = FirebaseAuth.getInstance().getCurrentUser();
+        mTriibeRepository = Globals.getInstance().getTriibeRepository();
         /**************************/
 
         // Check if UsageStatsManager for app tracking permission enabled
@@ -130,26 +131,79 @@ public class UsageStatsService extends Service{
                 dateInput = df.format(date);
                 previousAppMap.get(entry.getValue().getForgroundApp()).setEndTime(dateInput);
                 /*********FIREBASE*********/
-                String dataKey = mDatabase.child("data").child("Running Apps").push().getKey();
+                final String[] dataKey = new String[1];
+                mTriibeRepository.getUsageKey(new TriibeRepository.GetUsageKeyCallback() {
+                    @Override
+                    public void onUsageKeyLoaded(@Nullable String key) {
+                        dataKey[0] = key;
+                    }
+                });
                 appValues = previousAppMap.get(entry.getValue().getForgroundApp()).toMap();
-                totalAppMap.put("/data/Running Apps/"+user.getUid()+"/"+currentDate+"/"+dataKey,appValues);
+                totalAppMap.put("/data/Running Apps/"+mUserId+"/"+currentDate+"/"+ dataKey[0],appValues);
                 try {
                     TimeUnit.MILLISECONDS.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                mDatabase.updateChildren(totalAppMap);
+                mTriibeRepository.saveUsageStats(totalAppMap);
                 /**************************/
                 it.remove();
+
+                mTimer.cancel();
+                Toast.makeText(this, "Tracking Stopped", Toast.LENGTH_LONG).show();
             }
         }
     }
 
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (mUserId==null){
+        mUserId = intent.getStringExtra("USERID");
+        }
+        return START_STICKY;
+    }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        for(Iterator<Map.Entry<String, RunningApp>> it = previousAppMap.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<String, RunningApp> entry = it.next();
+            if (currentAppMap.containsKey(entry.getValue().getForgroundApp())){
+                //If the App is in both lists.
+                currentAppMap.remove(entry.getValue().getForgroundApp());
+            }else{
+                //System.out.println("the value: "+ entry.getValue().getIpAddrURL()+"no longer in current removing adding to total");
+                Date date = new Date();
+                dateInput = df.format(date);
+                previousAppMap.get(entry.getValue().getForgroundApp()).setEndTime(dateInput);
+                /*********FIREBASE*********/
+                final String[] dataKey = new String[1];
+                mTriibeRepository.getUsageKey(new TriibeRepository.GetUsageKeyCallback() {
+                    @Override
+                    public void onUsageKeyLoaded(@Nullable String key) {
+                        dataKey[0] = key;
+                    }
+                });
+                appValues = previousAppMap.get(entry.getValue().getForgroundApp()).toMap();
+                totalAppMap.put("/data/Running Apps/"+mUserId+"/"+currentDate+"/"+ dataKey[0],appValues);
+                try {
+                    TimeUnit.MILLISECONDS.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mTriibeRepository.saveUsageStats(totalAppMap);
+                /**************************/
+                it.remove();
+            }
+        }
+    }
+
 }

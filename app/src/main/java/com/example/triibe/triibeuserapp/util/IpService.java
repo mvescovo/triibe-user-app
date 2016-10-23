@@ -6,15 +6,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.widget.Toast;
 
+import com.example.triibe.triibeuserapp.data.TriibeRepository;
 import com.example.triibe.triibeuserapp.trackData.Connection;
 import com.example.triibe.triibeuserapp.trackData.ScreenActive;
 import com.example.triibe.triibeuserapp.trackData.ScreenReceiver;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -42,8 +40,8 @@ public class IpService extends Service {
     private Timer mTimer = null;
 
     /*********FIREBASE*********/
-    private DatabaseReference mDatabase;
-    private FirebaseUser user;
+    private TriibeRepository mTriibeRepository;
+    private String mUserId = null;
     /**************************/
 
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -62,7 +60,7 @@ public class IpService extends Service {
     private Map<String, Object> timeMap = new HashMap<>();
     Map<String, Object> timeVaules;
     ScreenActive Active;
-    String timeKey = "";
+    String timeKey;
 
 
     //Don't know what this method does but it is required to have a service
@@ -70,6 +68,7 @@ public class IpService extends Service {
     public IBinder onBind(Intent arg0) {
         return null;
     }
+
 
     /** Called when the service is being created. */
     @Override
@@ -83,9 +82,9 @@ public class IpService extends Service {
         // schedule task
         mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(), 0, CHECK_INTERVAL);
         currentDate = date.format(new Date());
+
         /*********FIREBASE*********/
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        user = FirebaseAuth.getInstance().getCurrentUser();
+        mTriibeRepository = Globals.getInstance().getTriibeRepository();
         /**************************/
 
         //screen checking
@@ -184,15 +183,22 @@ public class IpService extends Service {
                 dateInput = df.format(date);
                 previousConMap.get(entry.getValue().getIpAddrURL()).setEndConnection(dateInput);
                 /*********FIREBASE*********/
-                String dataKey = mDatabase.child("data").child("Total Connections").push().getKey();
+
+                final String[] dataKey = new String[1];
+                mTriibeRepository.getDataKey(new TriibeRepository.GetDataKeyCallback() {
+                    @Override
+                    public void onDataKeyLoaded(@Nullable String key) {
+                        dataKey[0] = key;
+                    }
+                });
                 connectionValues = previousConMap.get(entry.getValue().getIpAddrURL()).toMap();
-                totalConMap.put("/data/Total Connections/"+user.getUid()+"/"+currentDate+"/"+dataKey,connectionValues);
+                totalConMap.put("/data/Total Connections/"+mUserId+"/"+currentDate+"/"+ dataKey[0],connectionValues);
                 try {
                     TimeUnit.MILLISECONDS.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                mDatabase.updateChildren(totalConMap);
+                mTriibeRepository.saveConnection(totalConMap);
                 /**************************/
                 it.remove();
             }
@@ -206,12 +212,21 @@ public class IpService extends Service {
      * */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+       if(mUserId==null){
+        mUserId = intent.getStringExtra("USERID");
+       }
+
         // Let it continue running until it is stopped.
         boolean screenOn = intent.getBooleanExtra("screen_state", false);
         if (!screenOn) {
             System.out.println("SCREEN ON");
             /*********FIREBASE*********/
-            timeKey = mDatabase.child("data").child("Screen Time").child(user.getUid()).child(currentDate).push().getKey();
+            mTriibeRepository.getTimeKey(mUserId, currentDate, new TriibeRepository.GetTimeKeyCallback() {
+                @Override
+                public void onTimeKeyLoaded(@Nullable String key) {
+                    timeKey = key;
+                }
+            });
             /**************************/
             Date sDate = new Date();
             dateInput = df.format(sDate);
@@ -225,8 +240,8 @@ public class IpService extends Service {
             System.out.println(Active.getStopTime());
             /*********FIREBASE*********/
             timeVaules = Active.toMap();
-            timeMap.put("/data/Screen Time/"+user.getUid()+"/"+currentDate+"/"+timeKey,timeVaules);
-            mDatabase.updateChildren(timeMap);
+            timeMap.put("/data/Screen Time/"+mUserId+"/"+currentDate+"/"+timeKey,timeVaules);
+            mTriibeRepository.saveScreenTime(timeMap);
             /**************************/
         }
         Toast.makeText(this, "Tracking Started", Toast.LENGTH_LONG).show();
@@ -246,10 +261,16 @@ public class IpService extends Service {
             dateInput = df.format(date);
             previousConMap.get(entry.getValue().getIpAddrURL()).setEndConnection(dateInput);
             /*********FIREBASE*********/
-            String dataKey = mDatabase.child("data").child("Total Connections").child(user.getUid()).child(currentDate).push().getKey();
+            final String[] dataKey = new String[1];
+            mTriibeRepository.getDataKey(new TriibeRepository.GetDataKeyCallback() {
+                @Override
+                public void onDataKeyLoaded(@Nullable String key) {
+                    dataKey[0] = key;
+                }
+            });
             connectionValues = previousConMap.get(entry.getValue().getIpAddrURL()).toMap();
-            totalConMap.put("/data/Total Connections/"+user.getUid()+"/"+currentDate+"/"+dataKey,connectionValues);
-             mDatabase.updateChildren(totalConMap);
+            totalConMap.put("/data/Total Connections/"+mUserId+"/"+currentDate+"/"+dataKey,connectionValues);
+            mTriibeRepository.saveConnection(totalConMap);
             /**************************/
             it.remove();
         }
@@ -321,62 +342,3 @@ Proto
           are not included in the output unless you specify the  --listen‐
           ing (-l) or --all (-a) option.
  */
-
-/*
-
-
-//CODE FROM THE MAIN ACTIVITY EXAMPLES OF THE FUNCTIONS USED TO CALL THE SERVICE
-
-
-        import android.content.Context;
-        import android.content.Intent;
-
-        import android.os.PowerManager;
-        import android.support.v7.app.AppCompatActivity;
-        import android.os.Bundle;
-        import android.view.View;
-        import android.widget.Button;
-
-public class MainActivity extends AppCompatActivity {
-
-    PowerManager mgr;
-    PowerManager.WakeLock wakeLock;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        mgr = (PowerManager)this.getSystemService(Context.POWER_SERVICE);
-        wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
-
-        Button b = (Button) findViewById(R.id.button);
-        b.setText("start");
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Button b = (Button) view;
-                if (b.getText().equals("stop")) {
-                    stopService(view);
-                    b.setText("start");
-                    wakeLock.release();
-                } else {
-                    wakeLock.acquire();
-                    startService(view);
-                    b.setText("stop");
-                }
-            }
-        });
-    }
-    // Method to start the service
-    public void startService(View view) {
-        startService(new Intent(getBaseContext(), IpService.class));
-    }
-
-    // Method to stop the service
-    public void stopService(View view) {
-        stopService(new Intent(getBaseContext(), IpService.class));
-    }
-
-
-}*/
