@@ -8,6 +8,7 @@ The project uses Firebase auth and Firebase realtime database. To set these up d
 1. Click tools,
 2. Click Firebase,
 3. Click the relevant item and follow the documentation.
+
 # Licence
 [![AUR](https://img.shields.io/aur/license/yaourt.svg)]()
 
