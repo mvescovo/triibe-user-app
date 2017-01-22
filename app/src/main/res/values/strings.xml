@@ -158,4 +158,8 @@
     <string name="new_points_earned_title">New Points Earned</string>
     <string name="total_points_earned_title">Total Points Earned</string>
 
+    <!--WebVisualisation-->
+    <string name="open_visualisation">Open Visualisation</string>
+    <string name="url_visualisation">http://mzhr.github.io/triibe-webapp</string>
+
 </resources>

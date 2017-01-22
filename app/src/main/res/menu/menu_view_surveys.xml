@@ -8,6 +8,12 @@
         app:showAsAction="ifRoom"/>
 
     <item
+        android:id="@+id/start_web_visualisation"
+        android:icon="@drawable/ic_chart_bar_white_24dp"
+        android:title="@string/open_visualisation"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/view_points"
         android:title="@string/view_points"
         app:showAsAction="never"/>
