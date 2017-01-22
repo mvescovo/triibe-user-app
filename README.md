@@ -1,5 +1,9 @@
 # TRIIBE User
 An Android app to study user behaviour while at shopping malls. Methods include user surveys, app usage, and URL's visited.
+
+# Screenshots
+<img src="https://cloud.githubusercontent.com/assets/15829736/22179987/4884ceb6-e0b7-11e6-87c2-df6b0406b966.png" height="500" width="281">
+
 # Install
 Android Studio was used to build the app and is recommended.
 
